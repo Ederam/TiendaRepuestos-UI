@@ -1,0 +1,77 @@
+# creacion del proyecto
+
+ng new TiendaRepuestos-UI --routing --style=scss --strict --standalone --ssr=false
+
+--routing: Configura el enrutador SPA nativo de Angular (app.routes.ts).
+
+--style=scss: Utiliza SASS para anidamiento y modularización de estilos.
+
+--strict: Activa tipado estricto en TypeScript (prohíbe variables implícitas y nulos accidentales).
+
+--standalone: Adopta la arquitectura moderna de Angular (sin AppModule).
+
+--ssr=false: Evita Node.js del lado del servidor; genera una SPA cliente pura para consumir la API de .NET.
+
+# Instalar la Biblioteca de Componentes UI (Angular Material)
+
+Para lograr un acabado estético profesional, accesible y de nivel empresarial sin maquetar componentes base desde cero, instalamos Angular Material:
+
+PowerShell
+ng add @angular/material
+
+# Probar la compilación y el servidor local
+
+Levanta el servidor de desarrollo:
+
+PowerShell
+ng serve -o
+
+# Estructura Arquitectónica Senior para el Frontend
+
+Cuando confirmes que el servidor corre, crearemos la estructura de carpetas en src/app bajo el estándar Core / Features / Shared, diseñado para escalar sin acoplamiento:
+
+TiendaRepuestos-UI/src/app/
+├── core/ # Singleton: servicios globales, interceptores HTTP, guards y modelos base
+│ ├── guards/ # auth.guard.ts, role.guard.ts
+│ ├── interceptors/ # jwt.interceptor.ts, error.interceptor.ts
+│ ├── models/ # Interfaces TypeScript que espejan los DTOs de C#
+│ └── services/ # auth.service.ts
+├── features/ # Casos de uso / Vistas de negocio (Lazy Loaded)
+│ ├── auth/ # Pantalla de Login
+│ ├── catalogo/ # Lista paginada de productos con filtros y modal de creación
+│ ├── pos/ # Punto de venta (cobro, selección de productos y comprobante)
+│ └── reportes/ # Dashboards de stock crítico y top vendidos
+└── shared/ # Componentes reutilizables, pipes y directivas de UI
+└── components/ # Barra de navegación (navbar), diálogos de confirmación, etc.
+
+# Estructura de Directorios Propuesta (src/app/core)
+
+Plaintext
+src/app/
+├── core/
+│ ├── interceptors/
+│ │ ├── jwt.interceptor.ts
+│ │ └── error.interceptor.ts
+│ ├── models/
+│ │ ├── auth.models.ts
+│ │ ├── producto.models.ts
+│ │ ├── venta.models.ts
+│ │ ├── reporte.models.ts
+│ │ ├── api-response.models.ts
+│ │ └── problem-details.models.ts
+│ └── services/
+│ ├── auth.service.ts
+│ └── notification.service.ts
+├── environments/
+│ ├── environment.ts
+│ └── environment.development.ts
+
+Registro en app.config.ts
+En Angular 19 Standalone, los interceptores se configuran mediante withInterceptors dentro del proveedor HTTP principal:
+
+
+Ajuste de Path Aliases (TypeScript Best Practice)
+Para evitar rutas relativas frágiles y propensas a errores como ../../../environments/environment, la mejor práctica profesional en proyectos Enterprise de Angular es configurar un path alias en el compilador de TypeScript.
+
+Abre tu archivo tsconfig.json en la raíz y en la sección "compilerOptions" agrega o ajusta la propiedad "paths":
+

@@ -1,0 +1,33 @@
+Actúa como un Desarrollador Frontend Senior / Tech Lead especializado en Angular 19, TypeScript estricto y Angular Material.
+
+Estamos construyendo el Frontend SPA para "TiendaRepuestos", un sistema POS e Inventario automotriz. El Backend ya está 100% desarrollado y probado en .NET 8 con Clean Architecture, JWT, RBAC y especificación RFC 7807 para errores.
+
+📌 CONTEXTO TÉCNICO DEL BACKEND:
+
+- Base URL: https://localhost:7298
+- CORS: Habilitado para http://localhost:4200 con credenciales permitidas.
+- Autenticación: Bearer JWT con roles "Administrador" y "Vendedor".
+- Endpoints Principales:
+  - POST /api/Auth/login (Recibe: email, password | Devuelve: token, email, rol, nombreCompleto)
+  - GET /api/Productos/paginado?busqueda=&categoriaId=&soloActivos=true&pageNumber=1&pageSize=10
+  - POST /api/Productos (Admin)
+  - GET /api/Reportes/stock-critico (Admin)
+  - GET /api/Reportes/top-vendidos?limite=5 (Admin)
+  - POST /api/Ventas (Cajeros/Vendedores)
+
+📌 ESTADO DEL FRONTEND:
+
+- Proyecto creado en: C:\DEV_ER\Mis Archivos\Projects\Repuestos\TiendaRepuestos-UI
+- Stack: Angular 19 (Standalone, Signals, Router, SCSS, Strict Mode, SSR=false).
+- Biblioteca UI: Angular Material ya instalado y funcionando en http://localhost:4200.
+- Repositorio Git independiente inicializado en rama 'main'.
+
+📌 OBJETIVO INMEDIATO:
+Diseñar y estructurar la arquitectura del proyecto en 'src/app' bajo el patrón Core / Features / Shared.
+Vamos a trabajar con el mismo nivel de detalle, buenas prácticas y documentación que en el backend.
+
+Por favor, entrégame el paso a paso detallado para:
+
+1. Crear las interfaces TypeScript en 'core/models' que reflejen exactamente los contratos DTOs del backend.
+2. Implementar el AuthService con Signals para gestionar el estado de sesión y token.
+3. Crear el JwtInterceptor y ErrorInterceptor funcionales.

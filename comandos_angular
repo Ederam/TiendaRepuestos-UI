@@ -1,0 +1,17 @@
+# creacion del proyecto
+
+ng new TiendaRepuestos-UI --routing --style=scss --strict --standalone --ssr=false
+
+# Instalar la Biblioteca de Componentes UI (Angular Material)
+
+Para lograr un acabado estético profesional, accesible y de nivel empresarial sin maquetar componentes base desde cero, instalamos Angular Material:
+
+PowerShell
+ng add @angular/material
+
+# Probar la compilación y el servidor local
+
+Levanta el servidor de desarrollo:
+
+PowerShell
+ng serve -o
