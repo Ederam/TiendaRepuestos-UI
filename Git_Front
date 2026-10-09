@@ -27,3 +27,15 @@ git remote add origin https://github.com/Ederam/TiendaRepuestos-UI.git
 # 5. Asegurar nombre de rama principal y enviar cambios
 git branch -M main
 git push -u origin main
+
+# Setear usuario
+git config user.name "ederam"
+git config user.email "eramirezc1@ucentral.edu.co"
+
+# Verificación
+Para comprobar que los datos quedaron registrados correctamente en este repositorio, ejecuta:
+
+PowerShell
+git config user.name
+git config user.email
+
