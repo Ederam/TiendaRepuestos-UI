@@ -39,3 +39,19 @@ PowerShell
 git config user.name
 git config user.email
 
+git status
+git add .
+git commit -m "feat(auth): implementacion de guards RBAC, placeholders de features y componente standalone de Login con Angular Material"
+git push origin main
+
+# 1. Verificar estado de los archivos modificados
+git status
+
+# 2. Agregar todos los cambios al stage
+git add .
+
+# 3. Crear el commit formal
+git commit -m "feat(auth): resolucion de enrutamiento base con router-outlet y despliegue del componente standalone de Login con Angular Material"
+
+# 4. Enviar los cambios a la rama principal remota
+git push origin main

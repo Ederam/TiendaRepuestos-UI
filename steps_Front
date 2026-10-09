@@ -87,4 +87,17 @@ New-Item -ItemType File -Force -Path "src/app/core/guards/public.guard.ts"
 mplementación de Guards Funcionales
 En Angular 19 no se usan clases con CanActivate; se implementan funciones CanActivateFn puras que inyectan dependencias mediante inject().
 
+Comandos: Angular CLI vs PowerShell
+A partir de ahora tendrás siempre ambas opciones:
+
+Opción CLI (Recomendada para componentes):
+
+PowerShell
+ng g c features/nombre-componente --skip-tests
+Opción PowerShell/Manual (Recomendada para archivos puros de TypeScript como modelos o constantes):
+
+PowerShell
+New-Item -ItemType File -Force -Path "src/app/core/models/archivo.models.ts"
+
+
 
