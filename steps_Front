@@ -75,3 +75,16 @@ Para evitar rutas relativas frágiles y propensas a errores como ../../../enviro
 
 Abre tu archivo tsconfig.json en la raíz y en la sección "compilerOptions" agrega o ajusta la propiedad "paths":
 
+# Crear los archivos necesarios
+Ejecuta el siguiente comando en PowerShell desde la raíz (C:\DEV_ER\Mis Archivos\Projects\Repuestos\TiendaRepuestos-UI):
+
+PowerShell
+New-Item -ItemType Directory -Force -Path "src/app/core/guards"
+New-Item -ItemType File -Force -Path "src/app/core/guards/auth.guard.ts"
+New-Item -ItemType File -Force -Path "src/app/core/guards/role.guard.ts"
+New-Item -ItemType File -Force -Path "src/app/core/guards/public.guard.ts"
+
+mplementación de Guards Funcionales
+En Angular 19 no se usan clases con CanActivate; se implementan funciones CanActivateFn puras que inyectan dependencias mediante inject().
+
+

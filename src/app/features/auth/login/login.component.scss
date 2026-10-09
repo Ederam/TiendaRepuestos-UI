@@ -1,0 +1,97 @@
+.login-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+  padding: 1.5rem;
+  box-sizing: border-box;
+
+  .login-card {
+    width: 100%;
+    max-width: 440px;
+    border-radius: 16px;
+    padding: 2rem 1.5rem 1rem;
+    background-color: #ffffff;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+
+    .login-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 2rem;
+
+      .logo-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background-color: #e0f2fe;
+        color: #0284c7;
+        margin-bottom: 1rem;
+
+        .app-icon {
+          font-size: 36px;
+          width: 36px;
+          height: 36px;
+        }
+      }
+
+      .app-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+      }
+
+      .app-subtitle {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin-top: 0.25rem;
+      }
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      .full-width {
+        width: 100%;
+      }
+
+      .field-icon {
+        color: #64748b;
+        margin-right: 0.5rem;
+      }
+
+      .submit-button {
+        margin-top: 1rem;
+        height: 48px;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+
+        .spinner-btn {
+          display: inline-block;
+        }
+      }
+    }
+
+    .login-footer {
+      display: flex;
+      justify-content: center;
+      padding: 1.5rem 0 0.5rem;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      text-align: center;
+    }
+  }
+}

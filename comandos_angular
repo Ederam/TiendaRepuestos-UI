@@ -15,3 +15,16 @@ Levanta el servidor de desarrollo:
 
 PowerShell
 ng serve -o
+
+# En Angular existen generadores oficiales (ng generate o ng g):
+
+ng g guard core/guards/auth --functional (crea el guard funcional con boilerplate).
+
+ng g c features/auth/login (crea el componente con .ts, .html, .scss y .spec.ts).
+
+# Creacion de componentes
+
+ng g c features/auth/login --skip-tests
+ng g c features/pos --skip-tests
+ng g c features/inventario/inventario-list --skip-tests
+ng g c features/reportes/reportes-dashboard --skip-tests

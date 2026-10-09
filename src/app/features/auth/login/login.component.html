@@ -1,0 +1,62 @@
+<div class="login-wrapper">
+    <mat-card class="login-card elevation-z8">
+        <mat-card-header class="login-header">
+            <div class="logo-container">
+                <mat-icon class="app-icon">directions_car</mat-icon>
+            </div>
+            <mat-card-title class="app-title">TiendaRepuestos</mat-card-title>
+            <mat-card-subtitle class="app-subtitle">Gestión de Inventario y Ventas POS</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate class="login-form">
+                <!-- Correo Electrónico -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Correo Electrónico</mat-label>
+                    <input matInput type="email" formControlName="email" placeholder="usuario@tiendarepuestos.com"
+                        autocomplete="email" />
+                    <mat-icon matPrefix class="field-icon">mail_outline</mat-icon>
+                    @if (loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched) {
+                    <mat-error>El correo es obligatorio.</mat-error>
+                    }
+                    @if (loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched) {
+                    <mat-error>Ingrese un formato de correo válido.</mat-error>
+                    }
+                </mat-form-field>
+
+                <!-- Contraseña -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Contraseña</mat-label>
+                    <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password"
+                        placeholder="••••••••" autocomplete="current-password" />
+                    <mat-icon matPrefix class="field-icon">lock_outline</mat-icon>
+                    <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()"
+                        [attr.aria-label]="'Ocultar contraseña'" [attr.aria-pressed]="hidePassword()">
+                        <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                    @if (loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched) {
+                    <mat-error>La contraseña es obligatoria.</mat-error>
+                    }
+                    @if (loginForm.get('password')?.hasError('minlength') && loginForm.get('password')?.touched) {
+                    <mat-error>La contraseña debe tener al menos 6 caracteres.</mat-error>
+                    }
+                </mat-form-field>
+
+                <!-- Botón de Envío -->
+                <button mat-flat-button color="primary" type="submit" class="submit-button"
+                    [disabled]="loginForm.invalid || isLoading()">
+                    @if (isLoading()) {
+                    <mat-spinner diameter="20" class="spinner-btn"></mat-spinner>
+                    <span>Iniciando sesión...</span>
+                    } @else {
+                    <span>Ingresar al Sistema</span>
+                    }
+                </button>
+            </form>
+        </mat-card-content>
+
+        <mat-card-footer class="login-footer">
+            <small>© 2026 TiendaRepuestos. Sistema Integral de Operaciones.</small>
+        </mat-card-footer>
+    </mat-card>
+</div>
