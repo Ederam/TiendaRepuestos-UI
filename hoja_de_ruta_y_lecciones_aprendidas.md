@@ -134,3 +134,11 @@ El frontend de **TiendaRepuestos** es una Single Page Application (SPA) transacc
 | Versión | Fecha | Autor / Rol | Descripción de Cambios |
 | :--- | :--- | :--- | :--- |
 | **0.1.0** | Octubre 2026 | Tech Lead | Estructuración inicial de `core`: DTOs, AuthService con Signals, interceptores HTTP funcionales y creación de este documento de seguimiento. |
+
+### Hito 4 — Consolidación de Identidad Comercial (MACROLATAS) y Módulo Inventario
+* **Fecha:** 2026-10-10
+* **Entregables:**
+  - Adaptación de la paleta institucional (Azul Cobalto y Rojo Carmín) en Shell Layout.
+  - Implementación de `ProductoService` y catálogo paginado en `InventarioListComponent`.
+  - Integración de operador reactivo `debounceTime(400)` para búsquedas optimizadas sin saturación HTTP.
+  - Alertas visuales inmediatas para stock por debajo del mínimo crítico.

@@ -1,4 +1,27 @@
-/* You can add global styles to this file, and also import other style files */
+/* Reset general y tipografía */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    background-color: #f1f5f9;
+}
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* Modificadores globales para SnackBars del ErrorInterceptor */
+.error-snackbar {
+    --mdc-snackbar-container-color: #b91c1c !important;
+    --mdc-snackbar-supporting-text-color: #ffffff !important;
+    font-weight: 500;
+}
+
+.warning-snackbar {
+    --mdc-snackbar-container-color: #d97706 !important;
+    --mdc-snackbar-supporting-text-color: #ffffff !important;
+    font-weight: 500;
+}
+
+.success-snackbar {
+    --mdc-snackbar-container-color: #15803d !important;
+    --mdc-snackbar-supporting-text-color: #ffffff !important;
+    font-weight: 500;
+}

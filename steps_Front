@@ -99,5 +99,33 @@ Opción PowerShell/Manual (Recomendada para archivos puros de TypeScript como mo
 PowerShell
 New-Item -ItemType File -Force -Path "src/app/core/models/archivo.models.ts"
 
+# Angular CLI (Recomendada)
 
 
+PowerShell
+ng g c core/layout/main-layout --skip-tests
+Opción B: PowerShell nativo
+PowerShell
+New-Item -ItemType Directory -Force -Path "src/app/core/layout/main-layout"
+New-Item -ItemType File -Force -Path "src/app/core/layout/main-layout/main-layout.component.ts"
+New-Item -ItemType File -Force -Path "src/app/core/layout/main-layout/main-layout.component.html"
+New-Item -ItemType File -Force -Path "src/app/core/layout/main-layout/main-layout.component.scss"
+
+# Comandos para Generar Archivos
+Opción CLI (Recomendada para componentes si aún no existe):
+PowerShell
+ng g service core/services/producto --skip-tests
+Opción PowerShell (Creación directa):
+PowerShell
+New-Item -ItemType File -Force -Path "src/app/core/services/producto.service.ts"
+
+Mecánica Técnica en RxJS
+TypeScript
+this.searchControl.valueChanges
+  .pipe(
+    debounceTime(400),        // Espera 400ms de inactividad tras la última emisión.
+    distinctUntilChanged()    // Evita consultar si el texto es idéntico al anterior (ej: presionar Shift o flechas).
+  )
+  .subscribe(() => { ... });
+
+  

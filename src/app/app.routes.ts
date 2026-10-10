@@ -1,6 +1,6 @@
 /**
  * @fileoverview Configuración del árbol principal de rutas de la aplicación TiendaRepuestos-UI.
- * Aplica carga perezosa (Lazy Loading) y protección estricta con guards funcionales.
+ * Utiliza MainLayoutComponent como cascarón para rutas privadas y aplica RBAC estricto.
  */
 
 import { Routes } from '@angular/router';
@@ -10,14 +10,7 @@ import { publicGuard } from './core/guards/public.guard';
 import { ROLES } from './core/constants/roles.constants';
 
 export const routes: Routes = [
-  // Redirección por defecto
-  {
-    path: '',
-    pathMatch: 'full',
-    redirectTo: 'pos',
-  },
-
-  // Área pública (Login)
+  // Ruta pública: Autenticación
   {
     path: 'auth',
     canActivate: [publicGuard],
@@ -25,66 +18,62 @@ export const routes: Routes = [
       {
         path: 'login',
         loadComponent: () =>
-          import('./features/auth/login/login.component').then(
-            (m) => m.LoginComponent,
-          ),
+          import('./features/auth/login/login.component').then((m) => m.LoginComponent)
       },
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'login',
-      },
-    ],
+        redirectTo: 'login'
+      }
+    ]
   },
 
-  // Área transaccional y operativa (POS / Ventas) - Ambos roles autorizados
+  // Rutas privadas: Protegidas con authGuard y montadas sobre MainLayoutComponent
   {
-    path: 'pos',
+    path: '',
     canActivate: [authGuard],
+    loadComponent: () =>
+      import('./core/layout/main-layout/main-layout.component').then(
+        (m) => m.MainLayoutComponent
+      ),
     children: [
       {
         path: '',
-        loadComponent: () =>
-          import('./features/pos/pos.component').then((m) => m.PosComponent),
+        pathMatch: 'full',
+        redirectTo: 'pos'
       },
-    ],
-  },
-
-  // Gestión de Inventario / Productos - Exclusivo Administrador
-  {
-    path: 'inventario',
-    canActivate: [authGuard, roleGuard],
-    data: { expectedRoles: [ROLES.ADMIN] },
-    children: [
+      // POS / Ventas - Vendedor y Administrador
       {
-        path: '',
+        path: 'pos',
+        loadComponent: () =>
+          import('./features/pos/pos.component').then((m) => m.PosComponent)
+      },
+      // Inventario - Exclusivo Administrador
+      {
+        path: 'inventario',
+        canActivate: [roleGuard],
+        data: { expectedRoles: [ROLES.ADMIN] },
         loadComponent: () =>
           import('./features/inventario/inventario-list/inventario-list.component').then(
-            (m) => m.InventarioListComponent,
-          ),
+            (m) => m.InventarioListComponent
+          )
       },
-    ],
-  },
-
-  // Reportes Gerenciales y Financieros - Exclusivo Administrador
-  {
-    path: 'reportes',
-    canActivate: [authGuard, roleGuard],
-    data: { expectedRoles: [ROLES.ADMIN] },
-    children: [
+      // Reportes - Exclusivo Administrador
       {
-        path: '',
+        path: 'reportes',
+        canActivate: [roleGuard],
+        data: { expectedRoles: [ROLES.ADMIN] },
         loadComponent: () =>
           import('./features/reportes/reportes-dashboard/reportes-dashboard.component').then(
-            (m) => m.ReportesDashboardComponent,
-          ),
-      },
-    ],
+            (m) => m.ReportesDashboardComponent
+          )
+      }
+    ]
   },
 
-  // Comodín para rutas inexistentes (404)
+  // Comodín para rutas no encontradas
   {
     path: '**',
-    redirectTo: 'pos',
-  },
+    redirectTo: 'auth/login'
+  }
 ];
