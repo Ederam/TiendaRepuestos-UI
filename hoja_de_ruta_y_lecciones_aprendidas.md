@@ -142,3 +142,16 @@ El frontend de **TiendaRepuestos** es una Single Page Application (SPA) transacc
   - Implementación de `ProductoService` y catálogo paginado en `InventarioListComponent`.
   - Integración de operador reactivo `debounceTime(400)` para búsquedas optimizadas sin saturación HTTP.
   - Alertas visuales inmediatas para stock por debajo del mínimo crítico.
+
+
+### Hito 5 — Patrón Puertos y Adaptadores (Hexagonal) y Módulo POS Reactivo
+* **Fecha:** 2026-10-10
+* **Entregables:**
+  - Implementación del principio Abierto/Cerrado (OCP) desacoplando la capa de datos.
+  - Creación de contratos abstractos puros (`AuthService`, `ProductoService`, `VentaService`) como Puertos.
+  - Implementación de Adaptadores HTTP (`*HttpService`) y Adaptadores Mock en memoria (`*MockService`).
+  - Inyección condicional mediante `app.config.ts` según bandera `environment.useMocks`.
+  - Construcción del Módulo POS (`PosComponent`) con Signals reactivos para el ticket de venta, cálculo automático con `computed()` y catálogo de métodos de pago (`METODOS_PAGO`).
+* **Lecciones Aprendidas:**
+  - Las clases abstractas que actúan como puertos no deben declarar miembros privados de infraestructura (`private http`), ya que impiden la sustitución limpia en TypeScript (error TS2720).
+  - En Angular 19, los slots de proyección de `MatButton` requieren contenedores unificados para evitar advertencias de compilación `NG8011` en bloques condicionales `@else`.

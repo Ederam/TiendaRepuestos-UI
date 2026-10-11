@@ -6,7 +6,7 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../services/auth/auth.service';
 import { NotificationService } from '../services/notification.service';
 import { ProblemDetails } from '../models/problem-details.models';
 

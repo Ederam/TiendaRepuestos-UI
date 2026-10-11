@@ -128,4 +128,87 @@ this.searchControl.valueChanges
   )
   .subscribe(() => { ... });
 
+# Crear VentaService
+Primero creamos el servicio que se comunica con el endpoint POST /api/Ventas.
+
+Opción CLI (Recomendada):
+PowerShell
+ng g service core/services/venta --skip-tests
+Opción PowerShell:
+PowerShell
+New-Item -ItemType File -Force -Path "src/app/core/services/venta.service.ts"
   
+# La Práctica Enterprise / Clean Architecture para Mocks: Inversión de Dependencias (DI)
+En arquitectura de software profesional (tanto en .NET con IServiceCollection como en Angular con ApplicationConfig), los servicios reales nunca deben saber que existen mocks.
+
+¿Cómo se resuelve de forma 100% limpia sin tocar una sola línea del servicio real?
+Mediante Inversión de Dependencias con Tokens o Clases Abstractas.
+
+Plaintext
+                  ┌────────────────────────┐
+                  │    ProductoService     │ (Clase Abstracta / Contrato)
+                  └────────────────────────┘
+                              ▲
+               ┌──────────────┴──────────────┐
+               │                             │
+┌───────────────────────────┐   ┌───────────────────────────┐
+│     ProductoHttpService   │   │     ProductoMockService   │
+│  (100% Real contra .NET)  │   │     (100% Datos locales)  │
+└───────────────────────────┘   └───────────────────────────┘
+En app.config.ts, el contenedor de inyección decide qué clase proveer basándose en environment.useMocks:  
+
+Implementación Paso a Paso del Patrón de Adaptadores / DI
+Vamos a dejar los servicios desacoplados bajo esta arquitectura formal:
+
+Plaintext
+src/app/core/services/
+├── auth/
+│   ├── auth.service.ts         (Contrato / Abstract Base)
+│   ├── auth-http.service.ts    (Implementación real .NET 8)
+│   └── auth-mock.service.ts    (Implementación local mock)
+├── producto/
+│   ├── producto.service.ts
+│   ├── producto-http.service.ts
+│   └── producto-mock.service.ts
+└── venta/
+    ├── venta.service.ts
+    ├── venta-http.service.ts
+    └── venta-mock.service.ts
+3.1 Contrato e Implementaciones de ProductoService
+
+Estructura Ideal:
+Plaintext
+src/app/core/services/
+├── auth/
+│   ├── auth.service.ts
+│   ├── auth-http.service.ts
+│   └── auth-mock.service.ts
+├── productos/
+│   ├── producto.service.ts
+│   ├── producto-http.service.ts
+│   └── producto-mock.service.ts
+├── ventas/
+│   ├── venta.service.ts
+│   ├── venta-http.service.ts
+│   └── venta-mock.service.ts
+└── notification.service.ts
+
+# Comandos PowerShell para Reorganizar en Segundos
+Ejecuta este bloque en tu terminal PowerShell dentro de la raíz (D:\ER-DEV\App-Repuestos\TiendaRepuestos-UI):
+
+PowerShell
+# 1. Crear las carpetas de dominio
+New-Item -ItemType Directory -Force -Path "src/app/core/services/auth"
+New-Item -ItemType Directory -Force -Path "src/app/core/services/productos"
+New-Item -ItemType Directory -Force -Path "src/app/core/services/ventas"
+
+# 2. Mover los archivos de autenticación
+Move-Item -Path "src/app/core/services/auth*.service.ts" -Destination "src/app/core/services/auth/" -Force
+
+# 3. Mover los archivos de productos
+Move-Item -Path "src/app/core/services/producto*.service.ts" -Destination "src/app/core/services/productos/" -Force
+
+# 4. Mover los archivos de ventas
+Move-Item -Path "src/app/core/services/venta*.service.ts" -Destination "src/app/core/services/ventas/" -Force
+
+

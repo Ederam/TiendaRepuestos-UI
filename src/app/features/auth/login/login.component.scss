@@ -93,5 +93,20 @@
       font-size: 0.75rem;
       text-align: center;
     }
+
+    .demo-login-box {
+      margin-top: 0.5rem;
+
+      .btn-demo {
+        width: 100%;
+        height: 40px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        border-radius: 8px;
+        color: #d92525;
+        border-color: #fca5a5;
+        background-color: #fff1f2;
+      }
+    }
   }
 }

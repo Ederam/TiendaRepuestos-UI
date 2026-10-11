@@ -42,6 +42,14 @@
                     }
                 </mat-form-field>
 
+                <!-- Acceso rápido en modo desarrollo -->
+                <div class="demo-login-box">
+                    <button mat-stroked-button type="button" color="accent" class="btn-demo"
+                        (click)="loginForm.patchValue({ email: 'admin@macrolatas.com', password: 'Password123*' }); onSubmit()">
+                        <mat-icon>bolt</mat-icon>
+                        <span>Ingresar como Administrador (Demo)</span>
+                    </button>
+                </div>
                 <!-- Botón de Envío -->
                 <button mat-flat-button color="primary" type="submit" class="submit-button"
                     [disabled]="loginForm.invalid || isLoading()">

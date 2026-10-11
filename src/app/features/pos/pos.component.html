@@ -1,1 +1,161 @@
-<p>pos works!</p>
+<div class="pos-layout">
+    <!-- Panel Izquierdo: Catálogo y Búsqueda -->
+    <section class="catalog-section">
+        <div class="search-header">
+            <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+                <mat-label>Buscar repuesto (código o descripción)</mat-label>
+                <input matInput [formControl]="searchControl" placeholder="Ej: Bomba gasolina, 7701..."
+                    autocomplete="off" />
+                <mat-icon matPrefix>search</mat-icon>
+            </mat-form-field>
+        </div>
+
+        @if (isBuscando()) {
+        <mat-progress-bar mode="indeterminate" class="search-bar"></mat-progress-bar>
+        }
+
+        <!-- Grilla de Productos Rápidos -->
+        <div class="products-grid">
+            @for (prod of productosDisponibles(); track prod.id) {
+            <mat-card class="product-card" [class.out-of-stock]="prod.stockActual <= 0"
+                (click)="prod.stockActual > 0 && agregarAlCarrito(prod)">
+                <div class="product-card-top">
+                    <span class="product-code">{{ prod.codigo }}</span>
+                    <span class="stock-badge"
+                        [class.badge-critical]="prod.stockActual <= prod.stockMinimo && prod.stockActual > 0"
+                        [class.badge-zero]="prod.stockActual <= 0">
+                        {{ prod.stockActual }} disp.
+                    </span>
+                </div>
+
+                <h3 class="product-title">{{ prod.nombre }}</h3>
+                <p class="product-category">{{ prod.nombreCategoria || 'Repuesto General' }}</p>
+
+                <div class="product-card-bottom">
+                    <span class="product-price">{{ prod.precioVenta | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                    <button mat-icon-button color="primary" [disabled]="prod.stockActual <= 0"
+                        (click)="$event.stopPropagation(); agregarAlCarrito(prod)" aria-label="Agregar al carrito">
+                        <mat-icon>add_shopping_cart</mat-icon>
+                    </button>
+                </div>
+            </mat-card>
+            } @empty {
+            <div class="empty-catalog">
+                <mat-icon>search_off</mat-icon>
+                <p>No se encontraron repuestos con ese criterio de búsqueda.</p>
+            </div>
+            }
+        </div>
+    </section>
+
+    <!-- Panel Derecho: Ticket de Venta -->
+    <aside class="cart-section elevation-z2">
+        <div class="cart-header">
+            <div class="cart-title-wrapper">
+                <mat-icon class="cart-icon">shopping_cart</mat-icon>
+                <h2 class="cart-title">Ticket de Venta</h2>
+            </div>
+            @if (carrito().length > 0) {
+            <button mat-button color="warn" (click)="limpiarCarrito()" class="btn-clear">
+                <mat-icon>delete_sweep</mat-icon>
+                <span>Vaciar</span>
+            </button>
+            }
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Lista de Ítems en Carrito -->
+        <div class="cart-items-container">
+            @for (item of carrito(); track item.producto.id) {
+            <div class="cart-item">
+                <div class="item-info">
+                    <span class="item-name">{{ item.producto.nombre }}</span>
+                    <span class="item-unit-price">
+                        {{ item.precioUnitario | currency:'COP':'symbol-narrow':'1.0-0' }} c/u
+                    </span>
+                </div>
+
+                <div class="item-controls">
+                    <div class="quantity-picker">
+                        <button mat-icon-button (click)="actualizarCantidad(item.producto.id, -1)"
+                            aria-label="Disminuir cantidad">
+                            <mat-icon>remove</mat-icon>
+                        </button>
+                        <span class="quantity-number">{{ item.cantidad }}</span>
+                        <button mat-icon-button (click)="actualizarCantidad(item.producto.id, 1)"
+                            aria-label="Aumentar cantidad">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                    </div>
+
+                    <span class="item-subtotal">
+                        {{ item.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    </span>
+
+                    <button mat-icon-button color="warn" (click)="eliminarDelCarrito(item.producto.id)"
+                        aria-label="Eliminar repuesto">
+                        <mat-icon>delete_outline</mat-icon>
+                    </button>
+                </div>
+            </div>
+            } @empty {
+            <div class="empty-cart-state">
+                <mat-icon>production_quantity_limits</mat-icon>
+                <p>El ticket está vacío.<br />Selecciona repuestos del catálogo para iniciar la venta.</p>
+            </div>
+            }
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Formulario de Facturación sin valores quemados -->
+        <form [formGroup]="ventaForm" (ngSubmit)="procesarVenta()" class="checkout-form">
+            <div class="customer-fields">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>C.C. / NIT Cliente (Opcional)</mat-label>
+                    <input matInput formControlName="clienteDocumento" placeholder="Ej: 80123456" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Nombre Cliente (Opcional)</mat-label>
+                    <input matInput formControlName="clienteNombre" placeholder="Cliente Mostrador" />
+                </mat-form-field>
+            </div>
+
+            <mat-form-field appearance="outline" class="payment-method-field" subscriptSizing="dynamic">
+                <mat-label>Método de Pago</mat-label>
+                <mat-select formControlName="metodoPago">
+                    @for (metodo of metodosPago; track metodo.id) {
+                    <mat-option [value]="metodo.id">{{ metodo.label }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Resumen Financiero -->
+            <div class="financial-summary">
+                <div class="summary-line">
+                    <span>Artículos:</span>
+                    <strong>{{ cantidadItems() }} unid.</strong>
+                </div>
+                <div class="summary-line total-line">
+                    <span>Total a Pagar:</span>
+                    <span class="total-amount">{{ subtotalVenta() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                </div>
+            </div>
+
+            <!-- Botón de Cobro Corregido sin advertencia NG8011 -->
+            <button mat-flat-button type="submit" class="btn-checkout"
+                [disabled]="carrito().length === 0 || isProcesandoVenta()">
+                @if (isProcesandoVenta()) {
+                <span>Emitiendo Factura...</span>
+                } @else {
+                <span class="btn-checkout-content">
+                    <mat-icon>payments</mat-icon>
+                    <span>Cobrar {{ subtotalVenta() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                </span>
+                }
+            </button>
+        </form>
+    </aside>
+</div>

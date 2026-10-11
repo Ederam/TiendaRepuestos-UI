@@ -22,7 +22,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 // Core
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { ROLES } from '../../../core/constants/roles.constants';
 

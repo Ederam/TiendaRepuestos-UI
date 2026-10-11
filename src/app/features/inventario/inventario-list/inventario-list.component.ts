@@ -20,7 +20,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 // Core
-import { ProductoService } from '../../../core/services/producto.service';
+import { ProductoService } from '../../../core/services/productos/producto.service';
 import { Producto } from '../../../core/models/producto.models';
 
 @Component({

@@ -18,7 +18,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 
 // Core Services & Constants
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { ROLES } from '../../constants/roles.constants';
 
 /**

@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Contratos de datos (DTOs) para transacciones de venta en MACROLATAS.
+ */
+
+import { MetodoPagoId } from '../constants/pagos.constants';
+
 export interface DetalleVentaItem {
   productoId: number;
   cantidad: number;
@@ -8,7 +14,7 @@ export interface DetalleVentaItem {
 export interface CreateVentaRequest {
   clienteDocumento?: string;
   clienteNombre?: string;
-  metodoPago: 'Efectivo' | 'Transferencia' | 'Tarjeta';
+  metodoPago: MetodoPagoId;
   detalles: DetalleVentaItem[];
 }
 
