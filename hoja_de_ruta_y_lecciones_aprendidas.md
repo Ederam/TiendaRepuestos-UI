@@ -155,3 +155,12 @@ El frontend de **TiendaRepuestos** es una Single Page Application (SPA) transacc
 * **Lecciones Aprendidas:**
   - Las clases abstractas que actúan como puertos no deben declarar miembros privados de infraestructura (`private http`), ya que impiden la sustitución limpia en TypeScript (error TS2720).
   - En Angular 19, los slots de proyección de `MatButton` requieren contenedores unificados para evitar advertencias de compilación `NG8011` en bloques condicionales `@else`.
+
+  ### Hito 6 — Validación Extremo a Extremo de Flujo POS y Refinamiento UI
+* **Fecha:** 2026-10-12
+* **Entregables:**
+  - Validación de ciclo completo de venta y descuento reactivo de stock en mostrador.
+  - Ajuste de contraste tipográfico en menú lateral para modo oscuro institucional.
+  - Corrección de corte de etiquetas flotantes en inputs outline de Angular Material.
+  - Adición de botón de borrado rápido (`X`) en buscador del POS.
+  - Verificación exitosa de guardias de ruta ante accesos no autenticados directos por URL.

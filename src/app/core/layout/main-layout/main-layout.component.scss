@@ -12,8 +12,8 @@ $brand-red-hover: #b91c1c;
     .layout-sidenav {
         width: 270px;
         background-color: $brand-navy-dark;
-        color: #e2e8f0;
-        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
         display: flex;
         flex-direction: column;
 
@@ -68,33 +68,42 @@ $brand-red-hover: #b91c1c;
             .nav-item {
                 border-radius: 8px;
                 margin-bottom: 0.4rem;
-                color: #94a3b8;
-                transition: background-color 0.2s, color 0.2s;
+                /* Contraste corregido: texto e iconos claramente visibles en blanco suave */
+                color: #e2e8f0 !important;
+                opacity: 0.9;
+                transition: background-color 0.2s, opacity 0.2s;
 
                 .nav-icon {
-                    color: #64748b;
+                    color: #cbd5e1 !important;
                 }
 
                 .nav-label {
                     font-weight: 500;
-                    font-size: 0.9rem;
+                    font-size: 0.92rem;
+                    color: #f8fafc !important;
                 }
 
                 &:hover {
-                    background-color: rgba(255, 255, 255, 0.06);
-                    color: #ffffff;
+                    background-color: rgba(255, 255, 255, 0.12) !important;
+                    opacity: 1;
 
                     .nav-icon {
-                        color: #ef4444;
+                        color: #ffffff !important;
                     }
                 }
 
                 &.active-link {
-                    background-color: $brand-red;
-                    color: #ffffff;
+                    background-color: $brand-red !important;
+                    opacity: 1;
+                    color: #ffffff !important;
 
                     .nav-icon {
-                        color: #ffffff;
+                        color: #ffffff !important;
+                    }
+
+                    .nav-label {
+                        font-weight: 700;
+                        color: #ffffff !important;
                     }
                 }
             }
@@ -103,15 +112,15 @@ $brand-red-hover: #b91c1c;
         .sidenav-footer {
             padding: 1rem;
             text-align: center;
-            color: #64748b;
+            color: #94a3b8;
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
 
             .store-location {
                 font-size: 0.75rem;
-                color: #94a3b8;
+                color: #cbd5e1;
                 font-weight: 600;
             }
 

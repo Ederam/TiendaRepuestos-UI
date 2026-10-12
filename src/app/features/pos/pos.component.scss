@@ -22,6 +22,9 @@ $brand-red: #d92525;
     overflow: hidden;
 
     .search-header {
+        padding-top: 8px;
+
+        /* Espacio para que la etiqueta flotante del outline no se corte */
         .search-field {
             width: 100%;
             background-color: #ffffff;

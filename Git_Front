@@ -69,3 +69,14 @@ git commit -m "feat(inventario): catalogo paginado con MatTable, debounceTime(40
 # 4. Enviar al repositorio remoto
 git push origin main
 
+# 1. Comprobar archivos modificados
+git status
+
+# 2. Agregar cambios
+git add .
+
+# 3. Crear commit formal
+git commit -m "fix(ui): correccion de contraste en sidenav, ajuste de label flotante y boton limpiar en buscador POS"
+
+# 4. Enviar a remoto
+git push origin main
