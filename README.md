@@ -1,59 +1,98 @@
-# TiendaRepuestosUI
+# 🚗 TiendaRepuestos-UI — Sistema POS e Inventario Automotriz
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.15.
+Frontend SPA empresarial para la gestión integral de repuestos de carrocería, latas, iluminación y facturación en mostrador para **MACROLATAS**.
 
-## Development server
+Desarrollado con **Angular 19 Standalone**, **Angular Material**, **TypeScript Estricto** y arquitectura de **Puertos y Adaptadores (Hexagonal)**, totalmente integrado con backend en **.NET 8 (Clean Architecture)** y especificación de errores **RFC 7807**.
 
-To start a local development server, run:
+---
 
-```bash
+## 📸 Vitrina del Sistema (Showcase)
+
+### 1. Autenticación y Control de Acceso (RBAC)
+Acceso seguro con token JWT, validación de expiración en tiempo real y soporte para roles `Administrador` y `Vendedor`.
+![Inicio de Sesión](docs/screenshots/01-login.png)
+
+### 2. Punto de Venta (POS) y Caja Reactiva
+Búsqueda optimizada con retardo reactivo (`debounceTime`), control estricto de existencias en mostrador y ticket de venta en memoria con Signals.
+![Caja POS](docs/screenshots/02-pos.png)
+
+### 3. Catálogo y Control de Inventario
+Tabla de existencias con alertas visuales inmediatas para stock por debajo del umbral mínimo y paginación server-side.
+![Inventario](docs/screenshots/03-inventario.png)
+
+---
+
+## 🛠️ Stack Tecnológico
+
+* **Framework:** Angular 19 (Standalone Components, Signals reactivos, Zoneless ready).
+* **Biblioteca UI:** Angular Material (M3 components, MatTable, MatPaginator, MatDialog).
+* **Gestión de Estado:** Angular Signals y Computed Properties para reactividad de grano fino.
+* **Programación Asíncrona:** RxJS (Debounce, distinctUntilChanged, flujos HTTP).
+* **Estilos:** SCSS modularizado preparado para tematización CSS Custom Properties.
+* **Arquitectura:** Core / Features / Shared estructurado bajo Puertos y Adaptadores.
+
+---
+
+## 🏗️ Arquitectura de Software (Puertos y Adaptadores)
+
+Para desacoplar el desarrollo del Frontend de la disponibilidad del Backend, la aplicación implementa Inversión de Dependencias (DI) mediante contratos abstractos:
+
+```text
+src/app/core/services/
+├── auth/
+│   ├── auth.service.ts         (Puerto Abstracto)
+│   ├── auth-http.service.ts    (Adaptador Real .NET 8)
+│   └── auth-mock.service.ts    (Adaptador Mock Local)
+├── productos/
+│   ├── producto.service.ts
+│   ├── producto-http.service.ts
+│   └── producto-mock.service.ts
+└── ventas/
+    ├── venta.service.ts
+    ├── venta-http.service.ts
+    └── venta-mock.service.ts
+
+Conmutación Rápida de Entorno
+En src/environments/environment.development.ts:
+
+useMocks: true ➔ Ejecución autónoma con base de datos en memoria para diseño y pruebas.
+
+useMocks: false ➔ Conexión directa contra Web API .NET 8 en https://localhost:7298/api.
+
+🚀 Puesta en Marcha Local
+Prerrequisitos
+Node.js v20+ o v22+
+
+Angular CLI v19 (npm install -g @angular/cli)
+
+Instalación y Ejecución
+Bash
+# 1. Clonar el repositorio
+git clone [https://github.com/tu-usuario/TiendaRepuestos-UI.git](https://github.com/tu-usuario/TiendaRepuestos-UI.git)
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Iniciar servidor de desarrollo
 ng serve
-```
+Navega a http://localhost:4200/. El navegador recargará automáticamente la aplicación ante cualquier cambio en el código fuente.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+📌 Hoja de Ruta (Roadmap)
+[x] Arquitectura base, Interceptores (JWT / RFC 7807) y Signals de sesión.
 
-## Code scaffolding
+[x] Route Guards funcionales para RBAC (authGuard, roleGuard, publicGuard).
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+[x] Shell Layout responsivo con identidad corporativa de MACROLATAS.
 
-```bash
-ng generate component component-name
-```
+[x] Caja POS reactiva con cálculo financiero instantáneo y validación de stock.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+[x] Catálogo de inventario con paginación y alertas de stock crítico.
 
-```bash
-ng generate --help
-```
+[ ] Modal interactivo (MatDialog) para creación y edición de repuestos.
 
-## Building
+[ ] Dashboard gerencial de reportes (Top más vendidos y déficit de inventario).
 
-To build the project run:
+[ ] Configuración como Progressive Web App (PWA) para instalación en dispositivos móviles.
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+📄 Licencia
+Proyecto privado desarrollado para MACROLATAS — 7 de Agosto, Bogotá D.C. © 2026.

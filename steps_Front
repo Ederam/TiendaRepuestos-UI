@@ -211,4 +211,52 @@ Move-Item -Path "src/app/core/services/producto*.service.ts" -Destination "src/a
 # 4. Mover los archivos de ventas
 Move-Item -Path "src/app/core/services/venta*.service.ts" -Destination "src/app/core/services/ventas/" -Force
 
+# ¿Cómo organizar el progreso visual de forma profesional?
+La convención estándar en repositorios de GitHub es crear una carpeta docs/screenshots y referenciar las capturas directamente en el README.md o en un documento de vitrina (SHOWCASE.md).
+
+Estructura recomendada en el proyecto:
+Plaintext
+TiendaRepuestos-UI/
+├── docs/
+│   └── screenshots/
+│       ├── 01-login-screen.png
+│       ├── 02-pos-catalogo-general.png
+│       ├── 03-pos-filtro-venta.png
+│       └── 04-inventario-tabla-stock.png
+├── README.md
+└── hoja_de_ruta_y_lecciones_aprendidas.md
+
+# Crear la carpeta en PowerShell:
+
+PowerShell
+New-Item -ItemType Directory -Force -Path "docs/screenshots"
+
+# para actualizar en readme
+## 📸 Galería del Sistema (MACROLATAS)
+
+### 1. Inicio de Sesión y Autenticación RBAC
+![Login MACROLATAS](docs/screenshots/01-login.png)
+
+### 2. Punto de Venta (POS) y Caja en Mostrador
+![POS Mostrador](docs/screenshots/02-pos.png)
+
+### 3. Catálogo y Control de Inventario
+![Inventario](docs/screenshots/03-inventario.png)
+
+# Implementación: Modal de Creación y Edición de Repuesto (`MatDialog`)
+
+Construiremos un diálogo reutilizable con **Angular Material Dialog (`MatDialog`)** que servirá tanto para **registrar un repuesto nuevo** como para **editar uno existente**.
+
+#### Paso 3.1: Comandos para Generar el Componente
+Ejecuta en PowerShell:
+
+```powershell
+ng g c features/inventario/producto-dialog --skip-tests
+O si prefieres crearlo manualmente:
+
+PowerShell
+New-Item -ItemType Directory -Force -Path "src/app/features/inventario/producto-dialog"
+New-Item -ItemType File -Force -Path "src/app/features/inventario/producto-dialog/producto-dialog.component.ts"
+New-Item -ItemType File -Force -Path "src/app/features/inventario/producto-dialog/producto-dialog.component.html"
+New-Item -ItemType File -Force -Path "src/app/features/inventario/producto-dialog/producto-dialog.component.scss"
 

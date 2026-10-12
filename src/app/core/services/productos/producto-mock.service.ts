@@ -8,6 +8,7 @@ import { ProductoService } from './producto.service';
 import { Producto, CreateProductoRequest } from '../../models/producto.models';
 import { PagedResponse, ProductoFilterParams } from '../../models/api-response.models';
 import { MOCK_PRODUCTOS } from '../../mocks/repuestos.mock';
+import { CATEGORIAS_REPUESTOS } from '@core/constants/categorias.constants';
 
 @Injectable()
 export class ProductoMockService extends ProductoService {
@@ -44,13 +45,15 @@ export class ProductoMockService extends ProductoService {
     }
 
     override createProducto(request: CreateProductoRequest): Observable<Producto> {
+        const cat = CATEGORIAS_REPUESTOS.find((c) => c.id === request.categoriaId);
+
         const nuevo: Producto = {
             id: Math.max(...this.catalogoEnMemoria.map((p) => p.id), 0) + 1,
-            codigo: request.codigo,
-            nombre: request.nombre,
+            codigo: request.codigo.toUpperCase().trim(),
+            nombre: request.nombre.trim(),
             descripcion: request.descripcion,
             categoriaId: request.categoriaId,
-            nombreCategoria: 'General',
+            nombreCategoria: cat?.nombre || 'General',
             precioVenta: request.precioVenta,
             costo: request.costo,
             stockActual: request.stockActual,

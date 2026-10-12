@@ -104,4 +104,10 @@ export class LoginComponent {
       },
     });
   }
+
+  loginComoVendedor(): void {
+    // Si queremos simular login de vendedor
+    this.loginForm.patchValue({ email: 'vendedor@macrolatas.com', password: 'Password123*' });
+    this.onSubmit();
+  }
 }

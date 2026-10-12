@@ -80,3 +80,15 @@ git commit -m "fix(ui): correccion de contraste en sidenav, ajuste de label flot
 
 # 4. Enviar a remoto
 git push origin main
+
+# 1. Comprobar archivos modificados
+git status
+
+# 2. Agregar todos los cambios
+git add .
+
+# 3. Commit semántico formal
+git commit -m "feat(inventario): modal MatDialog para repuestos, sanitizacion de codigos a mayusculas y parametrizacion de categorias"
+
+# 4. Enviar a GitHub
+git push origin main

@@ -164,3 +164,13 @@ El frontend de **TiendaRepuestos** es una Single Page Application (SPA) transacc
   - Corrección de corte de etiquetas flotantes en inputs outline de Angular Material.
   - Adición de botón de borrado rápido (`X`) en buscador del POS.
   - Verificación exitosa de guardias de ruta ante accesos no autenticados directos por URL.
+
+### Hito 7 — Modal Interactivo de Repuestos (MatDialog) y Sanitización de Datos
+* **Fecha:** 2026-10-12
+* **Entregables:**
+  - Componente modal `ProductoDialogComponent` con `MatDialog` para creación y edición de repuestos.
+  - Parametrización de categorías en `CATEGORIAS_REPUESTOS` eliminando listas quemadas en vista.
+  - Sanitización en el ciclo de vida del formulario para forzar códigos de repuesto en mayúsculas (`toUpperCase()`) tanto visual como en memoria.
+  - Sincronización reactiva del catálogo tras inserciones y actualizaciones.
+* **Lecciones Aprendidas:**
+  - `style="text-transform: uppercase;"` en CSS es únicamente cosmético; no altera el valor del `FormControl`. Es necesario sanear el valor en TypeScript con `.toUpperCase()` en los eventos de blur o submit.  
