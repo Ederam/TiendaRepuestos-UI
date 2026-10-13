@@ -192,33 +192,52 @@ $brand-red: #d92525;
 // REGLAS CSS PARA IMPRESIÓN DIRECTA (@media print)
 // ==========================================================================
 @media print {
-  // Ocultar barras de herramientas, sidenav y encabezado modal
-  body * {
-    visibility: hidden;
-  }
-
-  .no-print {
+  // 1. Ocultar la aplicación base y elementos de UI
+  app-root,
+  .no-print,
+  .mat-mdc-dialog-actions,
+  .modal-actions-header {
     display: none !important;
   }
 
-  // Aislar exclusivamente el cuerpo del ticket térmico
-  #printable-ticket, #printable-ticket * {
-    visibility: visible;
+  // 2. Desactivar fondos oscuros, sombras y scrollbars del CDK Dialog
+  .cdk-overlay-container,
+  .cdk-global-overlay-wrapper,
+  .cdk-overlay-pane,
+  .mat-mdc-dialog-container,
+  .mat-mdc-dialog-surface {
+    position: static !important;
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border: none !important;
+    overflow: visible !important;
   }
 
-  #printable-ticket {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 78mm !important; // Ancho estándar de rollo de 80mm
-    margin: 0 !important;
+  .ticket-modal-wrapper {
+    background: transparent !important;
     padding: 0 !important;
+  }
+
+  // 3. Forzar el contenedor del ticket a 80mm de ancho exacto
+  .thermal-ticket-container {
+    display: block !important;
+    width: 76mm !important;
+    max-width: 76mm !important;
+    margin: 0 !important;
+    padding: 2mm !important;
     box-shadow: none !important;
     border-radius: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11px !important;
+    line-height: 1.2 !important;
   }
 
   @page {
     margin: 0;
-    size: 80mm auto; // Rollo continuo sin saltos de página tamaño carta
+    size: 80mm auto; // Formato continuo de ticket térmico
   }
 }

@@ -233,3 +233,13 @@ El frontend de **TiendaRepuestos** es una Single Page Application (SPA) transacc
 - **Lecciones Aprendidas:**
   - **Impresión Térmica en Navegadores:** Para evitar que `window.print()` imprima la barra superior, el Sidenav o márgenes tipo carta (A4), es fundamental fijar `@page { margin: 0; size: 80mm auto; }` y ocultar selectivamente los elementos de la interfaz mediante clases `.no-print`.
   - **Experiencia de Usuario en Mostrador:** El operador no debe tener que buscar la factura en un módulo secundario; tras pulsar "Cobrar", el sistema debe presentar inmediatamente el recibo para impresión con un solo clic.
+
+### Hito 12 — Resolución de Renderizado de Impresión Térmica en Angular CDK y Desacoplamiento de Tokens
+
+- **Fecha:** 2026-10-13
+- **Entregables:**
+  - Ajuste de selectores `@media print` en `TicketDialogComponent` para omitir `.cdk-overlay-container` y forzar visualización en Chromium sin hojas en blanco.
+  - Reemplazo de variables locales SCSS por tokens nativos `var(--brand-navy)` y `var(--brand-red)` de `:root`.
+  - Normalización arquitectónica de interfaces locales frente a DTOs de dominio.
+- **Lecciones Aprendidas:**
+  - **Impresión de Modales en Angular Material:** Ocultar `body *` en CSS de impresión apaga también los contenedores creados por Angular CDK en el body (`.cdk-overlay-container`). Para imprimir un diálogo modal, se deben resetear las propiedades de posicionamiento, sombras y overflow del overlay container y ocultar exclusivamente `app-root` y las clases `.no-print`.
