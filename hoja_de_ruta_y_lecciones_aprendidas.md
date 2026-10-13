@@ -221,3 +221,15 @@ El frontend de **TiendaRepuestos** es una Single Page Application (SPA) transacc
 - **Lecciones Aprendidas:**
   - **Tokens de Diseño:** El uso reiterado de variables SCSS locales (`$color`) genera dispersión y deuda técnica; las variables CSS nativas (`:root`) permiten centralizar la identidad corporativa y facilitan la conmutación dinámica de estilos multi-cliente.
   - **Concepto PWA:** Un Service Worker almacena en caché local la carcasa de la aplicación (Application Shell), permitiendo arrancar la SPA en terminales móviles con rendimiento nativo.
+
+### Hito 11 — Comprobante Térmico POS e Integración de Impresión Nativa
+
+- **Fecha:** 2026-10-13
+- **Entregables:**
+  - Componente modal `TicketDialogComponent` con plantilla formateada para comprobantes térmicos de 80mm.
+  - Inclusión de metadatos comerciales completos de **MACROLATAS** (Calle 65 # 27B - 13, 7 de Agosto, Bogotá D.C., líneas celulares y PBX).
+  - Integración automática del flujo de facturación en `PosComponent`: registro de venta seguido de apertura modal del ticket.
+  - Implementación de reglas `@media print` para aislamiento de elementos del DOM (`visibility: hidden` transversal y foco único en `#printable-ticket`) con configuración de página continua `size: 80mm auto`.
+- **Lecciones Aprendidas:**
+  - **Impresión Térmica en Navegadores:** Para evitar que `window.print()` imprima la barra superior, el Sidenav o márgenes tipo carta (A4), es fundamental fijar `@page { margin: 0; size: 80mm auto; }` y ocultar selectivamente los elementos de la interfaz mediante clases `.no-print`.
+  - **Experiencia de Usuario en Mostrador:** El operador no debe tener que buscar la factura en un módulo secundario; tras pulsar "Cobrar", el sistema debe presentar inmediatamente el recibo para impresión con un solo clic.

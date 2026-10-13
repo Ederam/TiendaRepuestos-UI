@@ -1,0 +1,224 @@
+$brand-navy: #18215d;
+$brand-red: #d92525;
+
+.ticket-modal-wrapper {
+  display: flex;
+  flex-direction: column;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  overflow: hidden;
+
+  .modal-actions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+
+    .modal-status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #15803d;
+      font-weight: 700;
+      font-size: 0.95rem;
+
+      .check-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+      }
+    }
+
+    .actions-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .btn-print {
+        background-color: $brand-navy;
+        font-weight: 600;
+        border-radius: 6px;
+      }
+    }
+  }
+
+  // --- Comprobante Térmico (Visualización en pantalla simulando rollo) ---
+  .thermal-ticket-container {
+    width: 320px;
+    margin: 1.5rem auto;
+    padding: 1.25rem 1rem;
+    background-color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
+    color: #000000;
+    line-height: 1.3;
+
+    .divider-dashed {
+      border-top: 1px dashed #000000;
+      margin: 0.5rem 0;
+    }
+
+    .divider-solid {
+      border-top: 1px solid #000000;
+      margin: 0.5rem 0;
+    }
+
+    .ticket-header {
+      text-align: center;
+
+      .business-name {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 900;
+        letter-spacing: 1px;
+      }
+
+      .business-tagline {
+        margin: 2px 0 0;
+        font-size: 0.85rem;
+        font-weight: 800;
+      }
+
+      .business-subtag {
+        margin: 2px 0 4px;
+        font-size: 0.75rem;
+      }
+
+      .business-info {
+        margin: 1px 0;
+        font-size: 0.72rem;
+      }
+    }
+
+    .invoice-meta {
+      font-size: 0.75rem;
+      margin: 0.4rem 0;
+
+      .meta-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2px;
+      }
+    }
+
+    .ticket-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+
+      th {
+        padding-bottom: 4px;
+        text-align: left;
+        border-bottom: 1px solid #000000;
+      }
+
+      td {
+        padding: 4px 0;
+        vertical-align: top;
+      }
+
+      .col-cant {
+        width: 15%;
+        text-align: center;
+        font-weight: 700;
+      }
+
+      .col-desc {
+        width: 55%;
+        display: flex;
+        flex-direction: column;
+
+        .item-name {
+          font-weight: 700;
+          line-height: 1.1;
+        }
+
+        .item-code {
+          font-size: 0.68rem;
+          color: #333333;
+        }
+      }
+
+      .col-precio {
+        width: 30%;
+        text-align: right;
+        font-weight: 700;
+      }
+    }
+
+    .ticket-totals {
+      font-size: 0.85rem;
+
+      .total-row {
+        display: flex;
+        justify-content: space-between;
+
+        &.main-total {
+          font-size: 1rem;
+          font-weight: 900;
+          margin: 4px 0;
+        }
+      }
+    }
+
+    .ticket-footer {
+      text-align: center;
+      margin-top: 0.5rem;
+
+      .thank-you-msg {
+        font-weight: 900;
+        font-size: 0.85rem;
+        margin: 4px 0 2px;
+      }
+
+      .despachos-tag {
+        font-weight: 700;
+        font-size: 0.75rem;
+        margin: 2px 0 4px;
+      }
+
+      .software-credits {
+        font-size: 0.65rem;
+        color: #555555;
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// REGLAS CSS PARA IMPRESIÓN DIRECTA (@media print)
+// ==========================================================================
+@media print {
+  // Ocultar barras de herramientas, sidenav y encabezado modal
+  body * {
+    visibility: hidden;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  // Aislar exclusivamente el cuerpo del ticket térmico
+  #printable-ticket, #printable-ticket * {
+    visibility: visible;
+  }
+
+  #printable-ticket {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 78mm !important; // Ancho estándar de rollo de 80mm
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  @page {
+    margin: 0;
+    size: 80mm auto; // Rollo continuo sin saltos de página tamaño carta
+  }
+}

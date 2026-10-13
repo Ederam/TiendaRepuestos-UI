@@ -1,0 +1,104 @@
+<div class="ticket-modal-wrapper">
+    <!-- Botonera superior en pantalla (Oculta al imprimir) -->
+    <div class="modal-actions-header no-print">
+        <div class="modal-status-badge">
+            <mat-icon class="check-icon">check_circle</mat-icon>
+            <span>Venta Registrada</span>
+        </div>
+        <div class="actions-group">
+            <button mat-flat-button color="primary" class="btn-print" (click)="imprimirTicket()">
+                <mat-icon>print</mat-icon>
+                <span>Imprimir Ticket</span>
+            </button>
+            <button mat-icon-button (click)="cerrar()" aria-label="Cerrar vista">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <!-- Contenedor del Comprobante Térmico (80mm) -->
+    <div class="thermal-ticket-container" id="printable-ticket">
+        <!-- Encabezado Institucional -->
+        <header class="ticket-header">
+            <h1 class="business-name">MACROLATAS</h1>
+            <p class="business-tagline">LATAS EN GENERAL</p>
+            <p class="business-subtag">Repuestos Nuevos y de Segunda</p>
+            <div class="divider-dashed"></div>
+            <p class="business-info">Calle 65 # 27B - 13</p>
+            <p class="business-info">7 de Agosto — Bogotá D.C.</p>
+            <p class="business-info">Tels: 312 450 6256 - 313 832 5523</p>
+            <p class="business-info">Fijo: (601) 9070740</p>
+            <div class="divider-dashed"></div>
+        </header>
+
+        <!-- Metadatos de la Factura -->
+        <section class="invoice-meta">
+            <div class="meta-row">
+                <span>FACTURA VENTA:</span>
+                <strong>#{{ data.venta.numeroFactura || data.venta.id }}</strong>
+            </div>
+            <div class="meta-row">
+                <span>FECHA / HORA:</span>
+                <span>{{ fechaEmision | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="meta-row">
+                <span>CLIENTE:</span>
+                <span>{{ data.clienteNombre || 'Cliente Mostrador' }}</span>
+            </div>
+            @if (data.clienteDocumento) {
+            <div class="meta-row">
+                <span>NIT / C.C.:</span>
+                <span>{{ data.clienteDocumento }}</span>
+            </div>
+            }
+            <div class="meta-row">
+                <span>FORMA PAGO:</span>
+                <span>{{ data.metodoPago }}</span>
+            </div>
+            <div class="divider-solid"></div>
+        </section>
+
+        <!-- Tabla de Ítems Vendidos -->
+        <table class="ticket-table">
+            <thead>
+                <tr>
+                    <th class="col-cant">Cant.</th>
+                    <th class="col-desc">Descripción</th>
+                    <th class="col-precio">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of data.items; track item.producto.id) {
+                <tr>
+                    <td class="col-cant">{{ item.cantidad }}</td>
+                    <td class="col-desc">
+                        <span class="item-name">{{ item.producto.nombre }}</span>
+                        <small class="item-code">[{{ item.producto.codigo }}]</small>
+                    </td>
+                    <td class="col-precio">
+                        {{ item.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="divider-solid"></div>
+
+        <!-- Liquidación Financiera -->
+        <section class="ticket-totals">
+            <div class="total-row main-total">
+                <span>TOTAL A PAGAR:</span>
+                <span>{{ data.venta.total | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            </div>
+            <div class="divider-dashed"></div>
+        </section>
+
+        <!-- Pie del Recibo -->
+        <footer class="ticket-footer">
+            <p class="thank-you-msg">¡GRACIAS POR SU COMPRA!</p>
+            <p class="despachos-tag">DESPACHOS A NIVEL NACIONAL</p>
+            <small class="software-credits">Sistema Comercial MACROLATAS v1.0</small>
+        </footer>
+    </div>
+</div>

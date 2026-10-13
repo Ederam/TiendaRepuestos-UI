@@ -314,4 +314,26 @@ En tu terminal PowerShell corre:
 PowerShell
 ng add @angular/pwa --project TiendaRepuestos-UI
 
+# Detalle Técnico y Conceptual: Service Worker (ngsw-worker.js) como "Proxy Reverso Local"
+┌─────────────────────────┐
+│     Angular 19 SPA      │  (Hilo de UI: componentes, signals, DOM)
+└────────────┬────────────┘
+             │  Petición fetch() / HttpClient
+             ▼
+┌─────────────────────────┐
+│ Service Worker (Proxy)  │  (ngsw-worker.js corriendo en segundo plano)
+└──────┬───────────┬──────┘
+       │           │
+       │ ¿Está en  │
+       │  Caché?   │
+       ▼           ▼
+┌─────────────┐ ┌─────────────────────────┐
+│ CacheStorage│ │      Red Externa        │
+│   (Disco)   │ │  (API .NET 8 / Internet)│
+└─────────────┘ └─────────────────────────┘
 
+Crear el Componente del Ticket
+Ejecuta en PowerShell:
+
+PowerShell
+ng g c features/pos/ticket-dialog --skip-tests

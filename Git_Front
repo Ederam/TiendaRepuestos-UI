@@ -1,149 +1,75 @@
+# 🛠️ Flujo de Trabajo Git y Bitácora de Commits — TiendaRepuestos-UI
+
+Documento maestro para la estandarización del control de versiones del frontend de **MACROLATAS**.
+
+---
+
+## 1. Guía Rápida de Comandos Habituales
+
+Para evitar guardar comandos repetidos en notas sueltas, utiliza esta referencia según la acción que vayas a realizar:
+
+### A. Configuración Inicial (Solo se ejecuta 1 vez por máquina)
+
+```powershell
 Set-Location -Path "C:\DEV_ER\Mis Archivos\Projects\Repuestos\TiendaRepuestos-UI"
-git init
-git branch -M main
-git status
 
-# Enlazar con github
-
-echo "# TiendaRepuestos-UI" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin https://github.com/Ederam/TiendaRepuestos-UI.git
-git push -u origin main
-
-# 1. Comprobar estado de archivos
-
-git status
-
-# 2. Agregar todos los cambios realizados
-
-git add .
-
-# 3. Crear el commit formal
-
-git commit -m "feat(core): configuracion de arquitectura base, models DTOs, AuthService con Signals, interceptores y documentacion"
-
-# 4. Vincular el repositorio remoto (reemplaza con tu URL real)
-
-git remote add origin https://github.com/Ederam/TiendaRepuestos-UI.git
-
-# 5. Asegurar nombre de rama principal y enviar cambios
-
-git branch -M main
-git push -u origin main
-
-# Setear usuario
-
+# Configurar identidad del autor
 git config user.name "ederam"
 git config user.email "eramirezc1@ucentral.edu.co"
 
-# Verificación
+# Inicializar y vincular repositorio remoto
+git init
+git branch -M main
+git remote add origin https://github.com/Ederam/TiendaRepuestos-UI.git
+```
 
-Para comprobar que los datos quedaron registrados correctamente en este repositorio, ejecuta:
+### B. Ciclo Estándar de Guardado (Al terminar cada sesión o hito)
 
-PowerShell
-git config user.name
-git config user.email
+Ejecuta siempre esta secuencia de 4 pasos:
 
-git status
-git add .
-git commit -m "feat(auth): implementacion de guards RBAC, placeholders de features y componente standalone de Login con Angular Material"
-git push origin main
-
-# 1. Verificar estado de los archivos modificados
-
+```powershell
+# 1. Comprobar archivos modificados y pendientes
 git status
 
-# 2. Agregar todos los cambios al stage
-
+# 2. Agregar todos los cambios al área de preparación (stage)
 git add .
 
-# 3. Crear el commit formal
+# 3. Crear commit semántico con mensaje claro
+git commit -m "tipo(alcance): descripcion breve en presente y sin punto final"
 
-git commit -m "feat(auth): resolucion de enrutamiento base con router-outlet y despliegue del componente standalone de Login con Angular Material"
-
-# 4. Enviar los cambios a la rama principal remota
-
+# 4. Enviar a la rama principal en GitHub
 git push origin main
+```
 
-# 1. Comprobar archivos en stage
+---
 
-git status
+## 2. Convención de Mensajes de Commit (Conventional Commits)
 
-# 2. Agregar cambios
+Usa siempre esta estructura para mantener un historial profesional:
 
-git add .
+| Prefijo     | Cuándo Usarlo                                       | Ejemplo                                                         |
+| :---------- | :-------------------------------------------------- | :-------------------------------------------------------------- |
+| `feat:`     | Nueva funcionalidad añadida al sistema.             | `feat(pos): implementacion de ticket de venta con Signals`      |
+| `fix:`      | Corrección de un bug o problema visual/lógico.      | `fix(ui): correccion de colapso de altura en grid del POS`      |
+| `refactor:` | Reorganización de código sin alterar funcionalidad. | `refactor(services): modularizacion de adaptadores por dominio` |
+| `style:`    | Ajustes cosméticos, formato, márgenes o colores.    | `style(theme): variables CSS centralizadas en styles.scss`      |
+| `docs:`     | Cambios o adiciones en documentación y READMEs.     | `docs(readme): incorporacion de capturas y guia PWA`            |
 
-# 3. Crear commit formal de hito
+---
 
-git commit -m "feat(inventario): catalogo paginado con MatTable, debounceTime(400) e identidad visual MACROLATAS en Shell Layout"
+## 3. Historial Cronológico de Commits del Proyecto
 
-# 4. Enviar al repositorio remoto
+Registro limpio y sin comandos redundantes del avance del desarrollo:
 
-git push origin main
-
-# 1. Comprobar archivos modificados
-
-git status
-
-# 2. Agregar cambios
-
-git add .
-
-# 3. Crear commit formal
-
-git commit -m "fix(ui): correccion de contraste en sidenav, ajuste de label flotante y boton limpiar en buscador POS"
-
-# 4. Enviar a remoto
-
-git push origin main
-
-# 1. Comprobar archivos modificados
-
-git status
-
-# 2. Agregar todos los cambios
-
-git add .
-
-# 3. Commit semántico formal
-
-git commit -m "feat(inventario): modal MatDialog para repuestos, sanitizacion de codigos a mayusculas y parametrizacion de categorias"
-
-# 4. Enviar a GitHub
-
-git push origin main
-
-# 1. Verificar estado de los archivos
-
-git status
-
-# 2. Agregar cambios
-
-git add .
-
-# 3. Commit de hito
-
-git commit -m "feat(reportes-pwa): AJuste para configurar menus desde cosntante, dashboard gerencial de metricas con ReporteService y configuracion PWA con service worker"
-
-# 4. Enviar al repositorio remoto
-
-git push origin main
-
-# 1. Comprobar los archivos modificados
-
-git status
-
-# 2. Agregar todos los cambios al staging
-
-git add .
-
-# 3. Crear commit formal
-
-git commit -m "feat(theming-pwa): centralizacion de variables CSS en styles.scss, dashboard KPI y documentacion PWA"
-
-# 4. Enviar los cambios al repositorio remoto
-
-git push origin main
+|   #    | Hash / Fecha | Mensaje del Commit                                                                                                                                            | Alcance Principal                                                    |
+| :----: | :----------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **01** | _Inicial_    | `feat(init): first commit`                                                                                                                                    | Estructura base del proyecto Angular 19.                             |
+| **02** | _Hito 1_     | `feat(core): configuracion de arquitectura base, models DTOs, AuthService con Signals, interceptores y documentacion`                                         | Núcleo de autenticación, interceptores JWT/RFC 7807 y modelos base.  |
+| **03** | _Hito 2_     | `feat(auth): implementacion de guards RBAC, placeholders de features y componente standalone de Login con Angular Material`                                   | Guardias de ruta funcionales y pantalla de login interactiva.        |
+| **04** | _Hito 2.1_   | `feat(auth): resolucion de enrutamiento base con router-outlet y despliegue del componente standalone de Login con Angular Material`                          | Corrección de jerarquía con RouterOutlet anidado en el Shell.        |
+| **05** | _Hito 3_     | `feat(inventario): catalogo paginado con MatTable, debounceTime(400) e identidad visual MACROLATAS en Shell Layout`                                           | Catálogo de existencias con búsqueda debounced y tema institucional. |
+| **06** | _Hito 4_     | `fix(ui): correccion de contraste en sidenav, ajuste de label flotante y boton limpiar en buscador POS`                                                       | Refinamiento de contraste tipográfico y accesibilidad en filtros.    |
+| **07** | _Hito 5_     | `feat(inventario): modal MatDialog para repuestos, sanitizacion de codigos a mayusculas y parametrizacion de categorias`                                      | Formulario emergente para altas/ediciones y saneamiento de datos.    |
+| **08** | _Hito 6_     | `feat(reportes-pwa): Ajuste para configurar menus desde constante, dashboard gerencial de metricas con ReporteService y configuracion PWA con service worker` | Panel administrativo de KPIs y manifiesto de instalación web.        |
+| **09** | _Hito 7_     | `feat(theming-pwa): centralizacion de variables CSS en styles.scss, dashboard KPI y documentacion PWA`                                                        | Desacoplamiento de tokens de color mediante CSS Custom Properties.   |
+| **10** | _Hito 8_     | `feat(pos): impresion de comprobante termico de 80mm con TicketDialogComponent y reglas media print`                                                          | 2026-10-13                                                           | Incorporacion de comprobante fisico de venta con datos comerciales de MACROLATAS, apertura modal automatica tras cobro y aislamiento CSS para impresion nativa. |
