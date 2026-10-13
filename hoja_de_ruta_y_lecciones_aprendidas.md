@@ -243,3 +243,20 @@ El frontend de **TiendaRepuestos** es una Single Page Application (SPA) transacc
   - Normalización arquitectónica de interfaces locales frente a DTOs de dominio.
 - **Lecciones Aprendidas:**
   - **Impresión de Modales en Angular Material:** Ocultar `body *` en CSS de impresión apaga también los contenedores creados por Angular CDK en el body (`.cdk-overlay-container`). Para imprimir un diálogo modal, se deben resetear las propiedades de posicionamiento, sombras y overflow del overlay container y ocultar exclusivamente `app-root` y las clases `.no-print`.
+
+### 3. Registro para la Hoja de Ruta (`hoja_de_ruta_y_lecciones_aprendidas.md`)
+
+Copia y pega este bloque en **`hoja_de_ruta_y_lecciones_aprendidas.md`**:
+
+```markdown
+### Hito 13 — Diagnóstico de Impresión en Overlays CDK y Corrección Sintáctica de Tokens CSS
+
+- **Fecha:** 2026-10-13
+- **Entregables:**
+  - Corrección de sintaxis en `ticket-dialog.component.scss` integrando la función nativa `var(--brand-navy)` dentro de propiedades CSS válidas.
+  - Ajuste de selectores en `@media print`: desestructuración de `.cdk-overlay-container` y reseteo de propiedades de posicionamiento para garantizar la transferencia del DOM modal al spooler de impresión del navegador.
+  - Estandarización de tablas y bitácora en la documentación de control de versiones.
+- **Lecciones Aprendidas:**
+  - **Sintaxis de CSS Custom Properties:** La instrucción `var(--token)` no puede existir de forma aislada en la raíz de una hoja de estilos; debe asignarse a una propiedad (`background-color: var(--token);`).
+  - **Impresión de Diálogos Modales (CDK Overlays):** Los componentes desplegados mediante `MatDialog` residen en un contenedor hermano fuera de `app-root` (`.cdk-overlay-container`). Al aplicar `@media print`, la instrucción `body * { visibility: hidden; }` oculta el contenedor global del overlay e invalida el layout de impresión. La solución correcta consiste en ocultar selectivamente `app-root` y redefinir `.cdk-overlay-container` como `display: block; position: static;` permitiendo la captura limpia del ticket térmico en PDF o rollo físico.
+```
