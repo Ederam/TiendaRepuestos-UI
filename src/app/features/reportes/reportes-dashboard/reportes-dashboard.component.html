@@ -1,1 +1,169 @@
-<p>reportes-dashboard works!</p>
+<div class="dashboard-container">
+    <!-- Cabecera del Dashboard -->
+    <div class="dashboard-header">
+        <div>
+            <h1 class="header-title">Reportes y Métricas Gerenciales</h1>
+            <p class="header-subtitle">Monitoreo de ingresos, rotación de latas y control de inventario.</p>
+        </div>
+        <button mat-stroked-button (click)="cargarMetricas()" [disabled]="isLoading()">
+            <mat-icon>refresh</mat-icon>
+            <span>Actualizar Datos</span>
+        </button>
+    </div>
+
+    @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate" class="loading-bar"></mat-progress-bar>
+    }
+
+    @if (datos(); as info) {
+    <!-- Grid de Tarjetas KPI -->
+    <div class="kpi-grid">
+        <!-- Tarjeta 1: Ingresos de Hoy -->
+        <mat-card class="kpi-card kpi-ingresos">
+            <div class="kpi-content">
+                <div class="kpi-icon-wrap icon-green">
+                    <mat-icon>attach_money</mat-icon>
+                </div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Ingresos de Hoy</span>
+                    <span class="kpi-value">{{ info.resumen.ingresosHoyMonto | currency:'COP':'symbol-narrow':'1.0-0'
+                        }}</span>
+                    <small class="kpi-subtext">{{ info.resumen.ventasHoyTotal }} ventas registradas</small>
+                </div>
+            </div>
+        </mat-card>
+
+        <!-- Tarjeta 2: Ventas Realizadas -->
+        <mat-card class="kpi-card">
+            <div class="kpi-content">
+                <div class="kpi-icon-wrap icon-navy">
+                    <mat-icon>receipt_long</mat-icon>
+                </div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Transacciones Hoy</span>
+                    <span class="kpi-value">{{ info.resumen.ventasHoyTotal }}</span>
+                    <small class="kpi-subtext">Tickets emitidos en mostrador</small>
+                </div>
+            </div>
+        </mat-card>
+
+        <!-- Tarjeta 3: Repuestos en Alerta -->
+        <mat-card class="kpi-card kpi-critico">
+            <div class="kpi-content">
+                <div class="kpi-icon-wrap icon-red">
+                    <mat-icon>warning_amber</mat-icon>
+                </div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Repuestos Bajo Mínimo</span>
+                    <span class="kpi-value value-red">{{ info.resumen.repuestosStockCritico }}</span>
+                    <small class="kpi-subtext subtext-red">Requieren pedido a proveedor</small>
+                </div>
+            </div>
+        </mat-card>
+
+        <!-- Tarjeta 4: Referencias Totales -->
+        <mat-card class="kpi-card">
+            <div class="kpi-content">
+                <div class="kpi-icon-wrap icon-slate">
+                    <mat-icon>category</mat-icon>
+                </div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Catálogo Activo</span>
+                    <span class="kpi-value">{{ info.resumen.totalReferenciasActivas }}</span>
+                    <small class="kpi-subtext">Referencias disponibles</small>
+                </div>
+            </div>
+        </mat-card>
+    </div>
+
+    <!-- Sección de Detalle: Dos Columnas -->
+    <div class="content-grid">
+        <!-- Tabla: Top Repuestos Más Vendidos -->
+        <mat-card class="content-card top-products-card">
+            <div class="card-header-bar">
+                <div class="card-title-group">
+                    <mat-icon class="card-icon">trending_up</mat-icon>
+                    <h2 class="card-title">Top Repuestos de Mayor Rotación</h2>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table mat-table [dataSource]="info.topRepuestos" class="top-table">
+                    <!-- Código -->
+                    <ng-container matColumnDef="codigo">
+                        <th mat-header-cell *matHeaderCellDef>Código</th>
+                        <td mat-cell *matCellDef="let item">
+                            <span class="badge-code">{{ item.codigo }}</span>
+                        </td>
+                    </ng-container>
+
+                    <!-- Nombre -->
+                    <ng-container matColumnDef="nombre">
+                        <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                        <td mat-cell *matCellDef="let item" class="product-name-cell">
+                            <strong>{{ item.nombre }}</strong>
+                        </td>
+                    </ng-container>
+
+                    <!-- Categoría -->
+                    <ng-container matColumnDef="categoria">
+                        <th mat-header-cell *matHeaderCellDef>Línea</th>
+                        <td mat-cell *matCellDef="let item">{{ item.categoria }}</td>
+                    </ng-container>
+
+                    <!-- Unidades Vendidas -->
+                    <ng-container matColumnDef="unidades">
+                        <th mat-header-cell *matHeaderCellDef class="text-center">Unid.</th>
+                        <td mat-cell *matCellDef="let item" class="text-center">
+                            <span class="units-badge">{{ item.unidadesVendidas }}</span>
+                        </td>
+                    </ng-container>
+
+                    <!-- Ingresos -->
+                    <ng-container matColumnDef="ingresos">
+                        <th mat-header-cell *matHeaderCellDef class="text-right">Total Generado</th>
+                        <td mat-cell *matCellDef="let item" class="text-right income-cell">
+                            {{ item.ingresosGenerados | currency:'COP':'symbol-narrow':'1.0-0' }}
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+            </div>
+        </mat-card>
+
+        <!-- Panel: Distribución por Medio de Pago -->
+        <mat-card class="content-card payment-methods-card">
+            <div class="card-header-bar">
+                <div class="card-title-group">
+                    <mat-icon class="card-icon">payments</mat-icon>
+                    <h2 class="card-title">Ventas por Método de Pago</h2>
+                </div>
+            </div>
+
+            <div class="payment-list">
+                @for (metodo of info.distribucionPagos; track metodo.metodoPago) {
+                <div class="payment-item">
+                    <div class="payment-item-header">
+                        <span class="payment-name">{{ metodo.metodoPago }}</span>
+                        <span class="payment-total">{{ metodo.totalMonto | currency:'COP':'symbol-narrow':'1.0-0'
+                            }}</span>
+                    </div>
+
+                    <!-- Barra visual de porcentaje -->
+                    <div class="bar-container">
+                        <div class="bar-fill" [style.width.%]="metodo.porcentaje"></div>
+                    </div>
+
+                    <div class="payment-item-footer">
+                        <span>{{ metodo.cantidadTransacciones }} transacciones</span>
+                        <strong>{{ metodo.porcentaje }}%</strong>
+                    </div>
+                </div>
+                }
+            </div>
+        </mat-card>
+    </div>
+    }
+</div>

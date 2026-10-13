@@ -286,3 +286,32 @@ Leerlo en TypeScript: Invocándolo como función: this.carrito()
 
 Leerlo en el HTML: <span>{{ carritoService.totalPagar() }}</span> (Angular actualiza solo ese <span> sin redibujar toda la página).
 
+## Resumen Técnico y Conceptual de las Implementaciones
+Este análisis resume las soluciones aplicadas para profundizar en los patrones de arquitectura utilizados:
+
+┌───────────────────────────────────────────────────────────────┐
+│                     Capa de Presentación                      │
+│   PosComponent (Signals)   │   InventarioListComponent (Table)│
+└───────────────────────────────┬───────────────────────────────┘
+                                │ Inyecta Contrato Puro
+                                ▼
+┌───────────────────────────────────────────────────────────────┐
+│                 Puerto Abstracto (Domain/Core)                │
+│    ProductoService (Clase Abstracta sin dependencias HTTP)    │
+└───────────────────────────────┬───────────────────────────────┘
+                                │ Resuelto en app.config.ts
+               ┌────────────────┴────────────────┐
+               ▼                                 ▼
+┌───────────────────────────────┐ ┌───────────────────────────────┐
+│        Adaptador HTTP         │ │        Adaptador Mock         │
+│     ProductoHttpService       │ │     ProductoMockService       │
+│    (HttpClient -> .NET 8)     │ │   (Filtros en memoria M3)     │
+└───────────────────────────────┘ └───────────────────────────────┘
+
+# Ejecutar el Schematic Oficial de Angular
+En tu terminal PowerShell corre:
+
+PowerShell
+ng add @angular/pwa --project TiendaRepuestos-UI
+
+

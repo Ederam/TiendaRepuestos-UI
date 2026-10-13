@@ -92,3 +92,16 @@ git commit -m "feat(inventario): modal MatDialog para repuestos, sanitizacion de
 
 # 4. Enviar a GitHub
 git push origin main
+
+
+# 1. Verificar estado de los archivos
+git status
+
+# 2. Agregar cambios
+git add .
+
+# 3. Commit de hito
+git commit -m "feat(reportes-pwa): AJuste para configurar menus desde cosntante, dashboard gerencial de metricas con ReporteService y configuracion PWA con service worker"
+
+# 4. Enviar al repositorio remoto
+git push origin main

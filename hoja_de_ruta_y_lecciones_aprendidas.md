@@ -201,3 +201,12 @@ El frontend de **TiendaRepuestos** es una Single Page Application (SPA) transacc
 - **Lecciones Aprendidas:**
   - **Colapso de CSS Grid/Flexbox:** Declarar `height: calc(100vh - X)` con `overflow: hidden` dentro de un contenedor hijo sin altura mínima forzada provoca que el navegador colapse el área a 0 píxeles. La solución es emplear `min-height` y permitir que el contenido defina su flujo natural.
   - **Coherencia en Adaptadores Mock:** Los adaptadores de prueba deben reflejar con exactitud los filtros requeridos por los componentes (`soloActivos`, paginación, búsqueda), de lo contrario devolverán colecciones vacías simulando falsos errores de red o visuales.
+
+### Hito 9 — Dashboard Gerencial de Reportes y Capacidades PWA
+
+- **Fecha:** 2026-10-13
+- **Entregables:**
+  - Puerto `ReporteService` y adaptadores (`ReporteHttpService`, `ReporteMockService`) para analítica de ventas.
+  - Implementación de `ReportesDashboardComponent` con KPIs de ingresos, tickets, alertas de stock mínimo y top repuestos más vendidos.
+  - Gráfica de distribución proporcional de pagos (Efectivo, Transferencia, Tarjeta).
+  - Integración del Service Worker de Angular y manifiesto PWA para instalación como app nativa.
