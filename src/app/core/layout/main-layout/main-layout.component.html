@@ -1,5 +1,5 @@
 <mat-sidenav-container class="layout-container" autosize>
-    <!-- Menú Lateral (Sidenav) con identidad MACROLATAS -->
+    <!-- Menú Lateral -->
     <mat-sidenav #sidenav mode="side" opened class="layout-sidenav" [fixedInViewport]="true">
         <div class="brand-header">
             <div class="brand-icon-wrapper">
@@ -13,7 +13,7 @@
 
         <mat-divider></mat-divider>
 
-        <!-- Enlaces de Navegación filtrados por RBAC -->
+        <!-- Enlaces del Menú -->
         <mat-nav-list class="nav-list">
             @for (item of navItems; track item.route) {
             @if (!item.adminOnly || isAdmin()) {
@@ -31,7 +31,7 @@
         </div>
     </mat-sidenav>
 
-    <!-- Contenido Principal con Barra Superior -->
+    <!-- Área de Contenido Principal -->
     <mat-sidenav-content class="layout-content">
         <mat-toolbar class="layout-toolbar elevation-z2">
             <button mat-icon-button (click)="sidenav.toggle()" aria-label="Alternar menú lateral">
@@ -42,7 +42,7 @@
 
             <span class="toolbar-spacer"></span>
 
-            <!-- Información del Usuario y Menú de Sesión -->
+            <!-- Perfil de Usuario -->
             <div class="user-profile-section">
                 <div class="user-meta">
                     <span class="user-name">{{ currentUser()?.nombreCompleto || 'Usuario' }}</span>
@@ -68,7 +68,7 @@
             </div>
         </mat-toolbar>
 
-        <!-- Área de trabajo dinámica -->
+        <!-- AQUÍ SE RENDERIZAN POS, INVENTARIO Y REPORTES -->
         <main class="page-container">
             <router-outlet></router-outlet>
         </main>

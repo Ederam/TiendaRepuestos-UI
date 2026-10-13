@@ -1,213 +1,199 @@
-// Paleta extraída de la tarjeta de MACROLATAS
 $brand-navy: #18215d;
 $brand-navy-dark: #0f153d;
 $brand-red: #d92525;
-$brand-red-hover: #b91c1c;
+
+:host {
+  display: block;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
 
 .layout-container {
-    height: 100vh;
-    width: 100vw;
-    background-color: #f1f5f9;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f1f5f9 !important;
 
-    .layout-sidenav {
-        width: 270px;
-        background-color: $brand-navy-dark;
+  .layout-sidenav {
+    width: 270px;
+    background-color: $brand-navy-dark !important;
+    color: #ffffff !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+
+    .brand-header {
+      padding: 1.5rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      background: linear-gradient(135deg, $brand-navy 0%, $brand-navy-dark 100%);
+
+      .brand-icon-wrapper {
+        background-color: $brand-red;
         color: #ffffff;
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        mat-icon {
+          font-size: 26px;
+          width: 26px;
+          height: 26px;
+        }
+      }
+
+      .brand-text {
         display: flex;
         flex-direction: column;
 
-        .brand-header {
-            padding: 1.5rem 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.85rem;
-            background: linear-gradient(135deg, $brand-navy 0%, $brand-navy-dark 100%);
-
-            .brand-icon-wrapper {
-                background-color: $brand-red;
-                color: #ffffff;
-                width: 44px;
-                height: 44px;
-                border-radius: 10px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                box-shadow: 0 4px 10px rgba(217, 37, 37, 0.35);
-
-                mat-icon {
-                    font-size: 26px;
-                    width: 26px;
-                    height: 26px;
-                }
-            }
-
-            .brand-text {
-                display: flex;
-                flex-direction: column;
-
-                .brand-title {
-                    font-weight: 800;
-                    font-size: 1.15rem;
-                    letter-spacing: 0.5px;
-                    color: #ffffff;
-                }
-
-                .brand-subtitle {
-                    font-size: 0.72rem;
-                    color: #cbd5e1;
-                    margin-top: 2px;
-                }
-            }
+        .brand-title {
+          font-weight: 800;
+          font-size: 1.15rem;
+          color: #ffffff;
         }
 
-        .nav-list {
-            padding: 1rem 0.65rem;
-            flex: 1;
-
-            .nav-item {
-                border-radius: 8px;
-                margin-bottom: 0.4rem;
-                /* Contraste corregido: texto e iconos claramente visibles en blanco suave */
-                color: #e2e8f0 !important;
-                opacity: 0.9;
-                transition: background-color 0.2s, opacity 0.2s;
-
-                .nav-icon {
-                    color: #cbd5e1 !important;
-                }
-
-                .nav-label {
-                    font-weight: 500;
-                    font-size: 0.92rem;
-                    color: #f8fafc !important;
-                }
-
-                &:hover {
-                    background-color: rgba(255, 255, 255, 0.12) !important;
-                    opacity: 1;
-
-                    .nav-icon {
-                        color: #ffffff !important;
-                    }
-                }
-
-                &.active-link {
-                    background-color: $brand-red !important;
-                    opacity: 1;
-                    color: #ffffff !important;
-
-                    .nav-icon {
-                        color: #ffffff !important;
-                    }
-
-                    .nav-label {
-                        font-weight: 700;
-                        color: #ffffff !important;
-                    }
-                }
-            }
+        .brand-subtitle {
+          font-size: 0.72rem;
+          color: #cbd5e1;
         }
-
-        .sidenav-footer {
-            padding: 1rem;
-            text-align: center;
-            color: #94a3b8;
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-
-            .store-location {
-                font-size: 0.75rem;
-                color: #cbd5e1;
-                font-weight: 600;
-            }
-
-            small {
-                font-size: 0.7rem;
-            }
-        }
+      }
     }
 
-    .layout-content {
+    .nav-list {
+      padding: 1rem 0.65rem;
+      flex: 1;
+
+      .nav-item {
+        border-radius: 8px;
+        margin-bottom: 0.4rem;
+        color: #e2e8f0 !important;
+
+        .nav-icon {
+          color: #cbd5e1 !important;
+        }
+
+        .nav-label {
+          font-weight: 500;
+          font-size: 0.92rem;
+          color: #f8fafc !important;
+        }
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.12) !important;
+        }
+
+        &.active-link {
+          background-color: $brand-red !important;
+          color: #ffffff !important;
+
+          .nav-icon, .nav-label {
+            color: #ffffff !important;
+            font-weight: 700;
+          }
+        }
+      }
+    }
+
+    .sidenav-footer {
+      padding: 1rem;
+      text-align: center;
+      color: #94a3b8;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+      .store-location {
+        font-size: 0.75rem;
+        color: #cbd5e1;
+        font-weight: 600;
+        display: block;
+      }
+      small {
+        font-size: 0.7rem;
+      }
+    }
+  }
+
+  .layout-content {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: auto;
+    background-color: #f1f5f9 !important;
+
+    .layout-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      height: 64px;
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border-bottom: 1px solid #e2e8f0;
+
+      .toolbar-title-active {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #475569 !important;
+        margin-left: 0.75rem;
+      }
+
+      .toolbar-spacer {
+        flex: 1 1 auto;
+      }
+
+      .user-profile-section {
         display: flex;
-        flex-direction: column;
-        height: 100vh;
-        overflow-y: auto;
+        align-items: center;
+        gap: 0.75rem;
 
-        .layout-toolbar {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            height: 64px;
-            background-color: #ffffff;
-            color: #0f172a;
-            border-bottom: 1px solid #e2e8f0;
+        .user-meta {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
 
-            .toolbar-title-active {
-                font-size: 0.95rem;
-                font-weight: 600;
-                color: #475569;
-                margin-left: 0.75rem;
+          .user-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1e293b !important;
+          }
+
+          .user-role-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background-color: #e2e8f0;
+            color: #475569;
+
+            &.badge-admin {
+              background-color: #fee2e2;
+              color: $brand-red;
             }
-
-            .toolbar-spacer {
-                flex: 1 1 auto;
-            }
-
-            .user-profile-section {
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-
-                .user-meta {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: flex-end;
-                    line-height: 1.2;
-
-                    .user-name {
-                        font-size: 0.875rem;
-                        font-weight: 600;
-                        color: #1e293b;
-                    }
-
-                    .user-role-badge {
-                        font-size: 0.7rem;
-                        font-weight: 600;
-                        padding: 2px 8px;
-                        border-radius: 4px;
-                        background-color: #e2e8f0;
-                        color: #475569;
-
-                        &.badge-admin {
-                            background-color: #fee2e2;
-                            color: $brand-red;
-                        }
-                    }
-                }
-
-                .btn-avatar {
-                    color: $brand-navy;
-                }
-            }
+          }
         }
 
-        .page-container {
-            padding: 1.5rem;
-            flex: 1;
-            box-sizing: border-box;
+        .btn-avatar {
+          color: $brand-navy;
         }
+      }
     }
+
+    .page-container {
+      padding: 1.5rem;
+      flex: 1;
+      box-sizing: border-box;
+      background-color: #f1f5f9 !important;
+    }
+  }
 }
 
 .menu-header {
-    padding: 0.5rem 1rem;
-
-    .menu-user-email {
-        margin: 0;
-        font-size: 0.8rem;
-        color: #64748b;
-    }
+  padding: 0.5rem 1rem;
+  .menu-user-email {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #64748b;
+  }
 }

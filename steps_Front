@@ -260,3 +260,29 @@ New-Item -ItemType File -Force -Path "src/app/features/inventario/producto-dialo
 New-Item -ItemType File -Force -Path "src/app/features/inventario/producto-dialog/producto-dialog.component.html"
 New-Item -ItemType File -Force -Path "src/app/features/inventario/producto-dialog/producto-dialog.component.scss"
 
+# Resumen Implementacion de Signals
+# Paso a paso para usar Signals en Angular:
+Declarar el Signal privado y mutable en el Servicio:
+
+TypeScript
+private readonly _carrito = signal<CarritoItem[]>([]);
+Exponerlo de solo lectura hacia los componentes:
+
+TypeScript
+readonly carrito = this._carrito.asReadonly();
+Crear valores calculados con computed() (se actualizan solos cuando cambia el Signal):
+
+TypeScript
+readonly totalPagar = computed(() => 
+  this._carrito().reduce((acc, item) => acc + item.subtotal, 0)
+);
+Modificar su valor:
+
+Reemplazar: this._carrito.set(nuevosItems);
+
+Actualizar según el estado previo: this._carrito.update(items => [...items, nuevo]);
+
+Leerlo en TypeScript: Invocándolo como función: this.carrito()
+
+Leerlo en el HTML: <span>{{ carritoService.totalPagar() }}</span> (Angular actualiza solo ese <span> sin redibujar toda la página).
+
