@@ -343,3 +343,15 @@ ng g c features/pos/ticket-dialog --skip-tests
 
 PowerShell
 npm install @angular/animations@^19.0.0
+
+
+# Guía rápida para futuros despliegues
+Para no tener que autorizar repositorio por repositorio en futuros proyectos:
+
+Ve a tu GitHub: Settings > Applications > pestaña Authorized GitHub Apps (o Installed GitHub Apps).
+
+Haz clic en Configure junto a Vercel.
+
+En la sección Repository access, selecciona "All repositories" y pulsa Save.
+
+De esta manera, cualquier repositorio que crees en el futuro aparecerá de inmediato en Vercel sin necesidad de pasos adicionales.
