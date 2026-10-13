@@ -4,6 +4,7 @@ git branch -M main
 git status
 
 # Enlazar con github
+
 echo "# TiendaRepuestos-UI" >> README.md
 git init
 git add README.md
@@ -13,26 +14,33 @@ git remote add origin https://github.com/Ederam/TiendaRepuestos-UI.git
 git push -u origin main
 
 # 1. Comprobar estado de archivos
+
 git status
 
 # 2. Agregar todos los cambios realizados
+
 git add .
 
 # 3. Crear el commit formal
+
 git commit -m "feat(core): configuracion de arquitectura base, models DTOs, AuthService con Signals, interceptores y documentacion"
 
 # 4. Vincular el repositorio remoto (reemplaza con tu URL real)
+
 git remote add origin https://github.com/Ederam/TiendaRepuestos-UI.git
 
 # 5. Asegurar nombre de rama principal y enviar cambios
+
 git branch -M main
 git push -u origin main
 
 # Setear usuario
+
 git config user.name "ederam"
 git config user.email "eramirezc1@ucentral.edu.co"
 
 # Verificación
+
 Para comprobar que los datos quedaron registrados correctamente en este repositorio, ejecuta:
 
 PowerShell
@@ -45,63 +53,97 @@ git commit -m "feat(auth): implementacion de guards RBAC, placeholders de featur
 git push origin main
 
 # 1. Verificar estado de los archivos modificados
+
 git status
 
 # 2. Agregar todos los cambios al stage
+
 git add .
 
 # 3. Crear el commit formal
+
 git commit -m "feat(auth): resolucion de enrutamiento base con router-outlet y despliegue del componente standalone de Login con Angular Material"
 
 # 4. Enviar los cambios a la rama principal remota
+
 git push origin main
 
-
 # 1. Comprobar archivos en stage
+
 git status
 
 # 2. Agregar cambios
+
 git add .
 
 # 3. Crear commit formal de hito
+
 git commit -m "feat(inventario): catalogo paginado con MatTable, debounceTime(400) e identidad visual MACROLATAS en Shell Layout"
 
 # 4. Enviar al repositorio remoto
+
 git push origin main
 
 # 1. Comprobar archivos modificados
+
 git status
 
 # 2. Agregar cambios
+
 git add .
 
 # 3. Crear commit formal
+
 git commit -m "fix(ui): correccion de contraste en sidenav, ajuste de label flotante y boton limpiar en buscador POS"
 
 # 4. Enviar a remoto
+
 git push origin main
 
 # 1. Comprobar archivos modificados
+
 git status
 
 # 2. Agregar todos los cambios
+
 git add .
 
 # 3. Commit semántico formal
+
 git commit -m "feat(inventario): modal MatDialog para repuestos, sanitizacion de codigos a mayusculas y parametrizacion de categorias"
 
 # 4. Enviar a GitHub
+
 git push origin main
 
-
 # 1. Verificar estado de los archivos
+
 git status
 
 # 2. Agregar cambios
+
 git add .
 
 # 3. Commit de hito
+
 git commit -m "feat(reportes-pwa): AJuste para configurar menus desde cosntante, dashboard gerencial de metricas con ReporteService y configuracion PWA con service worker"
 
 # 4. Enviar al repositorio remoto
+
+git push origin main
+
+# 1. Comprobar los archivos modificados
+
+git status
+
+# 2. Agregar todos los cambios al staging
+
+git add .
+
+# 3. Crear commit formal
+
+git commit -m "feat(theming-pwa): centralizacion de variables CSS en styles.scss, dashboard KPI y documentacion PWA"
+
+# 4. Enviar los cambios al repositorio remoto
+
 git push origin main

@@ -210,3 +210,14 @@ El frontend de **TiendaRepuestos** es una Single Page Application (SPA) transacc
   - Implementación de `ReportesDashboardComponent` con KPIs de ingresos, tickets, alertas de stock mínimo y top repuestos más vendidos.
   - Gráfica de distribución proporcional de pagos (Efectivo, Transferencia, Tarjeta).
   - Integración del Service Worker de Angular y manifiesto PWA para instalación como app nativa.
+
+### Hito 10 — Centralización de Tokens CSS, Dashboard KPI y Fundamentos PWA
+
+- **Fecha:** 2026-10-13
+- **Entregables:**
+  - Desacoplamiento de tokens de color mediante CSS Custom Properties (`var(--brand-red)`, `var(--brand-navy)`) en `styles.scss` para soporte de Theming y Marca Blanca.
+  - Consolidación del panel de métricas y tarjetas KPI gerenciales para visualización inmediata de salud financiera y rotación de stock.
+  - Incorporación del ecosistema PWA: Service Worker de Angular y `manifest.webmanifest` para instalación directa en dispositivos de mostrador y bodega.
+- **Lecciones Aprendidas:**
+  - **Tokens de Diseño:** El uso reiterado de variables SCSS locales (`$color`) genera dispersión y deuda técnica; las variables CSS nativas (`:root`) permiten centralizar la identidad corporativa y facilitan la conmutación dinámica de estilos multi-cliente.
+  - **Concepto PWA:** Un Service Worker almacena en caché local la carcasa de la aplicación (Application Shell), permitiendo arrancar la SPA en terminales móviles con rendimiento nativo.

@@ -1,27 +1,38 @@
-/* Reset general y tipografía */
-html,
-body {
-    height: 100%;
-    margin: 0;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
-    background-color: #f1f5f9;
+/* ==========================================================================
+   Variables de Identidad de Marca — MACROLATAS
+   ========================================================================== */
+:root {
+  --brand-navy: #18215d;
+  --brand-navy-dark: #0f153d;
+  --brand-red: #d92525;
+  --brand-red-hover: #b91c1c;
+  --brand-surface: #ffffff;
+  --brand-bg: #f1f5f9;
 }
 
-/* Modificadores globales para SnackBars del ErrorInterceptor */
+/* Reset general */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--brand-bg);
+}
+
+/* Modificadores globales para SnackBars */
 .error-snackbar {
-    --mdc-snackbar-container-color: #b91c1c !important;
-    --mdc-snackbar-supporting-text-color: #ffffff !important;
-    font-weight: 500;
+  --mdc-snackbar-container-color: #b91c1c !important;
+  --mdc-snackbar-supporting-text-color: #ffffff !important;
+  font-weight: 500;
 }
 
 .warning-snackbar {
-    --mdc-snackbar-container-color: #d97706 !important;
-    --mdc-snackbar-supporting-text-color: #ffffff !important;
-    font-weight: 500;
+  --mdc-snackbar-container-color: #d97706 !important;
+  --mdc-snackbar-supporting-text-color: #ffffff !important;
+  font-weight: 500;
 }
 
 .success-snackbar {
-    --mdc-snackbar-container-color: #15803d !important;
-    --mdc-snackbar-supporting-text-color: #ffffff !important;
-    font-weight: 500;
+  --mdc-snackbar-container-color: #15803d !important;
+  --mdc-snackbar-supporting-text-color: #ffffff !important;
+  font-weight: 500;
 }
