@@ -260,3 +260,12 @@ Copia y pega este bloque en **`hoja_de_ruta_y_lecciones_aprendidas.md`**:
   - **Sintaxis de CSS Custom Properties:** La instrucción `var(--token)` no puede existir de forma aislada en la raíz de una hoja de estilos; debe asignarse a una propiedad (`background-color: var(--token);`).
   - **Impresión de Diálogos Modales (CDK Overlays):** Los componentes desplegados mediante `MatDialog` residen en un contenedor hermano fuera de `app-root` (`.cdk-overlay-container`). Al aplicar `@media print`, la instrucción `body * { visibility: hidden; }` oculta el contenedor global del overlay e invalida el layout de impresión. La solución correcta consiste en ocultar selectivamente `app-root` y redefinir `.cdk-overlay-container` como `display: block; position: static;` permitiendo la captura limpia del ticket térmico en PDF o rollo físico.
 ```
+
+### Hito 15 — Resolución de Dependencia de Animaciones para Build de Producción
+
+- **Fecha:** 2026-10-13
+- **Entregables:**
+  - Instalación formal de `@angular/animations` para compatibilidad completa con `provideAnimationsAsync()`.
+  - Validación exitosa de empaquetado de producción (`npm run build`) generando artefactos en `dist/tienda-repuestos-ui/browser`.
+- **Lecciones Aprendidas:**
+  - **`provideAnimationsAsync()` en Entornos de Producción:** Aunque `ng serve` puede tolerar la ausencia de `@angular/animations` en memoria, el bundler de producción (esbuild) valida estrictamente las importaciones dinámicas (`import('@angular/animations/browser')`), requiriendo que la dependencia esté declarada en `package.json`.

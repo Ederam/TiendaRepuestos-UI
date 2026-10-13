@@ -337,3 +337,9 @@ Ejecuta en PowerShell:
 
 PowerShell
 ng g c features/pos/ticket-dialog --skip-tests
+
+
+# Ejecuta el siguiente comando en la raíz del proyecto para instalar @angular/animations con la misma versión que tus otros paquetes de Angular:
+
+PowerShell
+npm install @angular/animations@^19.0.0
