@@ -302,3 +302,13 @@ Copia y pega este bloque en **`hoja_de_ruta_y_lecciones_aprendidas.md`**:
   - Verificación del autocompletado de clientes en el formulario del POS y modal de alta rápida.
 - **Lecciones Aprendidas:**
   - **Componentes Standalone en Angular 19:** A diferencia de la arquitectura tradicional basada en `NgModule`, en componentes `standalone: true` toda directiva de plantilla (`matAutocomplete`, `matPrefix`, etc.) debe estar expresamente declarada en la lista `imports` del componente específico; de lo contrario, el compilador no enlaza las propiedades en el DOM (errores NG8001/NG8002).
+
+### Hito 19 — Integración de Gestión de Clientes en Producción y Ciclo de Vida de Tokens
+
+- **Fecha:** 2026-10-14
+- **Entregables:**
+  - Fusión de la rama `feat/clientes-facturacion` a la rama `main` y despliegue continuo en Vercel.
+  - Validación del comportamiento de persistencia en `localStorage` vs. expiración de tokens JWT en `AuthService`.
+  - Habilitación del flujo completo de ventas: selección/alta ágil de clientes, ticket con autocalculo y emisión de comprobante térmico.
+- **Lecciones Aprendidas:**
+  - **Expiración de Tokens JWT:** En arquitecturas SPA, la persistencia en `localStorage` mantiene viva la sesión mientras el token no haya superado su claim `exp`. La exclusión controlada de expiración en entornos mock acelera el desarrollo de interfaz, mientras que en producción la validación contra el reloj Unix garantiza la seguridad de las sesiones inactivas.
