@@ -25,6 +25,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 // Core
 import { ProductoService } from '../../core/services/productos/producto.service';
@@ -40,6 +41,9 @@ import {
   MetodoPagoId,
 } from '../../core/constants/pagos.constants';
 import { TicketDialogComponent } from './ticket-dialog/ticket-dialog.component';
+import { ClienteService } from '@core/services/clientes/cliente.service';
+import { Cliente } from '@core/models/cliente.models';
+import { ClienteDialogComponent } from './cliente-dialog/cliente-dialog.component';
 
 export interface CarritoItem {
   producto: Producto;
@@ -63,6 +67,7 @@ export interface CarritoItem {
     MatDividerModule,
     MatProgressBarModule,
     MatTooltipModule,
+    MatAutocompleteModule,
   ],
   templateUrl: './pos.component.html',
   styleUrl: './pos.component.scss',
@@ -72,6 +77,7 @@ export class PosComponent implements OnInit {
   private readonly ventaService = inject(VentaService);
   private readonly notify = inject(NotificationService);
   private readonly dialog = inject(MatDialog);
+  private readonly clienteService = inject(ClienteService);
 
   readonly metodosPago = LISTA_METODOS_PAGO;
 
@@ -80,6 +86,52 @@ export class PosComponent implements OnInit {
   readonly carrito = signal<CarritoItem[]>([]);
   readonly isBuscando = signal<boolean>(false);
   readonly isProcesandoVenta = signal<boolean>(false);
+  /** Clientes encontrados para el autocompletado */
+  readonly clientesSugeridos = signal<Cliente[]>([]);
+  readonly clienteSeleccionado = signal<Cliente | null>(null);
+
+  /**
+   * Escucha la búsqueda de clientes mientras se escribe en el documento.
+   */
+  onBuscarCliente(valor: string): void {
+    if (!valor || valor.trim().length < 2) {
+      this.clientesSugeridos.set([]);
+      return;
+    }
+
+    this.clienteService.buscarPorTermino(valor).subscribe((res) => {
+      this.clientesSugeridos.set(res);
+    });
+  }
+
+  /**
+   * Asigna el cliente seleccionado al formulario.
+   */
+  seleccionarCliente(cliente: Cliente): void {
+    this.clienteSeleccionado.set(cliente);
+    this.ventaForm.patchValue({
+      clienteDocumento: cliente.documento,
+      clienteNombre: cliente.nombre,
+    });
+    this.clientesSugeridos.set([]);
+  }
+
+  /**
+   * Abre el modal para crear un cliente nuevo con el documento ya digitado.
+   */
+  abrirModalNuevoCliente(): void {
+    const docActual = this.ventaForm.get('clienteDocumento')?.value || '';
+    const dialogRef = this.dialog.open(ClienteDialogComponent, {
+      width: '520px',
+      data: { documentoInicial: docActual },
+    });
+
+    dialogRef.afterClosed().subscribe((clienteCreado: Cliente | null) => {
+      if (clienteCreado) {
+        this.seleccionarCliente(clienteCreado);
+      }
+    });
+  }
 
   readonly searchControl = new FormControl<string>('', { nonNullable: true });
 

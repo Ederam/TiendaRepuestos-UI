@@ -3,7 +3,11 @@
  * Provee enrutamiento, animaciones, cliente HTTP e inyección condicional de adaptadores.
  */
 
-import { ApplicationConfig, provideZoneChangeDetection, isDevMode } from '@angular/core';
+import {
+  ApplicationConfig,
+  provideZoneChangeDetection,
+  isDevMode,
+} from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -32,6 +36,9 @@ import { ReporteService } from '@core/services/reportes/reporte.service';
 import { ReporteMockService } from '@core/services/reportes/reporte-mock.service';
 import { ReporteHttpService } from '@core/services/reportes/reporte-http.service';
 import { provideServiceWorker } from '@angular/service-worker';
+import { ClienteMockService } from '@core/services/clientes/cliente-mock.service';
+import { ClienteHttpService } from '@core/services/clientes/cliente-http.service';
+import { ClienteService } from '@core/services/clientes/cliente.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -56,11 +63,16 @@ export const appConfig: ApplicationConfig = {
       useClass: environment.useMocks ? VentaMockService : VentaHttpService,
     },
     {
+      provide: ClienteService,
+      useClass: environment.useMocks ? ClienteMockService : ClienteHttpService,
+    },
+    {
       provide: ReporteService,
       useClass: environment.useMocks ? ReporteMockService : ReporteHttpService,
-    }, provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000'
-          }),
+    },
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
   ],
 };

@@ -280,3 +280,25 @@ Copia y pega este bloque en **`hoja_de_ruta_y_lecciones_aprendidas.md`**:
   - Modelado conceptual para proveedores múltiples, marcas alternativas (TYC, DEPO, Genérico) y consulta de inventario compartido (Latas y Bomperes / Eurocar).
 - **Lecciones Aprendidas:**
   - **Doble Estado de Inventario en Mostrador:** El stock físico de base de datos no es idéntico al stock disponible inmediato para venta mientras hay un ticket en proceso. Emplear un valor proyectado derivado (`computed`) garantiza consistencia visual y previene errores de sobreventa sin modificar prematuramente el registro en el servidor.
+
+### Hito 18 — Gestión Ágil de Clientes en Mostrador y Soporte para Facturación
+
+- **Fecha:** 2026-10-14
+- **Rama Git:** `feat/clientes-facturacion`
+- **Entregables:**
+  - Puerto `ClienteService` y adaptadores (`ClienteMockService` / `ClienteHttpService`) para búsqueda por documento o término.
+  - Autocompletado reactivo de clientes en mostrador (`MatAutocomplete`) para agilizar transacciones repetitivas sin digitar datos manualmente.
+  - Modal rápido `ClienteDialogComponent` para registrar nuevos clientes (Cédula/NIT, Nombre, Teléfono, Correo y bandera de Factura Electrónica) sin interrumpir el ticket de venta.
+- **Lecciones Aprendidas:**
+  - **Experiencia de Usuario en Mostrador Tradicional:** En un almacén de repuestos, obligar a registrar un cliente antes de vender ralentiza la operación. La solución óptima es mantener "Cliente Mostrador" por defecto y habilitar el autocompletado y registro rápido solo cuando el cliente requiera comprobante formal o factura electrónica.
+
+### Hito 18 — Resolución de Dependencias en Standalone Component y Autocompletado de Clientes
+
+- **Fecha:** 2026-10-14
+- **Rama Git:** `feat/clientes-facturacion`
+- **Entregables:**
+  - Registro de `MatAutocompleteModule` en `PosComponent.imports` para habilitar directivas `matAutocomplete`.
+  - Normalización de paths de importación hacia la capa `core` de clientes.
+  - Verificación del autocompletado de clientes en el formulario del POS y modal de alta rápida.
+- **Lecciones Aprendidas:**
+  - **Componentes Standalone en Angular 19:** A diferencia de la arquitectura tradicional basada en `NgModule`, en componentes `standalone: true` toda directiva de plantilla (`matAutocomplete`, `matPrefix`, etc.) debe estar expresamente declarada en la lista `imports` del componente específico; de lo contrario, el compilador no enlaza las propiedades en el DOM (errores NG8001/NG8002).

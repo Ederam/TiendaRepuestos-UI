@@ -383,3 +383,10 @@ Se aplica el método contable PEPS (Primeras en Entrar, Primeras en Salir) o Cos
 
 En la base de datos se guarda el costo histórico de cada entrada en la tabla DetalleCompra. Al vender, el sistema descuenta primero el lote más antiguo o permite al cajero elegir el lote correspondiente.
 
+Modal de Registro Rápido de Cliente (cliente-dialog)
+Creamos el modal simple para el mostrador.
+
+4.1 Comando:
+PowerShell
+ng g c features/pos/cliente-dialog --skip-tests
+

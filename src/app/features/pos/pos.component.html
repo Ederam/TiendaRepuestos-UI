@@ -116,14 +116,35 @@
 
         <!-- Formulario de Cobro -->
         <form [formGroup]="ventaForm" (ngSubmit)="procesarVenta()" class="checkout-form">
-            <div class="customer-fields">
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label>C.C. / NIT Cliente (Opcional)</mat-label>
-                    <input matInput formControlName="clienteDocumento" placeholder="Ej: 80123456" />
-                </mat-form-field>
+            <!-- Sección Cliente Ágil -->
+            <div class="customer-section">
+                <div class="customer-row">
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field-doc">
+                        <mat-label>C.C. / NIT Cliente</mat-label>
+                        <input matInput formControlName="clienteDocumento" placeholder="Buscar por cédula o nombre..."
+                            [matAutocomplete]="autoCliente" (input)="onBuscarCliente($any($event.target).value)" />
+                        <mat-autocomplete #autoCliente="matAutocomplete">
+                            @for (cli of clientesSugeridos(); track cli.id) {
+                            <mat-option [value]="cli.documento" (onSelectionChange)="seleccionarCliente(cli)">
+                                <div class="client-option">
+                                    <strong>{{ cli.documento }}</strong> — {{ cli.nombre }}
+                                    @if (cli.esFacturaElectronica) {
+                                    <span class="badge-fe">FE</span>
+                                    }
+                                </div>
+                            </mat-option>
+                            }
+                        </mat-autocomplete>
+                    </mat-form-field>
+
+                    <button mat-icon-button type="button" color="primary" class="btn-add-client"
+                        matTooltip="Registrar nuevo cliente" (click)="abrirModalNuevoCliente()">
+                        <mat-icon>person_add</mat-icon>
+                    </button>
+                </div>
 
                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label>Nombre Cliente (Opcional)</mat-label>
+                    <mat-label>Nombre / Razón Social</mat-label>
                     <input matInput formControlName="clienteNombre" placeholder="Cliente Mostrador" />
                 </mat-form-field>
             </div>
