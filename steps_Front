@@ -436,3 +436,13 @@ Creamos el componente interactivo con Angular Material.
 PowerShell
 ng g c features/inventario/inventario-import --skip-tests
 
+# Estructura de carpetas propuesta:
+Plaintext
+src/app/features/inventario/inventario-import/
+ ├── strategies/
+ │    ├── excel-parser.strategy.ts         (Contrato común)
+ │    ├── macrolatas-parser.strategy.ts    (Lógica Macrolatas)
+ │    └── eurocar-parser.strategy.ts       (Lógica Eurocar con las columnas de tu imagen)
+ ├── utils/
+ │    └── excel-numeric.utils.ts           (Métodos puros de 3 líneas)
+ ├── inventario-import.component.ts        (Componente limpio < 60 líneas)

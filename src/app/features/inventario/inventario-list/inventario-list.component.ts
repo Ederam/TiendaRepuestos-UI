@@ -56,9 +56,9 @@ export class InventarioListComponent implements OnInit {
     'codigo',
     'nombre',
     'categoria',
+    'ubicacion',
     'precioVenta',
     'stock',
-    'estado',
     'acciones',
   ];
 
