@@ -312,3 +312,25 @@ Copia y pega este bloque en **`hoja_de_ruta_y_lecciones_aprendidas.md`**:
   - Habilitación del flujo completo de ventas: selección/alta ágil de clientes, ticket con autocalculo y emisión de comprobante térmico.
 - **Lecciones Aprendidas:**
   - **Expiración de Tokens JWT:** En arquitecturas SPA, la persistencia en `localStorage` mantiene viva la sesión mientras el token no haya superado su claim `exp`. La exclusión controlada de expiración en entornos mock acelera el desarrollo de interfaz, mientras que en producción la validación contra el reloj Unix garantiza la seguridad de las sesiones inactivas.
+
+### Hito 20 — Despliegue de Clientes en Producción y Apertura de Rama de Carga Masiva
+
+- **Fecha:** 2026-10-14
+- **Ramas Git:** `main` (desplegada en Vercel) -> `feat/inventario-carga-masiva` (activa)
+- **Entregables:**
+  - Publicación en producción en Vercel del módulo de ventas con autocompletado y registro rápido de clientes.
+  - Creación de la rama `feat/inventario-carga-masiva` para soportar importación masiva de Excel multiorigen y clasificación por marcas y condiciones.
+- **Lecciones Aprendidas:**
+  - **Seguridad en Tokens SPA:** El uso de Bearer Tokens en `localStorage` es estándar para arquitecturas desacopladas y PWAs. Su seguridad se basa en una estricta política de expiración por claims `exp`, transporte exclusivo bajo HTTPS y contención de inyecciones XSS evitando renderizado de HTML no sanitizado.
+
+### Hito 21 — Módulo de Importación Masiva Excel (SheetJS) y Catálogo Multiorigen
+
+- **Fecha:** 2026-10-14
+- **Rama Git:** `feat/inventario-carga-masiva`
+- **Entregables:**
+  - Integración de SheetJS (`xlsx`) para parseo y extracción de hojas de cálculo directamente en el navegador.
+  - Ampliación de contratos de dominio en `Producto`: soporte de marca (`TYC`, `DEPO`, `CHINA`), condición (`Nuevo`/`Segunda`), origen (`PROPIO_MACROLATAS`, `ALIADO_EUROCAR`) y ubicación física.
+  - Componente `InventarioImportComponent` con selector de plantilla, previsualización de lotes y validación antes de confirmar la importación.
+  - Extensión de `ProductoService` con contrato y adaptadores de `cargaMasiva`.
+- **Lecciones Aprendidas:**
+  - **Patrón de Previsualización en Carga Masiva:** En lugar de enviar un archivo binario a ciegas al backend arriesgando fallos de integridad referencial, procesar el archivo en el navegador del operador y proyectar una muestra previa permite validar columnas, precios y cantidades antes de ejecutar transacciones masivas en base de datos.

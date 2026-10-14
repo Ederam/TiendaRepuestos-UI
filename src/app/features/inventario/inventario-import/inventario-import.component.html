@@ -1,0 +1,147 @@
+<div class="import-container">
+    <!-- Cabecera -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Carga Masiva de Repuestos (Excel)</h1>
+            <p class="page-subtitle">
+                Importa catálogos propios de MACROLATAS o listados compartidos de aliados (Latas y Bomperes / Eurocar).
+            </p>
+        </div>
+        <a mat-stroked-button routerLink="/inventario">
+            <mat-icon>arrow_back</mat-icon>
+            <span>Volver a Inventario</span>
+        </a>
+    </div>
+
+    <!-- Tarjeta de Configuración y Subida -->
+    <mat-card class="upload-card">
+        <div class="card-grid">
+            <!-- Selector de Tipo de Formato -->
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Formato o Tipo de Lista</mat-label>
+                <mat-select [value]="formatoSeleccionado()" (selectionChange)="formatoSeleccionado.set($event.value)">
+                    <mat-option value="MACROLATAS">Plantilla Propia MACROLATAS (Hojas por categoría)</mat-option>
+                    <mat-option value="EUROCAR_NUEVO">Listado Aliado EUROCAR (Repuestos Nuevos)</mat-option>
+                    <mat-option value="EUROCAR_SEGUNDA">Listado Aliado EUROCAR (Repuestos de Segunda)</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Botón de Selección de Archivo -->
+            <div class="file-uploader">
+                <input type="file" #fileInput accept=".xlsx, .xls, .csv" (change)="onFileChange($event)"
+                    style="display: none;" />
+                <button mat-flat-button color="primary" class="btn-upload" (click)="fileInput.click()"
+                    [disabled]="isProcesando()">
+                    <mat-icon>upload_file</mat-icon>
+                    <span>Seleccionar Archivo Excel (.xlsx)</span>
+                </button>
+
+                @if (nombreArchivo()) {
+                <span class="file-name">{{ nombreArchivo() }}</span>
+                }
+            </div>
+        </div>
+    </mat-card>
+
+    @if (isProcesando()) {
+    <mat-progress-bar mode="indeterminate" class="loading-bar"></mat-progress-bar>
+    }
+
+    <!-- Previsualización -->
+    @if (itemsPrevisualizacion().length > 0) {
+    <mat-card class="preview-card">
+        <div class="preview-header">
+            <div class="preview-info">
+                <mat-icon class="icon-valid">check_circle</mat-icon>
+                <span>
+                    <strong>{{ itemsPrevisualizacion().length }}</strong> referencias detectadas y listas para procesar.
+                </span>
+            </div>
+            <div class="preview-actions">
+                <button mat-button (click)="cancelar()" [disabled]="isProcesando()">
+                    Descartar
+                </button>
+                <button mat-flat-button color="primary" class="btn-confirm" (click)="confirmarImportacion()"
+                    [disabled]="isProcesando()">
+                    <mat-icon>cloud_upload</mat-icon>
+                    <span>Confirmar e Importar al Catálogo</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabla de Datos Extraídos -->
+        <div class="table-responsive">
+            <table mat-table [dataSource]="itemsPrevisualizacion().slice(0, 50)" class="preview-table">
+                <ng-container matColumnDef="codigo">
+                    <th mat-header-cell *matHeaderCellDef>Código</th>
+                    <td mat-cell *matCellDef="let row">
+                        <span class="badge-code">{{ row.codigo }}</span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="nombre">
+                    <th mat-header-cell *matHeaderCellDef>Descripción</th>
+                    <td mat-cell *matCellDef="let row">{{ row.nombre }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="marca">
+                    <th mat-header-cell *matHeaderCellDef>Marca</th>
+                    <td mat-cell *matCellDef="let row">{{ row.marcaRepuesto }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="condicion">
+                    <th mat-header-cell *matHeaderCellDef class="text-center">Condición</th>
+                    <td mat-cell *matCellDef="let row" class="text-center">
+                        <span class="badge-pill" [class.badge-new]="row.condicion === 'Nuevo'"
+                            [class.badge-second]="row.condicion === 'Segunda'">
+                            {{ row.condicion }}
+                        </span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="origen">
+                    <th mat-header-cell *matHeaderCellDef class="text-center">Origen</th>
+                    <td mat-cell *matCellDef="let row" class="text-center">
+                        <span class="badge-pill badge-origin">{{ row.origen }}</span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="ubicacion">
+                    <th mat-header-cell *matHeaderCellDef>Ubicación</th>
+                    <td mat-cell *matCellDef="let row">{{ row.ubicacion }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="costo">
+                    <th mat-header-cell *matHeaderCellDef class="text-right">Costo</th>
+                    <td mat-cell *matCellDef="let row" class="text-right">
+                        {{ row.costo | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="precio">
+                    <th mat-header-cell *matHeaderCellDef class="text-right">Precio Venta</th>
+                    <td mat-cell *matCellDef="let row" class="text-right income-cell">
+                        {{ row.precioVenta | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="stock">
+                    <th mat-header-cell *matHeaderCellDef class="text-center">Cant.</th>
+                    <td mat-cell *matCellDef="let row" class="text-center">
+                        <strong>{{ row.stockActual }}</strong>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let r; columns: displayedColumns;"></tr>
+            </table>
+        </div>
+
+        @if (itemsPrevisualizacion().length > 50) {
+        <div class="preview-footer-note">
+            <small>* Mostrando las primeras 50 referencias como muestra de verificación previa.</small>
+        </div>
+        }
+    </mat-card>
+    }
+</div>

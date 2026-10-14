@@ -5,7 +5,12 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
 import { ProductoService } from './producto.service';
-import { Producto, CreateProductoRequest } from '../../models/producto.models';
+import {
+  Producto,
+  CreateProductoRequest,
+  CargaMasivaItemRequest,
+  CargaMasivaResponse,
+} from '../../models/producto.models';
 import {
   PagedResponse,
   ProductoFilterParams,
@@ -16,6 +21,60 @@ import { CATEGORIAS_REPUESTOS } from '../../constants/categorias.constants';
 @Injectable()
 export class ProductoMockService extends ProductoService {
   private catalogoEnMemoria: Producto[] = [...MOCK_PRODUCTOS];
+
+  override cargaMasiva(
+    items: CargaMasivaItemRequest[],
+  ): Observable<CargaMasivaResponse> {
+    let agregados = 0;
+
+    items.forEach((item) => {
+      // Si ya existe el código, actualizamos existencias y precio; si no, lo creamos
+      const existente = this.catalogoEnMemoria.find(
+        (p) => p.codigo.toLowerCase() === item.codigo.toLowerCase(),
+      );
+
+      if (existente) {
+        existente.stockActual += item.stockActual;
+        existente.precioVenta =
+          item.precioVenta > 0 ? item.precioVenta : existente.precioVenta;
+        existente.costo = item.costo > 0 ? item.costo : existente.costo;
+        if (item.ubicacion) existente.ubicacion = item.ubicacion;
+        agregados++;
+      } else {
+        const nuevo: Producto = {
+          id: Math.max(...this.catalogoEnMemoria.map((p) => p.id), 0) + 1,
+          codigo: item.codigo.toUpperCase().trim(),
+          nombre: item.nombre.trim(),
+          descripcion: item.descripcion || '',
+          categoriaId: 1,
+          nombreCategoria: item.categoriaNombre || 'General',
+          marcaRepuesto: item.marcaRepuesto || 'GENÉRICO',
+          marcaVehiculo: item.marcaVehiculo || 'MULTIMARCA',
+          condicion: item.condicion || 'Nuevo',
+          origen: item.origen || 'PROPIO_MACROLATAS',
+          ubicacion: item.ubicacion || 'BODEGA PRINCIPAL',
+          precioVenta: item.precioVenta,
+          costo: item.costo,
+          stockActual: item.stockActual,
+          stockMinimo: 2,
+          activo: true,
+        };
+        this.catalogoEnMemoria.unshift(nuevo);
+        agregados++;
+      }
+    });
+
+    const respuesta: CargaMasivaResponse = {
+      registrosProcesados: items.length,
+      registrosExitosos: agregados,
+      registrosOmitidos: items.length - agregados,
+      mensajes: [
+        `Se procesaron correctamente ${agregados} referencias en el catálogo.`,
+      ],
+    };
+
+    return of(respuesta).pipe(delay(400));
+  }
 
   override getProductosPaginado(
     params: ProductoFilterParams,
@@ -79,6 +138,11 @@ export class ProductoMockService extends ProductoService {
       stockActual: request.stockActual,
       stockMinimo: request.stockMinimo,
       activo: true,
+      condicion: request.condicion || 'Nuevo',
+      origen: request.origen || 'PROPIO_MACROLATAS',
+      marcaRepuesto: request.marcaRepuesto || 'GENÉRICO',
+      marcaVehiculo: request.marcaVehiculo || 'MULTIMARCA',
+      ubicacion: request.ubicacion || 'BODEGA PRINCIPAL',
     };
 
     this.catalogoEnMemoria.unshift(nuevo);

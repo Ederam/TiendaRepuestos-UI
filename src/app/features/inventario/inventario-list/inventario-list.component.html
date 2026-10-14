@@ -6,6 +6,10 @@
             <p class="page-subtitle">Consulta de existencias, precios y catálogo general de repuestos.</p>
         </div>
         <div class="header-actions">
+            <a mat-stroked-button routerLink="/inventario/importar" class="btn-importar">
+                <mat-icon>upload_file</mat-icon>
+                <span>Importar Excel</span>
+            </a>
             <button mat-flat-button color="primary" class="btn-nuevo" (click)="abrirModalCrear()">
                 <mat-icon>add</mat-icon>
                 <span>Nuevo Repuesto</span>

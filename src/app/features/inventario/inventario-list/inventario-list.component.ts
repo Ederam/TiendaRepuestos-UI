@@ -18,9 +18,13 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 // Core
 import { ProductoService } from '../../../core/services/productos/producto.service';
 import { NotificationService } from '../../../core/services/notification.service';
-import { Producto, CreateProductoRequest } from '../../../core/models/producto.models';
+import {
+  Producto,
+  CreateProductoRequest,
+} from '../../../core/models/producto.models';
 import { ProductoDialogComponent } from '../producto-dialog/producto-dialog.component';
 import { CATEGORIAS_REPUESTOS } from '@core/constants/categorias.constants';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-inventario-list',
@@ -37,10 +41,11 @@ import { CATEGORIAS_REPUESTOS } from '@core/constants/categorias.constants';
     MatChipsModule,
     MatProgressBarModule,
     MatTooltipModule,
-    MatDialogModule
+    MatDialogModule,
+    RouterLink,
   ],
   templateUrl: './inventario-list.component.html',
-  styleUrl: './inventario-list.component.scss'
+  styleUrl: './inventario-list.component.scss',
 })
 export class InventarioListComponent implements OnInit {
   private readonly productoService = inject(ProductoService);
@@ -54,7 +59,7 @@ export class InventarioListComponent implements OnInit {
     'precioVenta',
     'stock',
     'estado',
-    'acciones'
+    'acciones',
   ];
 
   readonly productos = signal<Producto[]>([]);
@@ -72,10 +77,7 @@ export class InventarioListComponent implements OnInit {
 
   private setupBuscador(): void {
     this.searchControl.valueChanges
-      .pipe(
-        debounceTime(400),
-        distinctUntilChanged()
-      )
+      .pipe(debounceTime(400), distinctUntilChanged())
       .subscribe(() => {
         this.pageIndex.set(0);
         this.cargarProductos();
@@ -90,7 +92,7 @@ export class InventarioListComponent implements OnInit {
         busqueda: this.searchControl.value,
         soloActivos: true,
         pageNumber: this.pageIndex() + 1,
-        pageSize: this.pageSize()
+        pageSize: this.pageSize(),
       })
       .subscribe({
         next: (response) => {
@@ -100,7 +102,7 @@ export class InventarioListComponent implements OnInit {
         },
         error: () => {
           this.isLoading.set(false);
-        }
+        },
       });
   }
 
@@ -124,19 +126,23 @@ export class InventarioListComponent implements OnInit {
   abrirModalCrear(): void {
     const dialogRef = this.dialog.open(ProductoDialogComponent, {
       width: '640px',
-      data: { modo: 'crear' }
+      data: { modo: 'crear' },
     });
 
-    dialogRef.afterClosed().subscribe((result: CreateProductoRequest | null) => {
-      if (result) {
-        this.productoService.createProducto(result).subscribe({
-          next: (creado) => {
-            this.notify.showSuccess(`Repuesto "${creado.nombre}" registrado exitosamente.`);
-            this.cargarProductos();
-          }
-        });
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .subscribe((result: CreateProductoRequest | null) => {
+        if (result) {
+          this.productoService.createProducto(result).subscribe({
+            next: (creado) => {
+              this.notify.showSuccess(
+                `Repuesto "${creado.nombre}" registrado exitosamente.`,
+              );
+              this.cargarProductos();
+            },
+          });
+        }
+      });
   }
 
   /**
@@ -145,20 +151,24 @@ export class InventarioListComponent implements OnInit {
   abrirModalEditar(prod: Producto): void {
     const dialogRef = this.dialog.open(ProductoDialogComponent, {
       width: '640px',
-      data: { producto: prod, modo: 'editar' }
+      data: { producto: prod, modo: 'editar' },
     });
 
-    dialogRef.afterClosed().subscribe((result: CreateProductoRequest | null) => {
-      if (result) {
-        const cat = CATEGORIAS_REPUESTOS.find((c) => c.id === result.categoriaId);
-        Object.assign(prod, {
-          ...result,
-          codigo: result.codigo.toUpperCase().trim(),
-          nombreCategoria: cat?.nombre || prod.nombreCategoria
-        });
-        this.notify.showSuccess(`Repuesto "${prod.nombre}" actualizado.`);
-        this.cargarProductos();
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .subscribe((result: CreateProductoRequest | null) => {
+        if (result) {
+          const cat = CATEGORIAS_REPUESTOS.find(
+            (c) => c.id === result.categoriaId,
+          );
+          Object.assign(prod, {
+            ...result,
+            codigo: result.codigo.toUpperCase().trim(),
+            nombreCategoria: cat?.nombre || prod.nombreCategoria,
+          });
+          this.notify.showSuccess(`Repuesto "${prod.nombre}" actualizado.`);
+          this.cargarProductos();
+        }
+      });
   }
 }

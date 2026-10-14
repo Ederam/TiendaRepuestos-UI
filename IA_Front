@@ -31,3 +31,38 @@ Por favor, entrégame el paso a paso detallado para:
 1. Crear las interfaces TypeScript en 'core/models' que reflejen exactamente los contratos DTOs del backend.
 2. Implementar el AuthService con Signals para gestionar el estado de sesión y token.
 3. Crear el JwtInterceptor y ErrorInterceptor funcionales.
+
+# Prompt Maestro para Iniciar la Siguiente Conversación
+
+Copia y pega el siguiente bloque como tu primer mensaje en el nuevo chat:
+
+Markdown
+Hola Gemini. Continuamos con el desarrollo integral del sistema de POS e Inventario Automotriz para el almacén familiar "MACROLATAS" (7 de Agosto, Bogotá D.C.), desarrollado con Angular 19 Standalone, Angular Material, Signals y .NET 8 (Clean Architecture).
+
+Este es el resumen del estado actual y la arquitectura consolidada:
+
+1. ESTADO ACTUAL Y ENTREGABLES:
+
+- Repositorio Frontend: TiendaRepuestos-UI desplegado en Vercel (https://tienda-repuestos-ui-xi.vercel.app/).
+- Identidad de Marca: "MACROLATAS — Repuestos de Colisión para Carros", colores institucionales en tokens CSS (:root con --brand-navy: #18215d y --brand-red: #d92525).
+- Módulos Implementados en Frontend:
+  - Autenticación RBAC (Administrador y Vendedor) con guards funcionales y Signals.
+  - Punto de Venta (POS): Búsqueda con debounceTime(350), catálogo reactivo que descuenta existencias en tiempo real (stockDisponibleVisual = stockActual - cantidadEnCarrito), reordenamiento de agotados al final, autocompletado y modal rápido de clientes (Cédula/NIT, FE flag).
+  - Impresión de Comprobante: TicketDialogComponent adaptado para impresoras térmicas de 80mm con reglas @media print en overlay de Material.
+  - Catálogo de Inventario: Tabla paginada, alertas de stock mínimo y modal MatDialog para crear/editar piezas con códigos normalizados a mayúsculas.
+  - Reportes y Métricas: Dashboard gerencial con tarjetas KPI (Ingresos, Transacciones, Quiebres de stock, Catálogo activo) y distribución de métodos de pago.
+  - Capacidades PWA: Configurada con Service Worker (ngsw-worker.js) y manifest.webmanifest para instalación nativa en PC y móviles.
+- Arquitectura de Software: Puertos y Adaptadores (Arquitectura Hexagonal). Todos los servicios tienen interfaz abstracta y dos implementaciones (HTTP real contra .NET 8 y Mock local en memoria) conmutadas desde app.config.ts mediante environment.useMocks.
+
+2. RAMA DE TRABAJO ACTIVA:
+
+- Rama Git: feat/inventario-carga-masiva (derivada de main).
+
+3. NUEVOS REQUERIMIENTOS Y RETOS DE NEGOCIO IDENTIFICADOS:
+
+- Inventario Multiorigen y Multi-Lote: Soportar piezas de bodega propia (MACROLATAS) y piezas compartidas de aliados (LATAS Y BOMPERES / EUROCAR).
+- Distinción de Calidades y Marcas: Un mismo repuesto (ej: Farola Clio 2018) puede ser de distintas marcas (TYC Taiwán, DEPO, Genérico China, Original de Segunda) con costos de adquisición diferentes.
+- Carga Masiva: Importación de hojas de cálculo Excel (.xlsx) con SheetJS (xlsx) procesando tanto la plantilla interna de Macrolatas como listados de aliados (ACT 04 OCT.xlsx) con previsualización antes de guardar.
+- Facturación Electrónica: Soporte para clientes con factura electrónica vía Facturatech (bolsas de 50 folios DIAN).
+
+Por favor, confirma que tienes este contexto claro para continuar con la implementación y pruebas del módulo de carga masiva en inventario-import y la resolución de la persistencia masiva.

@@ -18,14 +18,16 @@ export const routes: Routes = [
       {
         path: 'login',
         loadComponent: () =>
-          import('./features/auth/login/login.component').then((m) => m.LoginComponent)
+          import('./features/auth/login/login.component').then(
+            (m) => m.LoginComponent,
+          ),
       },
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'login'
-      }
-    ]
+        redirectTo: 'login',
+      },
+    ],
   },
 
   // Rutas privadas: Protegidas con authGuard y montadas sobre MainLayoutComponent
@@ -34,19 +36,19 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./core/layout/main-layout/main-layout.component').then(
-        (m) => m.MainLayoutComponent
+        (m) => m.MainLayoutComponent,
       ),
     children: [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'pos'
+        redirectTo: 'pos',
       },
       // POS / Ventas - Vendedor y Administrador
       {
         path: 'pos',
         loadComponent: () =>
-          import('./features/pos/pos.component').then((m) => m.PosComponent)
+          import('./features/pos/pos.component').then((m) => m.PosComponent),
       },
       // Inventario - Exclusivo Administrador
       {
@@ -55,8 +57,8 @@ export const routes: Routes = [
         data: { expectedRoles: [ROLES.ADMIN] },
         loadComponent: () =>
           import('./features/inventario/inventario-list/inventario-list.component').then(
-            (m) => m.InventarioListComponent
-          )
+            (m) => m.InventarioListComponent,
+          ),
       },
       // Reportes - Exclusivo Administrador
       {
@@ -65,15 +67,24 @@ export const routes: Routes = [
         data: { expectedRoles: [ROLES.ADMIN] },
         loadComponent: () =>
           import('./features/reportes/reportes-dashboard/reportes-dashboard.component').then(
-            (m) => m.ReportesDashboardComponent
-          )
-      }
-    ]
+            (m) => m.ReportesDashboardComponent,
+          ),
+      },
+      {
+        path: 'inventario/importar',
+        loadComponent: () =>
+          import('./features/inventario/inventario-import/inventario-import.component').then(
+            (m) => m.InventarioImportComponent,
+          ),
+        canActivate: [roleGuard],
+        data: { roles: [ROLES.ADMIN] },
+      },
+    ],
   },
 
   // Comodín para rutas no encontradas
   {
     path: '**',
-    redirectTo: 'auth/login'
-  }
+    redirectTo: 'auth/login',
+  },
 ];

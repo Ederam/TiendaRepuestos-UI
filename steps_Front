@@ -390,3 +390,49 @@ Creamos el modal simple para el mostrador.
 PowerShell
 ng g c features/pos/cliente-dialog --skip-tests
 
+# Arquitectura y Plan para el Módulo de Carga MasivaBasados en el análisis de los archivos de Excel reales (INVENTARIO MACROLATAS y ACT 04 OCT):                                     Archivos Excel / Listados
+                        ┌───────────────────────────────┐
+                        │ - INVENTARIO MACROLATAS.xlsx  │ (Por categorías: FAROLAS, BOMPERES...)
+                        │ - ACT 04 OCT (EUROCAR / LATAS)│ (Columnas: Codigo, Desc, Cant, Precio, Ubi)
+                        └───────────────┬───────────────┘
+                                        │
+                                        ▼
+                 ┌─────────────────────────────────────────────┐
+                 │       Parser de Excel (xlsx / sheetjs)      │
+                 │      Normalización e Inferencia de Datos    │
+                 └──────────────────────┬──────────────────────┘
+                                        │
+             ┌──────────────────────────┴──────────────────────────┐
+             ▼                                                     ▼
+┌─────────────────────────────┐                       ┌─────────────────────────────┐
+│  Catálogo Físico Propio     │                       │  Inventario Aliados         │
+│  - Origen: MACROLATAS       │                       │  - Origen: EUROCAR / LATAS  │
+│  - Stock: Físico en bodega  │                       │  - Stock: Virtual / Pedido  │
+│  - Marca: TYC / DEPO / etc. │                       │  - Costo aliado para cotizar│
+└─────────────────────────────┘                       └─────────────────────────────┘
+
+# la mejor práctica de la industria (Enterprise Pattern) consiste en dividir el proceso en dos responsabilidades claramente definidas:
+
+[ FRONTEND (Angular 19) ]                     [ BACKEND (.NET 8 + EF Core) ]
+1. Carga de archivo (.xlsx / .csv)           4. Recepción de lote (Batch Request)
+2. Lectura en memoria con SheetJS            5. Validación relacional en BD
+3. Mapeo y PREVISUALIZACIÓN en tabla         6. Inserción masiva optimizada (Bulk Insert)
+   (El usuario valida columnas, precios,        mediante transacciones SQL
+   cantidades y errores antes de guardar)    7. Retorno de métricas:
+                                                - N° Registrados
+                                                - N° Actualizados
+                                                - N° Errores/Omitidos
+
+# Instalar la Librería xlsx (SheetJS)
+En tu terminal PowerShell, ubicado en la raíz del proyecto, ejecuta:
+
+PowerShell
+npm install xlsx@^0.18.5
+
+# Componente de Carga Masiva (inventario-import)
+Creamos el componente interactivo con Angular Material.
+
+1. Comando CLI:
+PowerShell
+ng g c features/inventario/inventario-import --skip-tests
+
