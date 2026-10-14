@@ -269,3 +269,14 @@ Copia y pega este bloque en **`hoja_de_ruta_y_lecciones_aprendidas.md`**:
   - Validación exitosa de empaquetado de producción (`npm run build`) generando artefactos en `dist/tienda-repuestos-ui/browser`.
 - **Lecciones Aprendidas:**
   - **`provideAnimationsAsync()` en Entornos de Producción:** Aunque `ng serve` puede tolerar la ausencia de `@angular/animations` en memoria, el bundler de producción (esbuild) valida estrictamente las importaciones dinámicas (`import('@angular/animations/browser')`), requiriendo que la dependencia esté declarada en `package.json`.
+
+### Hito 17 — Descuento Reactivo de Existencias en POS y Reordenamiento Inteligente
+
+- **Fecha:** 2026-10-14
+- **Entregables:**
+  - Actualización de branding institucional: "MACROLATAS — Repuestos de Colisión para Carros".
+  - Cálculo de existencias disponibles en mostrador en tiempo real (`stockDisponibleVisual = stockActual - cantidadEnCarrito`) mediante Signals y `computed()`.
+  - Reordenamiento automático del catálogo: los productos con disponibilidad física se sitúan en las primeras posiciones y los agotados se desplazan al final.
+  - Modelado conceptual para proveedores múltiples, marcas alternativas (TYC, DEPO, Genérico) y consulta de inventario compartido (Latas y Bomperes / Eurocar).
+- **Lecciones Aprendidas:**
+  - **Doble Estado de Inventario en Mostrador:** El stock físico de base de datos no es idéntico al stock disponible inmediato para venta mientras hay un ticket en proceso. Emplear un valor proyectado derivado (`computed`) garantiza consistencia visual y previene errores de sobreventa sin modificar prematuramente el registro en el servidor.

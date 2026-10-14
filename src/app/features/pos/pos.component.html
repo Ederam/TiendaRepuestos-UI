@@ -22,14 +22,14 @@
         <!-- Grilla de Tarjetas -->
         <div class="products-grid">
             @for (prod of productosDisponibles(); track prod.id) {
-            <mat-card class="product-card" [class.out-of-stock]="prod.stockActual <= 0"
-                (click)="prod.stockActual > 0 && agregarAlCarrito(prod)">
+            <mat-card class="product-card" [class.out-of-stock]="prod.stockDisponibleVisual <= 0"
+                (click)="prod.stockDisponibleVisual > 0 && agregarAlCarrito(prod)">
                 <div class="product-card-top">
                     <span class="product-code">{{ prod.codigo }}</span>
                     <span class="stock-badge"
-                        [class.badge-critical]="prod.stockActual <= prod.stockMinimo && prod.stockActual > 0"
-                        [class.badge-zero]="prod.stockActual <= 0">
-                        {{ prod.stockActual }} disp.
+                        [class.badge-critical]="prod.stockDisponibleVisual <= prod.stockMinimo && prod.stockDisponibleVisual > 0"
+                        [class.badge-zero]="prod.stockDisponibleVisual <= 0">
+                        {{ prod.stockDisponibleVisual }} disp.
                     </span>
                 </div>
 
@@ -38,7 +38,7 @@
 
                 <div class="product-card-bottom">
                     <span class="product-price">{{ prod.precioVenta | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                    <button mat-icon-button color="primary" [disabled]="prod.stockActual <= 0"
+                    <button mat-icon-button color="primary" [disabled]="prod.stockDisponibleVisual <= 0"
                         (click)="$event.stopPropagation(); agregarAlCarrito(prod)" aria-label="Agregar al carrito">
                         <mat-icon>add_shopping_cart</mat-icon>
                     </button>

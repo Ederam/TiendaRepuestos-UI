@@ -355,3 +355,31 @@ Haz clic en Configure junto a Vercel.
 En la sección Repository access, selecciona "All repositories" y pulsa Save.
 
 De esta manera, cualquier repositorio que crees en el futuro aparecerá de inmediato en Vercel sin necesidad de pasos adicionales.
+
+# ┌──────────────────────────────────────────────┐
+                    │               Producto (Catálogo)            │
+                    │  CodigoBase: CLIO-FAR-018-RH                 │
+                    │  Descripcion: Farola Der Renault Clio 2018   │
+                    └──────────────────────┬───────────────────────┘
+                                           │ 1 a N
+              ┌────────────────────────────┼────────────────────────────┐
+              ▼                            ▼                            ▼
+   ┌──────────────────────┐     ┌──────────────────────┐     ┌──────────────────────┐
+   │    Lote / Stock A    │     │    Lote / Stock B    │     │    Lote / Stock C    │
+   ├──────────────────────┤     ├──────────────────────┤     ├──────────────────────┤
+   │ Marca: TYC (Taiwán)  │     │ Marca: Genérico China│     │ Marca: Usado Original│
+   │ Proveedor: Mundial   │     │ Proveedor: Indufaros │     │ Condición: Segunda   │
+   │ Costo: $280.000      │     │ Costo: $170.000      │     │ Costo: $120.000      │
+   │ Venta: $350.000      │     │ Venta: $250.000      │     │ Venta: $220.000      │
+   │ Stock: 2 unidades    │     │ Stock: 4 unidades    │     │ Stock: 1 unidad      │
+   └──────────────────────┘     └──────────────────────┘     └──────────────────────┘
+
+# Manejo de Precios y Costos Diferentes (PEPS / Promociones)
+Para el cliente final: El precio de venta al público se define por la Calidad / Marca (TYC tiene un precio superior al genérico por garantía de óptica y ensamble).
+
+Mismo repuesto que llega a menor costo (Promoción / Descuento):
+
+Se aplica el método contable PEPS (Primeras en Entrar, Primeras en Salir) o Costo Promedio Ponderado.
+
+En la base de datos se guarda el costo histórico de cada entrada en la tabla DetalleCompra. Al vender, el sistema descuenta primero el lote más antiguo o permite al cajero elegir el lote correspondiente.
+

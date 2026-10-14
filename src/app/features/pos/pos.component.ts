@@ -1,6 +1,7 @@
 /**
  * @fileoverview Componente de Punto de Venta (POS) para MACROLATAS.
- * Gestiona consultas rápidas de inventario y facturación ágil para mostrador.
+ * Gestiona el carrito mediante Signals, descuento reactivo en tiempo real
+ * y reordenamiento automático de repuestos con existencias disponibles.
  */
 
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
@@ -23,6 +24,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 
 // Core
 import { ProductoService } from '../../core/services/productos/producto.service';
@@ -37,7 +39,6 @@ import {
   LISTA_METODOS_PAGO,
   MetodoPagoId,
 } from '../../core/constants/pagos.constants';
-import { MatDialog } from '@angular/material/dialog';
 import { TicketDialogComponent } from './ticket-dialog/ticket-dialog.component';
 
 export interface CarritoItem {
@@ -72,19 +73,16 @@ export class PosComponent implements OnInit {
   private readonly notify = inject(NotificationService);
   private readonly dialog = inject(MatDialog);
 
-  /** Constante expuesta a la vista sin valores quemados */
   readonly metodosPago = LISTA_METODOS_PAGO;
 
-  /** Signals reactivos de estado */
-  readonly productosDisponibles = signal<Producto[]>([]);
+  /** Signals de catálogo y carrito */
+  private readonly _productosBase = signal<Producto[]>([]);
   readonly carrito = signal<CarritoItem[]>([]);
   readonly isBuscando = signal<boolean>(false);
   readonly isProcesandoVenta = signal<boolean>(false);
 
-  /** Control para la barra de búsqueda rápida */
   readonly searchControl = new FormControl<string>('', { nonNullable: true });
 
-  /** Formulario de cierre de venta */
   readonly ventaForm = new FormGroup({
     clienteDocumento: new FormControl<string>(''),
     clienteNombre: new FormControl<string>(''),
@@ -94,7 +92,36 @@ export class PosComponent implements OnInit {
     }),
   });
 
-  /** Computed reactivo para cálculos automáticos */
+  /**
+   * Computed: Catálogo proyectado en tiempo real.
+   * 1. Descuenta las existencias agregadas al carrito.
+   * 2. Reordena: productos con stock disponible van primero; agotados van al final.
+   */
+  readonly productosDisponibles = computed(() => {
+    const base = this._productosBase();
+    const itemsCarrito = this.carrito();
+
+    const proyectados = base.map((prod) => {
+      const enCarrito = itemsCarrito.find((c) => c.producto.id === prod.id);
+      const cantidadEnCarrito = enCarrito ? enCarrito.cantidad : 0;
+      const stockDisponible = Math.max(0, prod.stockActual - cantidadEnCarrito);
+
+      return {
+        ...prod,
+        stockDisponibleVisual: stockDisponible,
+      };
+    });
+
+    // Ordenar: primero los que tienen stock > 0, luego los que están en 0
+    return proyectados.sort((a, b) => {
+      if (a.stockDisponibleVisual > 0 && b.stockDisponibleVisual === 0)
+        return -1;
+      if (a.stockDisponibleVisual === 0 && b.stockDisponibleVisual > 0)
+        return 1;
+      return 0;
+    });
+  });
+
   readonly subtotalVenta = computed(() =>
     this.carrito().reduce((acc, item) => acc + item.subtotal, 0),
   );
@@ -123,11 +150,11 @@ export class PosComponent implements OnInit {
         busqueda: termino,
         soloActivos: true,
         pageNumber: 1,
-        pageSize: 10,
+        pageSize: 16,
       })
       .subscribe({
         next: (res) => {
-          this.productosDisponibles.set(res.items);
+          this._productosBase.set(res.items);
           this.isBuscando.set(false);
         },
         error: () => this.isBuscando.set(false),
@@ -135,28 +162,22 @@ export class PosComponent implements OnInit {
   }
 
   agregarAlCarrito(producto: Producto): void {
-    if (producto.stockActual <= 0) {
+    const items = [...this.carrito()];
+    const index = items.findIndex((i) => i.producto.id === producto.id);
+    const cantidadActualEnCarrito = index > -1 ? items[index].cantidad : 0;
+
+    if (cantidadActualEnCarrito + 1 > producto.stockActual) {
       this.notify.showWarning(
-        `El producto "${producto.nombre}" no cuenta con existencias.`,
+        `Existencias agotadas para "${producto.nombre}".`,
       );
       return;
     }
 
-    const items = [...this.carrito()];
-    const index = items.findIndex((i) => i.producto.id === producto.id);
-
     if (index > -1) {
-      const actual = items[index];
-      if (actual.cantidad + 1 > producto.stockActual) {
-        this.notify.showWarning(
-          `Stock máximo alcanzado (${producto.stockActual} unidades disponibles).`,
-        );
-        return;
-      }
       items[index] = {
-        ...actual,
-        cantidad: actual.cantidad + 1,
-        subtotal: (actual.cantidad + 1) * actual.precioUnitario,
+        ...items[index],
+        cantidad: items[index].cantidad + 1,
+        subtotal: (items[index].cantidad + 1) * items[index].precioUnitario,
       };
     } else {
       items.push({
@@ -177,7 +198,7 @@ export class PosComponent implements OnInit {
           const nuevaCantidad = item.cantidad + cambio;
           if (nuevaCantidad > item.producto.stockActual) {
             this.notify.showWarning(
-              `Stock disponible superado: ${item.producto.stockActual} unidades.`,
+              `Stock máximo alcanzado: ${item.producto.stockActual} unidades.`,
             );
             return item;
           }
@@ -238,7 +259,6 @@ export class PosComponent implements OnInit {
           `¡Venta registrada exitosamente! Factura #${res.numeroFactura || res.id}`,
         );
 
-        // Abrir el diálogo modal con el comprobante térmico listo para imprimir
         this.dialog.open(TicketDialogComponent, {
           width: '420px',
           disableClose: true,
@@ -251,7 +271,6 @@ export class PosComponent implements OnInit {
           },
         });
 
-        // Limpiar el estado del mostrador
         this.limpiarCarrito();
         this.ventaForm.patchValue({
           clienteDocumento: '',
