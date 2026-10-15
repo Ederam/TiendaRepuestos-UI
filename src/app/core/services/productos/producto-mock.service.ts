@@ -1,5 +1,6 @@
 /**
- * @fileoverview Adaptador en memoria de ProductoService con soporte estricto de filtros.
+ * @fileoverview Adaptador en memoria de ProductoService con soporte estricto de filtros,
+ * indexación O(1) para carga masiva e idempotencia (Upsert) multiorigen.
  */
 
 import { Injectable } from '@angular/core';
@@ -21,37 +22,68 @@ import { CATEGORIAS_REPUESTOS } from '../../constants/categorias.constants';
 @Injectable()
 export class ProductoMockService extends ProductoService {
   private catalogoEnMemoria: Producto[] = [...MOCK_PRODUCTOS];
+  private nextId = Math.max(...this.catalogoEnMemoria.map((p) => p.id), 0) + 1;
+
+  /**
+   * Genera una clave compuesta única por origen y código para garantizar idempotencia.
+   */
+  private buildCompositeKey(
+    origen: string | undefined,
+    codigo: string,
+  ): string {
+    const orig = (origen || 'PROPIO_MACROLATAS').trim().toUpperCase();
+    const cod = (codigo || '').trim().toUpperCase();
+    return `${orig}::${cod}`;
+  }
 
   override cargaMasiva(
     items: CargaMasivaItemRequest[],
   ): Observable<CargaMasivaResponse> {
-    let agregados = 0;
+    // 1. Construir índice Map en O(N) para búsquedas directas O(1)
+    const mapaProductos = new Map<string, Producto>();
+    for (const prod of this.catalogoEnMemoria) {
+      mapaProductos.set(this.buildCompositeKey(prod.origen, prod.codigo), prod);
+    }
 
-    items.forEach((item) => {
-      // Si ya existe el código, actualizamos existencias y precio; si no, lo creamos
-      const existente = this.catalogoEnMemoria.find(
-        (p) => p.codigo.toLowerCase() === item.codigo.toLowerCase(),
-      );
+    let insertados = 0;
+    let actualizados = 0;
+    const nuevosParaAgregar: Producto[] = [];
+
+    // 2. Procesar lote en O(1) por registro sin congelar el hilo principal
+    for (const item of items) {
+      const codigoLimpio = item.codigo?.trim().toUpperCase();
+      if (!codigoLimpio) continue;
+
+      const origenLimpio = item.origen || 'PROPIO_MACROLATAS';
+      const key = this.buildCompositeKey(origenLimpio, codigoLimpio);
+      const existente = mapaProductos.get(key);
 
       if (existente) {
-        existente.stockActual += item.stockActual;
+        // ACTUALIZACIÓN IDEMPOTENTE:
+        // Se actualizan precios, ubicación y catálogo; el stock se sincroniza al nuevo valor del archivo
         existente.precioVenta =
           item.precioVenta > 0 ? item.precioVenta : existente.precioVenta;
         existente.costo = item.costo > 0 ? item.costo : existente.costo;
+        existente.stockActual = item.stockActual; // Sincronización directa para evitar duplicar stock
         if (item.ubicacion) existente.ubicacion = item.ubicacion;
-        agregados++;
+        if (item.nombre) existente.nombre = item.nombre.trim();
+        if (item.descripcion) existente.descripcion = item.descripcion;
+        if (item.marcaRepuesto) existente.marcaRepuesto = item.marcaRepuesto;
+        if (item.marcaVehiculo) existente.marcaVehiculo = item.marcaVehiculo;
+        actualizados++;
       } else {
+        // INSERCIÓN DE NUEVA REFERENCIA
         const nuevo: Producto = {
-          id: Math.max(...this.catalogoEnMemoria.map((p) => p.id), 0) + 1,
-          codigo: item.codigo.toUpperCase().trim(),
-          nombre: item.nombre.trim(),
+          id: this.nextId++,
+          codigo: codigoLimpio,
+          nombre: item.nombre?.trim() || 'Sin Nombre',
           descripcion: item.descripcion || '',
           categoriaId: 1,
           nombreCategoria: item.categoriaNombre || 'General',
           marcaRepuesto: item.marcaRepuesto || 'GENÉRICO',
           marcaVehiculo: item.marcaVehiculo || 'MULTIMARCA',
           condicion: item.condicion || 'Nuevo',
-          origen: item.origen || 'PROPIO_MACROLATAS',
+          origen: origenLimpio,
           ubicacion: item.ubicacion || 'BODEGA PRINCIPAL',
           precioVenta: item.precioVenta,
           costo: item.costo,
@@ -59,21 +91,28 @@ export class ProductoMockService extends ProductoService {
           stockMinimo: 2,
           activo: true,
         };
-        this.catalogoEnMemoria.unshift(nuevo);
-        agregados++;
+
+        mapaProductos.set(key, nuevo);
+        nuevosParaAgregar.push(nuevo);
+        insertados++;
       }
-    });
+    }
+
+    // 3. Volcar los nuevos elementos al inicio de la lista
+    if (nuevosParaAgregar.length > 0) {
+      this.catalogoEnMemoria.unshift(...nuevosParaAgregar);
+    }
 
     const respuesta: CargaMasivaResponse = {
       registrosProcesados: items.length,
-      registrosExitosos: agregados,
-      registrosOmitidos: items.length - agregados,
+      registrosExitosos: insertados + actualizados,
+      registrosOmitidos: items.length - (insertados + actualizados),
       mensajes: [
-        `Se procesaron correctamente ${agregados} referencias en el catálogo.`,
+        `Proceso completado: ${insertados} referencias creadas, ${actualizados} actualizadas (Total: ${insertados + actualizados}).`,
       ],
     };
 
-    return of(respuesta).pipe(delay(400));
+    return of(respuesta).pipe(delay(250));
   }
 
   override getProductosPaginado(
@@ -81,12 +120,10 @@ export class ProductoMockService extends ProductoService {
   ): Observable<PagedResponse<Producto>> {
     let filtrados = [...this.catalogoEnMemoria];
 
-    // Filtro por solo activos
     if (params.soloActivos) {
       filtrados = filtrados.filter((p) => p.activo === true);
     }
 
-    // Filtro por búsqueda
     if (params.busqueda && params.busqueda.trim() !== '') {
       const q = params.busqueda.toLowerCase().trim();
       filtrados = filtrados.filter(
@@ -96,7 +133,6 @@ export class ProductoMockService extends ProductoService {
       );
     }
 
-    // Filtro por categoría
     if (params.categoriaId) {
       filtrados = filtrados.filter((p) => p.categoriaId === params.categoriaId);
     }
@@ -118,7 +154,7 @@ export class ProductoMockService extends ProductoService {
       hasNextPage: page < totalPages,
     };
 
-    return of(response).pipe(delay(150));
+    return of(response).pipe(delay(100));
   }
 
   override createProducto(
@@ -127,7 +163,7 @@ export class ProductoMockService extends ProductoService {
     const cat = CATEGORIAS_REPUESTOS.find((c) => c.id === request.categoriaId);
 
     const nuevo: Producto = {
-      id: Math.max(...this.catalogoEnMemoria.map((p) => p.id), 0) + 1,
+      id: this.nextId++,
       codigo: request.codigo.toUpperCase().trim(),
       nombre: request.nombre.trim(),
       descripcion: request.descripcion,

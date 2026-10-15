@@ -26,9 +26,26 @@ export class ProductoHttpService extends ProductoService {
   override cargaMasiva(
     items: CargaMasivaItemRequest[],
   ): Observable<CargaMasivaResponse> {
-    return this.http.post<CargaMasivaResponse>(`${this.apiUrl}/carga-masiva`, {
-      items,
-    });
+    // Mapeo limpio hacia el contrato CargaMasivaItemDto de .NET 8
+    const payload = items.map((item) => ({
+      codigoParte: item.codigo.trim().toUpperCase(),
+      nombre: item.nombre.trim(),
+      descripcion: item.descripcion || '',
+      precioVenta: item.precioVenta,
+      costo: item.costo,
+      stockActual: item.stockActual,
+      ubicacion: item.ubicacion || 'BODEGA PRINCIPAL',
+      origen: item.origen || 'PROPIO_MACROLATAS',
+      marcaRepuesto: item.marcaRepuesto || 'GENÉRICO',
+      marcaVehiculo: item.marcaVehiculo || 'MULTIMARCA',
+      condicion: item.condicion || 'Nuevo',
+      categoriaId: null, // El backend asigna la categoría por defecto
+    }));
+
+    return this.http.post<CargaMasivaResponse>(
+      `${this.apiUrl}/carga-masiva`,
+      payload,
+    );
   }
 
   override getProductosPaginado(

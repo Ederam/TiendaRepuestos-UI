@@ -60,8 +60,10 @@ export interface CargaMasivaItemRequest {
 }
 
 export interface CargaMasivaResponse {
-  registrosProcesados: number;
-  registrosExitosos: number;
-  registrosOmitidos: number;
+  totalProcesados: number;
+  insertados: number;
+  actualizados: number;
+  sinCambios: number;
+  omitidos: number;
   mensajes: string[];
 }

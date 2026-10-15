@@ -334,3 +334,16 @@ Copia y pega este bloque en **`hoja_de_ruta_y_lecciones_aprendidas.md`**:
   - Extensión de `ProductoService` con contrato y adaptadores de `cargaMasiva`.
 - **Lecciones Aprendidas:**
   - **Patrón de Previsualización en Carga Masiva:** En lugar de enviar un archivo binario a ciegas al backend arriesgando fallos de integridad referencial, procesar el archivo en el navegador del operador y proyectar una muestra previa permite validar columnas, precios y cantidades antes de ejecutar transacciones masivas en base de datos.
+
+### Hito 22 — Patrón Strategy en Importación Masiva, Optimización O(1) e Idempotencia
+
+- **Fecha:** 2026-10-15
+- **Rama Git:** `feat/inventario-carga-masiva`
+- **Entregables:**
+  - Desacoplamiento total del parseo de archivos mediante el patrón Strategy (`ExcelParserStrategy`, `EurocarParserStrategy`, `MacrolatasParserStrategy`).
+  - Utilidad centralizada `excel-numeric.utils.ts` para saneamiento numérico seguro contra celdas de texto con formato moneda.
+  - Orquestación limpia en `InventarioImportComponent` con inyección de estrategias y previsualización paginada.
+  - Ajuste de diseño en `inventario-list`: sustitución de la columna `Estado` por `Ubicación` para trazabilidad física en bodega (7 de Agosto).
+  - Definición de política de idempotencia (Upsert) mediante clave compuesta `(Codigo, Origen)` para prevenir duplicados en re-importaciones de lotes de hasta 20.000 ítems.
+- **Lecciones Aprendidas:**
+  - **Idempotencia en Cargas Masivas:** La importación de catálogos debe ser idempotente. El uso de `Map<string, Producto>` con clave natural compuesta en frontend y mecanismos de `MERGE / Upsert` en backend garantiza tiempos $O(1)$ por registro y evita la polución de inventario ante reintentos de carga del mismo archivo.
