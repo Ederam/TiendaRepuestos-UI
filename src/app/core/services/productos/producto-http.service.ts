@@ -1,5 +1,6 @@
 /**
- * @fileoverview Adaptador HTTP real de ProductoService contra ASP.NET Core 8.
+ * @fileoverview Adaptador HTTP real de ProductoService que consume la Web API de ASP.NET Core 8.
+ * Implementa comunicación REST estricta con manejo de parámetros de paginación y carga masiva.
  */
 
 import { Injectable, inject } from '@angular/core';
@@ -18,16 +19,26 @@ import {
   ProductoFilterParams,
 } from '../../models/api-response.models';
 
+/**
+ * Adaptador de infraestructura que realiza llamadas HTTP directas contra los endpoints de Productos en el backend.
+ */
 @Injectable()
 export class ProductoHttpService extends ProductoService {
-  private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/Productos`;
+  /** Cliente HTTP nativo inyectado mediante función inject */
+  private readonly http: HttpClient = inject(HttpClient);
 
+  /** URL base del controlador de Productos resuelta desde el environment */
+  private readonly apiUrl: string = `${environment.apiUrl}/Productos`;
+
+  /**
+   * Envía un lote masivo de repuestos parseados al endpoint de persistencia idempotente (Upsert).
+   * @param items Lista de repuestos extraídos por las estrategias de Excel.
+   * @returns Flujo observable con el balance cuantitativo de inserciones, actualizaciones y registros sin cambios.
+   */
   override cargaMasiva(
     items: CargaMasivaItemRequest[],
   ): Observable<CargaMasivaResponse> {
-    // Mapeo limpio hacia el contrato CargaMasivaItemDto de .NET 8
-    const payload = items.map((item) => ({
+    const payload = items.map((item: CargaMasivaItemRequest) => ({
       codigoParte: item.codigo.trim().toUpperCase(),
       nombre: item.nombre.trim(),
       descripcion: item.descripcion || '',
@@ -39,7 +50,7 @@ export class ProductoHttpService extends ProductoService {
       marcaRepuesto: item.marcaRepuesto || 'GENÉRICO',
       marcaVehiculo: item.marcaVehiculo || 'MULTIMARCA',
       condicion: item.condicion || 'Nuevo',
-      categoriaId: null, // El backend asigna la categoría por defecto
+      categoriaId: null,
     }));
 
     return this.http.post<CargaMasivaResponse>(
@@ -48,10 +59,15 @@ export class ProductoHttpService extends ProductoService {
     );
   }
 
+  /**
+   * Consulta el catálogo de repuestos en el servidor aplicando filtros y paginación.
+   * @param params Filtros de búsqueda textual, categoría, estado y límites de página.
+   * @returns Flujo observable con la página resultante y los metadatos de paginación.
+   */
   override getProductosPaginado(
     params: ProductoFilterParams,
   ): Observable<PagedResponse<Producto>> {
-    let httpParams = new HttpParams();
+    let httpParams: HttpParams = new HttpParams();
 
     if (params.busqueda && params.busqueda.trim() !== '') {
       httpParams = httpParams.set('busqueda', params.busqueda.trim());
@@ -74,6 +90,11 @@ export class ProductoHttpService extends ProductoService {
     });
   }
 
+  /**
+   * Registra un repuesto de manera individual en el sistema.
+   * @param request Datos de entrada para la creación del producto.
+   * @returns Flujo observable con el repuesto registrado.
+   */
   override createProducto(
     request: CreateProductoRequest,
   ): Observable<Producto> {
