@@ -347,3 +347,14 @@ Copia y pega este bloque en **`hoja_de_ruta_y_lecciones_aprendidas.md`**:
   - Definición de política de idempotencia (Upsert) mediante clave compuesta `(Codigo, Origen)` para prevenir duplicados en re-importaciones de lotes de hasta 20.000 ítems.
 - **Lecciones Aprendidas:**
   - **Idempotencia en Cargas Masivas:** La importación de catálogos debe ser idempotente. El uso de `Map<string, Producto>` con clave natural compuesta en frontend y mecanismos de `MERGE / Upsert` en backend garantiza tiempos $O(1)$ por registro y evita la polución de inventario ante reintentos de carga del mismo archivo.
+
+### Hito 25 — Optimización Ergonómica de Modal, Sugerencia de SKU y Manejo de Red
+
+- **Fecha:** 2026-10-19
+- **Rama Git:** `feat/inventario-carga-masiva`
+- **Entregables:**
+  - Rediseño del modal `ProductoDialogComponent` con ancho fijo de 680px, eliminando scrollbars horizontales y superposiciones.
+  - Implementación de chips de plantillas de un solo clic para autocompletar nombres de repuestos de prueba.
+  - Generación reactiva de SKU según la libreta física de Macrolatas (`F-200-LH-XXX`).
+  - Sustitución de tecnicismos ("CORS") en el interceptor por mensajes amigables para el usuario de mostrador.
+  - Corrección del contrato de envío en `ProductoHttpService` para compatibilidad con GUIDs de .NET 8.

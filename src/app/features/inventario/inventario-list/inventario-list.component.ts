@@ -125,8 +125,11 @@ export class InventarioListComponent implements OnInit {
    */
   abrirModalCrear(): void {
     const dialogRef = this.dialog.open(ProductoDialogComponent, {
-      width: '640px',
+      width: '680px',
+      maxWidth: '95vw',
+      panelClass: 'modal-sin-scroll',
       data: { modo: 'crear' },
+      disableClose: false,
     });
 
     dialogRef

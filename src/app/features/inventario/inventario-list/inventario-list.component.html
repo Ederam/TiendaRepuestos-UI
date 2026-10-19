@@ -21,7 +21,7 @@
     <div class="filters-card elevation-z1">
         <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
             <mat-label>Buscar por código o nombre de repuesto</mat-label>
-            <input matInput [formControl]="searchControl" placeholder="Ej: Pastillas de freno, 770120..."
+            <input matInput [formControl]="searchControl" placeholder="Ej: Farola Accent, F-200..."
                 autocomplete="off" />
             <mat-icon matPrefix>search</mat-icon>
             @if (searchControl.value) {
@@ -44,18 +44,53 @@
             <ng-container matColumnDef="codigo">
                 <th mat-header-cell *matHeaderCellDef>Código</th>
                 <td mat-cell *matCellDef="let prod">
+                    @if (prod.codigo && prod.codigo.trim() !== '') {
                     <span class="badge-code">{{ prod.codigo }}</span>
+                    } @else {
+                    <span class="badge-code"
+                        style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">
+                        Sin código
+                    </span>
+                    }
                 </td>
             </ng-container>
 
-            <!-- Columna Nombre -->
+            <!-- Columna Nombre con Badges de Marca y Condición -->
             <ng-container matColumnDef="nombre">
                 <th mat-header-cell *matHeaderCellDef>Descripción / Nombre</th>
                 <td mat-cell *matCellDef="let prod">
-                    <div class="product-info">
-                        <span class="product-name">{{ prod.nombre }}</span>
+                    <div class="product-info" style="display: flex; flex-direction: column; gap: 4px; padding: 4px 0;">
+                        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                            <span class="product-name" style="font-weight: 500;">{{ prod.nombre }}</span>
+
+                            <!-- Badge Marca Aftermarket -->
+                            @if (prod.marcaRepuesto) {
+                            <span
+                                style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); text-transform: uppercase;">
+                                {{ prod.marcaRepuesto }}
+                            </span>
+                            }
+
+                            <!-- Badge Condición -->
+                            <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;"
+                                [style.background]="prod.condicion === 'Nuevo' ? 'rgba(52, 211, 153, 0.15)' : 'rgba(251, 191, 36, 0.15)'"
+                                [style.color]="prod.condicion === 'Nuevo' ? '#34d399' : '#fbbf24'"
+                                [style.border]="prod.condicion === 'Nuevo' ? '1px solid rgba(52, 211, 153, 0.3)' : '1px solid rgba(251, 191, 36, 0.3)'">
+                                {{ prod.condicion }}
+                            </span>
+
+                            <!-- Badge Origen Aliado -->
+                            @if (prod.origen && prod.origen !== 'PROPIO_MACROLATAS') {
+                            <span
+                                style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: rgba(192, 132, 252, 0.15); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.3);">
+                                Aliado
+                            </span>
+                            }
+                        </div>
+
                         @if (prod.descripcion) {
-                        <small class="product-desc">{{ prod.descripcion }}</small>
+                        <small class="product-desc" style="color: #94a3b8; font-size: 0.75rem;">{{ prod.descripcion
+                            }}</small>
                         }
                     </div>
                 </td>

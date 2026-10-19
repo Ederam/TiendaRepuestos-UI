@@ -161,14 +161,13 @@ export class InventarioImportComponent {
 
         this.notify.showSuccess(mensaje);
         this.cancelar();
+        this.isProcesando.set(false);
       },
       error: () => {
         this.notify.showError(
           'No se pudo completar la carga masiva en el servidor.',
         );
-      },
-      complete: () => {
-        this.isProcesando.set(false);
+        this.isProcesando.set(false); // Evita que la interfaz se quede pegada
       },
     });
   }

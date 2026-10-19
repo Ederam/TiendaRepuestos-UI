@@ -1,70 +1,53 @@
 /**
- * @fileoverview Interceptor HTTP funcional para captura y tratamiento global de excepciones.
- * Mapea respuestas con especificación RFC 7807 (ProblemDetails) y gestiona códigos de error HTTP.
+ * @fileoverview Interceptor HTTP global para manejo estandarizado de errores en MACROLATAS.
+ * Traduce fallos de red en mensajes comprensibles y gestiona expiración de sesiones.
  */
 
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
-import { AuthService } from '../services/auth/auth.service';
 import { NotificationService } from '../services/notification.service';
-import { ProblemDetails } from '../models/problem-details.models';
 
-/**
- * Interceptor funcional para la captura centralizada de errores HTTP.
- * Despliega notificaciones comprensibles al usuario y ejecuta acciones según el código de estado.
- */
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthService);
-  const notify = inject(NotificationService);
+  const router: Router = inject(Router);
+  const notify: NotificationService = inject(NotificationService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      let userFriendlyMessage = 'Ocurrió un error inesperado en el servidor.';
+      let mensajeAmigable: string =
+        'Ocurrió un inconveniente. Intente de nuevo.';
 
-      if (error.error && typeof error.error === 'object') {
-        const problem = error.error as ProblemDetails;
-
-        if (problem.errors && Object.keys(problem.errors).length > 0) {
-          // Errores de validación FluentValidation / ASP.NET Core
-          const validationMessages = Object.values(problem.errors).flat();
-          userFriendlyMessage = validationMessages.join(' | ');
-        } else if (problem.detail) {
-          userFriendlyMessage = problem.detail;
-        } else if (problem.title) {
-          userFriendlyMessage = problem.title;
+      // Caso 0: Backend apagado, puerto bloqueado o sin conexión a internet
+      if (error.status === 0) {
+        mensajeAmigable =
+          'No fue posible conectar con el sistema. Por favor verifique que el servicio esté encendido.';
+      } else if (error.status === 401) {
+        // No alertar si fue un fallo en la pantalla de login (la pantalla ya avisa "credenciales inválidas")
+        if (!req.url.includes('/Auth/login')) {
+          mensajeAmigable =
+            'Su sesión ha finalizado. Por favor ingrese de nuevo.';
+          localStorage.removeItem('token');
+          router.navigate(['/auth/login']);
+        } else {
+          mensajeAmigable = 'Correo electrónico o contraseña incorrectos.';
         }
+      } else if (error.status === 403) {
+        mensajeAmigable = 'No cuenta con permisos para realizar esta acción.';
+      } else if (error.status === 404) {
+        mensajeAmigable =
+          error.error?.detail || 'El registro solicitado no fue encontrado.';
+      } else if (error.status === 409) {
+        mensajeAmigable =
+          error.error?.detail ||
+          'El registro ya existe o fue modificado simultáneamente por otro usuario.';
+      } else if (error.status >= 500) {
+        mensajeAmigable =
+          error.error?.detail ||
+          'El servidor reportó un error al procesar los datos.';
       }
 
-      switch (error.status) {
-        case 401:
-          notify.showError('Sesión expirada o credenciales inválidas.');
-          authService.logout();
-          break;
-        case 403:
-          notify.showWarning(
-            'No tienes permisos suficientes para realizar esta acción.',
-          );
-          break;
-        case 404:
-          notify.showWarning(userFriendlyMessage || 'Recurso no encontrado.');
-          break;
-        case 400:
-          notify.showError(userFriendlyMessage);
-          break;
-        case 500:
-          notify.showError('Error interno del servidor. Contacte a soporte.');
-          break;
-        case 0:
-          notify.showError(
-            'No se pudo conectar con el servidor backend. Verifique su conexión y CORS.',
-          );
-          break;
-        default:
-          notify.showError(userFriendlyMessage);
-          break;
-      }
-
+      notify.showError(mensajeAmigable);
       return throwError(() => error);
     }),
   );

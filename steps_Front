@@ -446,3 +446,30 @@ src/app/features/inventario/inventario-import/
  ├── utils/
  │    └── excel-numeric.utils.ts           (Métodos puros de 3 líneas)
  ├── inventario-import.component.ts        (Componente limpio < 60 líneas)
+
+# Modelo para Parametrización de Marcas de Fabricante (TYC, DEPO, CHINA, ORIGINAL)
+src/app/
+ ├── core/
+ │    └── utils/
+ │         └── sku-generator.util.ts   <-- Servicio/Utilidad Pura de Sugerencia de SKU
+ └── features/
+      └── inventario/
+           ├── components/
+           │    └── nuevo-repuesto-modal/   <-- Consume la utilidad en el evento (blur)/(input)
+           └── inventario-list/             <-- Muestra badges visuales sin duplicar lógica
+
+
+
+# Ejecutar el Dump en la Máquina Actual (Oficina)
+Abre PowerShell en la raíz del proyecto y corre:
+
+PowerShell
+podman exec -t tienda_repuestos_db pg_dump -U dev_user -d pos_repuestos_db > backup_macrolatas.sql
+
+
+# Restaurar en tu Casa (Cuando enciendas Docker)
+En tu equipo personal, con el contenedor de PostgreSQL encendido:
+
+PowerShell
+# En tu casa con Docker:
+docker exec -i tienda_repuestos_db psql -U dev_user -d pos_repuestos_db < backup_macrolatas.sql

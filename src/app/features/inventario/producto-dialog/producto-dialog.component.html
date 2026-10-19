@@ -1,87 +1,149 @@
-<h2 mat-dialog-title class="dialog-title">
-    <mat-icon class="title-icon">
-        {{ data.modo === 'crear' ? 'add_circle_outline' : 'edit_note' }}
-    </mat-icon>
-    <span>{{ data.modo === 'crear' ? 'Nuevo Repuesto' : 'Editar Repuesto' }}</span>
-</h2>
+<div class="repuesto-dialog-container">
+    <!-- Cabecera -->
+    <div class="dialog-header">
+        <div class="header-icon-title">
+            <mat-icon class="header-icon">{{ data.modo === 'crear' ? 'add_circle' : 'edit' }}</mat-icon>
+            <h2 class="header-text">{{ data.modo === 'crear' ? 'Nuevo Repuesto' : 'Editar Repuesto' }}</h2>
+        </div>
+        <button mat-icon-button (click)="onCancelar()" class="btn-close" aria-label="Cerrar modal">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
 
-<mat-dialog-content class="dialog-body">
-    <form [formGroup]="form" class="form-grid">
-        <!-- Código del Repuesto (con normalización forzada a mayúsculas) -->
-        <mat-form-field appearance="outline" class="col-6">
-            <mat-label>Código de Repuesto / Parte</mat-label>
-            <input matInput formControlName="codigo" placeholder="Ej: HLX-CAP-001" style="text-transform: uppercase;"
-                (blur)="onCodigoBlur()" />
-            @if (form.get('codigo')?.hasError('required') && form.get('codigo')?.touched) {
-            <mat-error>El código es obligatorio.</mat-error>
-            }
-        </mat-form-field>
+    <!-- Contenido del Formulario -->
+    <mat-dialog-content class="dialog-body">
+        <form [formGroup]="form" class="form-layout">
+            <!-- 1. Nombre Comercial con asistente y plantilla de un clic -->
+            <div class="field-container">
+                <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Nombre o Descripción Comercial*</mat-label>
+                    <input matInput formControlName="nombre" placeholder="Ej: HYUNDAI ACCENT 98/05 FAROLA LH"
+                        (blur)="onNombreBlur()" autocomplete="off" />
+                    @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
+                    <mat-error>El nombre del repuesto es obligatorio.</mat-error>
+                    }
+                </mat-form-field>
+                <!-- Sugerencia rápida interactiva: Un clic y lo copia al campo -->
+                <div class="ejemplo-copiable">
+                    <span>Ejemplo rápido: </span>
+                    <button type="button" class="btn-chip-ejemplo"
+                        (click)="usarPlantillaEjemplo('HYUNDAI ACCENT 98/05 FAROLA LH')">
+                        HYUNDAI ACCENT 98/05 FAROLA LH
+                    </button>
+                    <button type="button" class="btn-chip-ejemplo"
+                        (click)="usarPlantillaEjemplo('CHEVROLET OPTRA 06/10 STOP RH')">
+                        CHEVROLET OPTRA 06/10 STOP RH
+                    </button>
+                </div>
+            </div>
 
-        <!-- Categoría parametrizada -->
-        <mat-form-field appearance="outline" class="col-6">
-            <mat-label>Categoría</mat-label>
-            <mat-select formControlName="categoriaId">
-                @for (cat of categorias; track cat.id) {
-                <mat-option [value]="cat.id">{{ cat.nombre }}</mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
+            <!-- 2. Código SKU con botón Sugerir -->
+            <div class="code-generator-row">
+                <mat-form-field appearance="outline" class="code-field">
+                    <mat-label>Código de Repuesto / SKU*</mat-label>
+                    <input matInput formControlName="codigo" placeholder="Ej: F-200-LH-101" (blur)="onCodigoBlur()"
+                        class="input-code" />
+                    <mat-hint>Código interno de bodega o del fabricante.</mat-hint>
+                    @if (form.get('codigo')?.invalid && form.get('codigo')?.touched) {
+                    <mat-error>El código es obligatorio.</mat-error>
+                    }
+                </mat-form-field>
 
-        <!-- Nombre / Descripción Principal -->
-        <mat-form-field appearance="outline" class="col-12">
-            <mat-label>Nombre o Descripción Comercial</mat-label>
-            <input matInput formControlName="nombre" placeholder="Ej: Capó Delantero Toyota Hilux 2021-2024" />
-            @if (form.get('nombre')?.hasError('required') && form.get('nombre')?.touched) {
-            <mat-error>La descripción es obligatoria.</mat-error>
-            }
-        </mat-form-field>
+                <button type="button" mat-stroked-button class="btn-magic-sugerir" (click)="sugerirCodigoManual()"
+                    matTooltip="Generar código sugerido con base en el nombre">
+                    <mat-icon>auto_fix_high</mat-icon>
+                    <span>Sugerir</span>
+                </button>
+            </div>
 
-        <!-- Detalle adicional -->
-        <mat-form-field appearance="outline" class="col-12">
-            <mat-label>Detalle Adicional / Estado (Opcional)</mat-label>
-            <textarea matInput rows="2" formControlName="descripcion"
-                placeholder="Ej: Original nueva, con primer anticorrosivo"></textarea>
-        </mat-form-field>
+            <!-- 3. Fila de Clasificación: Categoría, Calidad y Condición -->
+            <div class="form-grid-3">
+                <mat-form-field appearance="outline">
+                    <mat-label>Categoría*</mat-label>
+                    <mat-select formControlName="categoriaId">
+                        @for (cat of categorias; track cat.id) {
+                        <mat-option [value]="cat.id">{{ cat.nombre }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
 
-        <!-- Costo de Adquisición -->
-        <mat-form-field appearance="outline" class="col-6">
-            <mat-label>Costo de Compra (COP)</mat-label>
-            <input matInput type="number" formControlName="costo" placeholder="0" />
-            <span matPrefix>$&nbsp;</span>
-        </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Marca / Calidad</mat-label>
+                    <mat-select formControlName="marcaRepuesto">
+                        @for (m of marcasRepuesto; track m) {
+                        <mat-option [value]="m">{{ m }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
 
-        <!-- Precio de Venta al Público -->
-        <mat-form-field appearance="outline" class="col-6">
-            <mat-label>Precio Venta al Público (COP)</mat-label>
-            <input matInput type="number" formControlName="precioVenta" placeholder="0" />
-            <span matPrefix>$&nbsp;</span>
-            @if (form.get('precioVenta')?.hasError('min')) {
-            <mat-error>El precio no puede ser negativo.</mat-error>
-            }
-        </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label>Condición*</mat-label>
+                    <mat-select formControlName="condicion">
+                        @for (c of condiciones; track c) {
+                        <mat-option [value]="c">{{ c }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
 
-        <!-- Stock Actual -->
-        <mat-form-field appearance="outline" class="col-6">
-            <mat-label>Stock en Bodega (Unidades)</mat-label>
-            <input matInput type="number" formControlName="stockActual" placeholder="0" />
-            <span matSuffix>unid.</span>
-        </mat-form-field>
+            <!-- 4. Fila de Origen y Ubicación Física -->
+            <div class="form-grid-2">
+                <mat-form-field appearance="outline">
+                    <mat-label>Origen de Inventario</mat-label>
+                    <mat-select formControlName="origen">
+                        @for (o of origenes; track o) {
+                        <mat-option [value]="o">{{ o }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
 
-        <!-- Stock Mínimo para Alerta -->
-        <mat-form-field appearance="outline" class="col-6">
-            <mat-label>Stock Mínimo (Alerta Crítica)</mat-label>
-            <input matInput type="number" formControlName="stockMinimo" placeholder="2" />
-            <span matSuffix>unid.</span>
-        </mat-form-field>
-    </form>
-</mat-dialog-content>
+                <mat-form-field appearance="outline">
+                    <mat-label>Ubicación en Bodega</mat-label>
+                    <input matInput formControlName="ubicacion" placeholder="BODEGA PRINCIPAL" />
+                </mat-form-field>
+            </div>
 
-<mat-dialog-actions align="end" class="dialog-actions">
-    <button mat-button type="button" (click)="onCancelar()">
-        Cancelar
-    </button>
-    <button mat-flat-button color="primary" type="button" [disabled]="form.invalid" (click)="onGuardar()">
-        <mat-icon>save</mat-icon>
-        <span>{{ data.modo === 'crear' ? 'Registrar Repuesto' : 'Actualizar' }}</span>
-    </button>
-</mat-dialog-actions>
+            <!-- 5. Fila de Precios y Stock -->
+            <div class="form-grid-4">
+                <mat-form-field appearance="outline">
+                    <mat-label>Costo (COP)</mat-label>
+                    <input matInput type="number" formControlName="costo" min="0" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Precio Venta (COP)*</mat-label>
+                    <input matInput type="number" formControlName="precioVenta" min="0" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Stock Bodega*</mat-label>
+                    <input matInput type="number" formControlName="stockActual" min="0" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Stock Mínimo*</mat-label>
+                    <input matInput type="number" formControlName="stockMinimo" min="0" />
+                </mat-form-field>
+            </div>
+
+            <!-- 6. Observaciones -->
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Detalle Adicional / Aplicación (Opcional)</mat-label>
+                <textarea matInput formControlName="descripcion" rows="2"
+                    placeholder="Observaciones o compatibilidad"></textarea>
+            </mat-form-field>
+        </form>
+    </mat-dialog-content>
+
+    <!-- Acciones / Botones -->
+    <mat-dialog-actions class="dialog-footer">
+        <button mat-button type="button" (click)="onCancelar()" class="btn-cancel">
+            Cancelar
+        </button>
+        <button mat-flat-button color="primary" type="button" (click)="onGuardar()" [disabled]="form.invalid"
+            class="btn-submit">
+            <mat-icon>save</mat-icon>
+            <span>{{ data.modo === 'crear' ? 'Registrar Repuesto' : 'Actualizar Repuesto' }}</span>
+        </button>
+    </mat-dialog-actions>
+</div>

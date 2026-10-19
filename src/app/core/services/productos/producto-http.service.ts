@@ -98,6 +98,18 @@ export class ProductoHttpService extends ProductoService {
   override createProducto(
     request: CreateProductoRequest,
   ): Observable<Producto> {
-    return this.http.post<Producto>(this.apiUrl, request);
+    // Si viene un ID numérico o inválido, enviamos Guid.Empty ("00000000-0000-0000-0000-000000000000")
+    // para que el backend le asigne la categoría por defecto de forma segura.
+    const payload = {
+      nombre: request.nombre.trim(),
+      codigoParte: request.codigo.trim().toUpperCase(),
+      precioVenta: request.precioVenta,
+      stockInicial: request.stockActual,
+      stockMinimo: request.stockMinimo,
+      estado: 0, // EstadoProducto.Nuevo
+      categoriaId: '00000000-0000-0000-0000-000000000000',
+    };
+
+    return this.http.post<Producto>(this.apiUrl, payload);
   }
 }
