@@ -473,3 +473,56 @@ En tu equipo personal, con el contenedor de PostgreSQL encendido:
 PowerShell
 # En tu casa con Docker:
 docker exec -i tienda_repuestos_db psql -U dev_user -d pos_repuestos_db < backup_macrolatas.sql
+podman exec -t tienda_repuestos_db pg_dump -U dev_user -d pos_repuestos_db > backup_macrolatas.sql
+
+
+# En casa (importar):
+docker exec -i tienda_repuestos_db psql -U dev_user -d pos_repuestos_db < backup_macrolatas.sql
+
+# Comando correcto sin TTY para backups limpios:
+
+PowerShell
+podman exec tienda_repuestos_db pg_dump -U dev_user -d pos_repuestos_db > backup_macrolatas.sql
+
+# Plan de Despliegue: Backend (.NET 8) y Base de Datos (PostgreSQL en Railway)
+Para dejar el backend en la nube y accesible desde cualquier equipo, seguiremos esta secuencia paso a paso:
+
+[Paso 1] Crear Proyecto y Base de Datos PostgreSQL en Railway
+   ↓
+[Paso 2] Desplegar el Repositorio de Backend (TiendaRepuestos) en Railway
+   ↓
+[Paso 3] Configurar Variables de Entorno (ConnectionStrings, JWT, CORS)
+   ↓
+[Paso 4] Aplicar Migraciones EF Core remotas y Cargar Datos Iniciales (Seed / Dump)
+   ↓
+[Paso 5] Conectar Frontend (Angular) al nuevo dominio HTTPS de Railway
+
+# Crear la Base de Datos en Railway
+Ingresa a railway.app e inicia sesión con tu cuenta de GitHub (Ederam).
+Haz clic en + New Project $\rightarrow$ selecciona Provision PostgreSQL.
+En la pestaña Variables o Connect del servicio PostgreSQL recién creado, copia la variable DATABASE_URL o los datos individuales:
+PGHOST
+PGPORT
+PGDATABASE
+PGUSER
+PGPASSWORD
+
+# En el equipo de tu casa (con Docker):
+Cuando enciendas tu equipo personal:
+
+PowerShell
+# 1. Traer los últimos cambios
+git pull
+
+# 2. Levantar el contenedor local
+docker compose up -d
+
+# 3. Restaurar la base de datos (desde la carpeta donde esté el archivo .sql)
+docker exec -i tienda_repuestos_db psql -U dev_user -d pos_repuestos_db < backup_macrolatas.sql
+
+# Abre DBeaver en tu casa o ejecuta en terminal:
+
+PowerShell
+docker exec -i tienda_repuestos_db psql -U dev_user -d pos_repuestos_db -c 'SELECT "Origen", count(*) FROM productos GROUP BY "Origen";'
+
+

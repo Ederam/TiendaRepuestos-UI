@@ -358,3 +358,16 @@ Copia y pega este bloque en **`hoja_de_ruta_y_lecciones_aprendidas.md`**:
   - Generación reactiva de SKU según la libreta física de Macrolatas (`F-200-LH-XXX`).
   - Sustitución de tecnicismos ("CORS") en el interceptor por mensajes amigables para el usuario de mostrador.
   - Corrección del contrato de envío en `ProductoHttpService` para compatibilidad con GUIDs de .NET 8.
+
+### Hito 26 — Estandarización de Tema Oscuro, Filtros por Familia y SKU Asistido
+
+- **Fecha:** 2026-10-20
+- **Rama Git:** `feat/inventario-carga-masiva`
+- **Entregables:**
+  - Forzado global de tema oscuro (`color-scheme: dark`) en `styles.scss` para garantizar contraste idéntico en cualquier navegador sin extensiones.
+  - Normalización bidireccional en `ProductoHttpService` (mapeo `codigoParte` a `codigo`), resolviendo el badge "Sin código".
+  - Incorporación de chips de filtros rápidos por familia (Farolas, Stops, Bomperes, Capots, etc.) combinados con el buscador reactivo.
+  - Modal `ProductoDialogComponent` rediseñado a 720px con plantillas interactivas de un solo clic y generación automática de SKU según libreta física.
+  - Mensajes de error amigables en el interceptor global sin tecnicismos ("CORS").
+- **Lecciones Aprendidas:**
+  - **Aislamiento de Configuración de Navegador:** Los sistemas para entornos operativos de mostrador deben forzar explícitamente sus variables de contraste y esquema de color en `:root` y overlays de Material para no depender de la configuración del sistema operativo del cliente.

@@ -1,11 +1,11 @@
 /**
  * @fileoverview Adaptador HTTP real de ProductoService que consume la Web API de ASP.NET Core 8.
- * Implementa comunicación REST estricta con manejo de parámetros de paginación y carga masiva.
+ * Normaliza las propiedades entre el backend (codigoParte) y el modelo de Angular (codigo).
  */
 
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ProductoService } from './producto.service';
 import {
@@ -20,21 +20,58 @@ import {
 } from '../../models/api-response.models';
 
 /**
- * Adaptador de infraestructura que realiza llamadas HTTP directas contra los endpoints de Productos en el backend.
+ * Interfaz interna que refleja la respuesta cruda de C# para ProductoResponseDto.
  */
+interface BackendProductoDto {
+  id: string | number;
+  nombre: string;
+  codigoParte?: string;
+  codigo?: string;
+  descripcion?: string;
+  categoriaId: string | number;
+  nombreCategoria?: string;
+  precioVenta: number;
+  costo?: number;
+  stockActual: number;
+  stockMinimo: number;
+  estado?: number | string;
+  origen?: string;
+  ubicacion?: string;
+  marcaRepuesto?: string;
+  marcaVehiculo?: string;
+  condicion?: string;
+  activo: boolean;
+}
+
 @Injectable()
 export class ProductoHttpService extends ProductoService {
-  /** Cliente HTTP nativo inyectado mediante función inject */
   private readonly http: HttpClient = inject(HttpClient);
-
-  /** URL base del controlador de Productos resuelta desde el environment */
   private readonly apiUrl: string = `${environment.apiUrl}/Productos`;
 
   /**
-   * Envía un lote masivo de repuestos parseados al endpoint de persistencia idempotente (Upsert).
-   * @param items Lista de repuestos extraídos por las estrategias de Excel.
-   * @returns Flujo observable con el balance cuantitativo de inserciones, actualizaciones y registros sin cambios.
+   * Mapea un DTO de backend al modelo de dominio unificado de Angular.
    */
+  private normalizarProducto(dto: BackendProductoDto): Producto {
+    return {
+      id: typeof dto.id === 'number' ? dto.id : 0,
+      codigo: (dto.codigoParte || dto.codigo || '').trim().toUpperCase(),
+      nombre: dto.nombre,
+      descripcion: dto.descripcion,
+      categoriaId: typeof dto.categoriaId === 'number' ? dto.categoriaId : 1,
+      nombreCategoria: dto.nombreCategoria || 'General',
+      marcaRepuesto: dto.marcaRepuesto || 'GENÉRICO',
+      marcaVehiculo: dto.marcaVehiculo || 'MULTIMARCA',
+      condicion: (dto.condicion as any) || 'Nuevo',
+      origen: (dto.origen as any) || 'PROPIO_MACROLATAS',
+      ubicacion: dto.ubicacion || 'BODEGA PRINCIPAL',
+      costo: dto.costo || 0,
+      precioVenta: dto.precioVenta,
+      stockActual: dto.stockActual,
+      stockMinimo: dto.stockMinimo,
+      activo: dto.activo ?? true,
+    };
+  }
+
   override cargaMasiva(
     items: CargaMasivaItemRequest[],
   ): Observable<CargaMasivaResponse> {
@@ -59,11 +96,6 @@ export class ProductoHttpService extends ProductoService {
     );
   }
 
-  /**
-   * Consulta el catálogo de repuestos en el servidor aplicando filtros y paginación.
-   * @param params Filtros de búsqueda textual, categoría, estado y límites de página.
-   * @returns Flujo observable con la página resultante y los metadatos de paginación.
-   */
   override getProductosPaginado(
     params: ProductoFilterParams,
   ): Observable<PagedResponse<Producto>> {
@@ -85,31 +117,35 @@ export class ProductoHttpService extends ProductoService {
     );
     httpParams = httpParams.set('pageSize', (params.pageSize ?? 10).toString());
 
-    return this.http.get<PagedResponse<Producto>>(`${this.apiUrl}/paginado`, {
-      params: httpParams,
-    });
+    return this.http
+      .get<PagedResponse<BackendProductoDto>>(`${this.apiUrl}/paginado`, {
+        params: httpParams,
+      })
+      .pipe(
+        map((response) => ({
+          ...response,
+          items: (response.items || []).map((dto) =>
+            this.normalizarProducto(dto),
+          ),
+        })),
+      );
   }
 
-  /**
-   * Registra un repuesto de manera individual en el sistema.
-   * @param request Datos de entrada para la creación del producto.
-   * @returns Flujo observable con el repuesto registrado.
-   */
   override createProducto(
     request: CreateProductoRequest,
   ): Observable<Producto> {
-    // Si viene un ID numérico o inválido, enviamos Guid.Empty ("00000000-0000-0000-0000-000000000000")
-    // para que el backend le asigne la categoría por defecto de forma segura.
     const payload = {
       nombre: request.nombre.trim(),
       codigoParte: request.codigo.trim().toUpperCase(),
       precioVenta: request.precioVenta,
       stockInicial: request.stockActual,
       stockMinimo: request.stockMinimo,
-      estado: 0, // EstadoProducto.Nuevo
+      estado: 0,
       categoriaId: '00000000-0000-0000-0000-000000000000',
     };
 
-    return this.http.post<Producto>(this.apiUrl, payload);
+    return this.http
+      .post<BackendProductoDto>(this.apiUrl, payload)
+      .pipe(map((dto) => this.normalizarProducto(dto)));
   }
 }

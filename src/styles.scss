@@ -1,38 +1,47 @@
 /* ==========================================================================
-   Variables de Identidad de Marca — MACROLATAS
+   TEMA CORPORATIVO UNIFICADO MACROLATAS (Dark Theme Obligatorio)
+   Evita que navegadores en modo claro dañen contrastes o dejen textos invisibles.
    ========================================================================== */
+
 :root {
-  --brand-navy: #18215d;
-  --brand-navy-dark: #0f153d;
-  --brand-red: #d92525;
-  --brand-red-hover: #b91c1c;
-  --brand-surface: #ffffff;
-  --brand-bg: #f1f5f9;
+  color-scheme: dark !important;
 }
 
-/* Reset general */
 html, body {
   height: 100%;
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-  background-color: var(--brand-bg);
+  background-color: #0b1120 !important; // Azul noche profundo corporativo
+  color: #f1f5f9 !important;
+  font-family: 'Roboto', 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Modificadores globales para SnackBars */
-.error-snackbar {
-  --mdc-snackbar-container-color: #b91c1c !important;
-  --mdc-snackbar-supporting-text-color: #ffffff !important;
-  font-weight: 500;
+// Fondo de diálogos y modales de Angular Material
+.cdk-overlay-pane {
+  .mat-mdc-dialog-container .mdc-dialog__surface {
+    background-color: #0f172a !important; // Slate-900 sólido
+    color: #f8fafc !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+  }
 }
 
-.warning-snackbar {
-  --mdc-snackbar-container-color: #d97706 !important;
-  --mdc-snackbar-supporting-text-color: #ffffff !important;
-  font-weight: 500;
+// Corrección de contraste en botones primarios (Guardar Cliente / Registrar)
+.btn-primary-fix,
+button[mat-flat-button][color="primary"] {
+  background-color: #2563eb !important; // Azul corporativo visible
+  color: #ffffff !important; // Texto blanco de alto contraste garantizado
+  font-weight: 600 !important;
+
+  &:disabled {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    color: rgba(255, 255, 255, 0.38) !important;
+  }
 }
 
-.success-snackbar {
-  --mdc-snackbar-container-color: #15803d !important;
-  --mdc-snackbar-supporting-text-color: #ffffff !important;
-  font-weight: 500;
+// Evitar scrolls no deseados en modales
+.modal-sin-scroll {
+  .mat-mdc-dialog-content {
+    overflow-x: hidden !important;
+  }
 }

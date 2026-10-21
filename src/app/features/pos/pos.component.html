@@ -1,185 +1,211 @@
 <div class="pos-layout">
-    <!-- Columna 1: Buscador y Grilla de Productos -->
-    <section class="catalog-section">
-        <div class="search-header">
-            <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
-                <mat-label>Buscar repuesto (código o descripción)</mat-label>
-                <input matInput [formControl]="searchControl" placeholder="Ej: Hilux, Capó, Farola, 7701..."
+    <!-- Panel Izquierdo: Catálogo y Búsqueda -->
+    <div class="pos-catalog-section">
+        <!-- Buscador Reactivo -->
+        <div class="search-bar-card">
+            <mat-form-field appearance="outline" class="w-full search-field" subscriptSizing="dynamic">
+                <mat-label>Buscar repuesto por código, marca o descripción</mat-label>
+                <input matInput [formControl]="searchControl" placeholder="Ej: Farola Accent, Stop Optra, F-200..."
                     autocomplete="off" />
                 <mat-icon matPrefix>search</mat-icon>
-                @if (searchControl.value) {
-                <button mat-icon-button matSuffix (click)="searchControl.setValue('')" aria-label="Limpiar búsqueda">
-                    <mat-icon>close</mat-icon>
-                </button>
-                }
             </mat-form-field>
         </div>
 
         @if (isBuscando()) {
-        <mat-progress-bar mode="indeterminate" class="search-bar"></mat-progress-bar>
+        <mat-progress-bar mode="indeterminate" class="loading-bar"></mat-progress-bar>
         }
 
-        <!-- Grilla de Tarjetas -->
+        <!-- Rejilla de Tarjetas de Repuestos -->
         <div class="products-grid">
-            @for (prod of productosDisponibles(); track prod.id) {
-            <mat-card class="product-card" [class.out-of-stock]="prod.stockDisponibleVisual <= 0"
+            @for (prod of productosDisponibles(); track prod.codigo) {
+            <div class="product-pos-card" [class.disabled-card]="prod.stockDisponibleVisual <= 0"
                 (click)="prod.stockDisponibleVisual > 0 && agregarAlCarrito(prod)">
-                <div class="product-card-top">
-                    <span class="product-code">{{ prod.codigo }}</span>
-                    <span class="stock-badge"
-                        [class.badge-critical]="prod.stockDisponibleVisual <= prod.stockMinimo && prod.stockDisponibleVisual > 0"
-                        [class.badge-zero]="prod.stockDisponibleVisual <= 0">
+                <div class="card-badges">
+                    <span class="code-chip">{{ prod.codigo || 'SIN-COD' }}</span>
+                    <span class="stock-chip" [class.out-of-stock]="prod.stockDisponibleVisual <= 0"
+                        [class.low-stock]="prod.stockDisponibleVisual > 0 && prod.stockDisponibleVisual <= prod.stockMinimo">
                         {{ prod.stockDisponibleVisual }} disp.
                     </span>
                 </div>
 
-                <h3 class="product-title">{{ prod.nombre }}</h3>
-                <p class="product-category">{{ prod.nombreCategoria || 'Repuesto General' }}</p>
+                <h3 class="prod-title">{{ prod.nombre }}</h3>
 
-                <div class="product-card-bottom">
-                    <span class="product-price">{{ prod.precioVenta | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                    <button mat-icon-button color="primary" [disabled]="prod.stockDisponibleVisual <= 0"
-                        (click)="$event.stopPropagation(); agregarAlCarrito(prod)" aria-label="Agregar al carrito">
+                <div class="card-meta">
+                    @if (prod.marcaRepuesto) {
+                    <span class="badge-tag">{{ prod.marcaRepuesto }}</span>
+                    }
+                    <span class="badge-tag condition">{{ prod.condicion }}</span>
+                    @if (prod.ubicacion) {
+                    <span class="location-tag">{{ prod.ubicacion }}</span>
+                    }
+                </div>
+
+                <div class="card-footer">
+                    <span class="price-val">{{ prod.precioVenta | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                    <button mat-icon-button class="btn-add" [disabled]="prod.stockDisponibleVisual <= 0"
+                        aria-label="Agregar al carrito">
                         <mat-icon>add_shopping_cart</mat-icon>
                     </button>
                 </div>
-            </mat-card>
-            } @empty {
-            <div class="empty-catalog">
-                <mat-icon>search_off</mat-icon>
-                <p>No se encontraron repuestos disponibles.</p>
             </div>
             }
         </div>
-    </section>
+    </div>
 
-    <!-- Columna 2: Ticket de Venta y Facturación -->
-    <aside class="cart-section elevation-z2">
-        <div class="cart-header">
-            <div class="cart-title-wrapper">
-                <mat-icon class="cart-icon">shopping_cart</mat-icon>
-                <h2 class="cart-title">Ticket de Venta</h2>
-            </div>
-            @if (carrito().length > 0) {
-            <button mat-button color="warn" (click)="limpiarCarrito()" class="btn-clear">
-                <mat-icon>delete_sweep</mat-icon>
-                <span>Vaciar</span>
-            </button>
-            }
+    <!-- Panel Derecho: Ticket de Venta -->
+    <div class="pos-ticket-panel">
+        <div class="ticket-header">
+            <mat-icon class="ticket-icon">receipt_long</mat-icon>
+            <h2 class="ticket-title">Ticket de Venta</h2>
         </div>
 
-        <mat-divider></mat-divider>
+        <!-- Lista de Artículos en el Carrito con Precio Editable -->
+        <div class="ticket-items-scroll">
+            @if (carrito().length === 0) {
+            <div class="empty-ticket-state">
+                <mat-icon class="cart-empty-icon">remove_shopping_cart</mat-icon>
+                <p>El ticket está vacío. Seleccione repuestos del catálogo.</p>
+            </div>
+            } @else {
+            <div class="ticket-items-list">
+                @for (item of carrito(); track item.producto.codigo) {
+                <div class="ticket-item-row" [class.warning-cost]="item.esBajoCosto">
+                    <div class="item-info">
+                        <span class="item-name">{{ item.producto.nombre }}</span>
+                        <span class="item-code">{{ item.producto.codigo || 'SIN-COD' }}</span>
+                    </div>
 
-        <!-- Ítems agregados -->
-        <div class="cart-items-container">
-            @for (item of carrito(); track item.producto.id) {
-            <div class="cart-item">
-                <div class="item-info">
-                    <span class="item-name">{{ item.producto.nombre }}</span>
-                    <span class="item-unit-price">
-                        {{ item.precioUnitario | currency:'COP':'symbol-narrow':'1.0-0' }} c/u
-                    </span>
-                </div>
-
-                <div class="item-controls">
-                    <div class="quantity-picker">
-                        <button mat-icon-button (click)="actualizarCantidad(item.producto.id, -1)"
+                    <!-- Modificador de Cantidad -->
+                    <div class="quantity-controls">
+                        <button mat-icon-button class="btn-qty" (click)="actualizarCantidad(item.producto.codigo, -1)"
                             aria-label="Disminuir cantidad">
                             <mat-icon>remove</mat-icon>
                         </button>
-                        <span class="quantity-number">{{ item.cantidad }}</span>
-                        <button mat-icon-button (click)="actualizarCantidad(item.producto.id, 1)"
+                        <span class="qty-val">{{ item.cantidad }}</span>
+                        <button mat-icon-button class="btn-qty" (click)="actualizarCantidad(item.producto.codigo, 1)"
                             aria-label="Aumentar cantidad">
                             <mat-icon>add</mat-icon>
                         </button>
                     </div>
 
-                    <span class="item-subtotal">
-                        {{ item.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}
-                    </span>
+                    <!-- Precio Unitario Negociable (Editable) -->
+                    <div class="price-edit-box">
+                        <span class="lbl-unit">P. Unit:</span>
+                        <input type="number" [ngModel]="item.precioUnitario"
+                            (ngModelChange)="actualizarPrecioUnitario(item.producto.codigo, $event)"
+                            class="input-unit-price" [class.under-cost]="item.esBajoCosto"
+                            matTooltip="Editar precio unitario acordado en mostrador" />
+                    </div>
 
-                    <button mat-icon-button color="warn" (click)="eliminarDelCarrito(item.producto.id)"
-                        aria-label="Eliminar repuesto">
-                        <mat-icon>delete_outline</mat-icon>
-                    </button>
+                    <!-- Subtotal y Eliminar -->
+                    <div class="item-total-col">
+                        <span class="item-subtotal">{{ item.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                        <button mat-icon-button class="btn-remove" (click)="eliminarDelCarrito(item.producto.codigo)"
+                            aria-label="Eliminar repuesto">
+                            <mat-icon>delete_outline</mat-icon>
+                        </button>
+                    </div>
+
+                    @if (item.esBajoCosto) {
+                    <div class="cost-alert-msg">
+                        ⚠️ Por debajo del costo ($ {{ item.costoUnitario | number:'1.0-0' }})
+                    </div>
+                    }
                 </div>
-            </div>
-            } @empty {
-            <div class="empty-cart-state">
-                <mat-icon>production_quantity_limits</mat-icon>
-                <p>El ticket está vacío.<br />Selecciona repuestos del catálogo para iniciar la venta.</p>
+                }
             </div>
             }
         </div>
 
-        <mat-divider></mat-divider>
+        <!-- Configuración del Cliente: Mostrador vs Factura Electrónica -->
+        <div class="ticket-client-box">
+            <div class="switch-factura-row">
+                <mat-slide-toggle [checked]="requiereFacturaElectronica()"
+                    (change)="onToggleFacturaElectronica($event.checked)" color="primary">
+                    ¿Factura Electrónica (DIAN)?
+                </mat-slide-toggle>
+            </div>
 
-        <!-- Formulario de Cobro -->
-        <form [formGroup]="ventaForm" (ngSubmit)="procesarVenta()" class="checkout-form">
-            <!-- Sección Cliente Ágil -->
-            <div class="customer-section">
-                <div class="customer-row">
-                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field-doc">
-                        <mat-label>C.C. / NIT Cliente</mat-label>
-                        <input matInput formControlName="clienteDocumento" placeholder="Buscar por cédula o nombre..."
-                            [matAutocomplete]="autoCliente" (input)="onBuscarCliente($any($event.target).value)" />
+            <!-- Modo Mostrador Predeterminado -->
+            @if (!requiereFacturaElectronica()) {
+            <div class="client-summary-badge">
+                <mat-icon class="client-badge-icon">storefront</mat-icon>
+                <div class="client-badge-text">
+                    <span class="cli-title">Venta de Mostrador</span>
+                    <span class="cli-sub">Consumidor Final (222222222222)</span>
+                </div>
+            </div>
+            } @else {
+            <!-- Modo Facturación Electrónica con Búsqueda de Cliente -->
+            <form [formGroup]="ventaForm" class="client-form-dian">
+                <div class="doc-search-row">
+                    <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                        <mat-label>Buscar Cliente (Cédula / NIT / Nombre)*</mat-label>
+                        <input matInput formControlName="clienteDocumento" [matAutocomplete]="autoCliente"
+                            (input)="onBuscarCliente($any($event.target).value)" placeholder="Ej: 1023456789" />
                         <mat-autocomplete #autoCliente="matAutocomplete">
                             @for (cli of clientesSugeridos(); track cli.id) {
                             <mat-option [value]="cli.documento" (onSelectionChange)="seleccionarCliente(cli)">
-                                <div class="client-option">
-                                    <strong>{{ cli.documento }}</strong> — {{ cli.nombre }}
-                                    @if (cli.esFacturaElectronica) {
-                                    <span class="badge-fe">FE</span>
-                                    }
-                                </div>
+                                <strong>{{ cli.documento }}</strong> - {{ cli.nombre }}
                             </mat-option>
                             }
                         </mat-autocomplete>
                     </mat-form-field>
 
-                    <button mat-icon-button type="button" color="primary" class="btn-add-client"
-                        matTooltip="Registrar nuevo cliente" (click)="abrirModalNuevoCliente()">
+                    <button mat-icon-button type="button" class="btn-add-client" (click)="abrirModalNuevoCliente()"
+                        matTooltip="Registrar nuevo cliente">
                         <mat-icon>person_add</mat-icon>
                     </button>
                 </div>
 
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label>Nombre / Razón Social</mat-label>
-                    <input matInput formControlName="clienteNombre" placeholder="Cliente Mostrador" />
-                </mat-form-field>
-            </div>
-
-            <mat-form-field appearance="outline" class="payment-method-field" subscriptSizing="dynamic">
-                <mat-label>Método de Pago</mat-label>
-                <mat-select formControlName="metodoPago">
-                    @for (metodo of metodosPago; track metodo.id) {
-                    <mat-option [value]="metodo.id">{{ metodo.label }}</mat-option>
-                    }
-                </mat-select>
-            </mat-form-field>
-
-            <div class="financial-summary">
-                <div class="summary-line">
-                    <span>Artículos:</span>
-                    <strong>{{ cantidadItems() }} unid.</strong>
+                <!-- Alerta visual clara cuando el cliente no existe -->
+                @if (clienteNoEncontrado()) {
+                <div class="cliente-not-found-banner">
+                    <span>Cliente no registrado.</span>
+                    <button type="button" class="btn-crear-inline" (click)="abrirModalNuevoCliente()">
+                        + Crear ahora
+                    </button>
                 </div>
-                <div class="summary-line total-line">
-                    <span>Total a Pagar:</span>
-                    <span class="total-amount">{{ subtotalVenta() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                </div>
-            </div>
-
-            <button mat-flat-button type="submit" class="btn-checkout"
-                [disabled]="carrito().length === 0 || isProcesandoVenta()">
-                @if (isProcesandoVenta()) {
-                <span>Emitiendo Factura...</span>
-                } @else {
-                <span class="btn-checkout-content">
-                    <mat-icon>payments</mat-icon>
-                    <span>Cobrar {{ subtotalVenta() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                </span>
                 }
+
+                <mat-form-field appearance="outline" class="w-full mt-2" subscriptSizing="dynamic">
+                    <mat-label>Nombre Completo / Razón Social*</mat-label>
+                    <input matInput formControlName="clienteNombre" placeholder="Nombre del cliente o empresa" />
+                </mat-form-field>
+            </form>
+            }
+
+            <!-- Método de Pago: Enlaza metodo.id y muestra metodo.label -->
+            <form [formGroup]="ventaForm" class="mt-2">
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                    <mat-label>Método de Pago*</mat-label>
+                    <mat-select formControlName="metodoPago">
+                        @for (metodo of metodosPago; track metodo.id) {
+                        <mat-option [value]="metodo.id">{{ metodo.label }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </form>
+        </div>
+
+        <!-- Resumen Final y Botón de Cobro -->
+        <div class="ticket-footer">
+            <div class="totals-summary">
+                <div class="row-stat">
+                    <span>Artículos:</span>
+                    <strong>{{ cantidadItems() }} u.</strong>
+                </div>
+                <div class="row-stat total-row">
+                    <span>Total a Pagar:</span>
+                    <strong class="total-number">{{ subtotalVenta() | currency:'COP':'symbol-narrow':'1.0-0' }}</strong>
+                </div>
+            </div>
+
+            <button mat-flat-button color="warn" class="btn-cobrar-pos" [disabled]="!puedeCobrar()"
+                (click)="procesarVenta()">
+                <mat-icon>check_circle</mat-icon>
+                <span>Cobrar {{ subtotalVenta() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
             </button>
-        </form>
-    </aside>
+        </div>
+    </div>
 </div>

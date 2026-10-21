@@ -32,6 +32,19 @@
         </mat-form-field>
     </div>
 
+    <div class="chips-filtros-rapidos" style="display: flex; gap: 8px; margin: 12px 0; overflow-x: auto;">
+        @for (f of filtrosRapidos; track f) {
+        <button type="button" class="chip-filtro"
+            [style.background]="filtroSeleccionado() === f ? '#2563eb' : 'rgba(255, 255, 255, 0.06)'"
+            [style.color]="filtroSeleccionado() === f ? '#ffffff' : '#94a3b8'"
+            [style.border]="filtroSeleccionado() === f ? '1px solid #3b82f6' : '1px solid rgba(255, 255, 255, 0.1)'"
+            style="border-radius: 20px; padding: 4px 14px; font-size: 0.82rem; font-weight: 500; cursor: pointer;"
+            (click)="seleccionarFiltroRapido(f)">
+            {{ f }}
+        </button>
+        }
+    </div>
+
     <!-- Barra de Progreso durante Cargas -->
     @if (isLoading()) {
     <mat-progress-bar mode="indeterminate" class="loading-bar"></mat-progress-bar>

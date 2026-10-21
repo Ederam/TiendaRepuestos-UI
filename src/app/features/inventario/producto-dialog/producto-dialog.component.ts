@@ -1,6 +1,7 @@
 /**
- * @fileoverview Diálogo modal para creación y edición de repuestos en MACROLATAS.
- * Utiliza Reactive Forms tipados, autocompletado asistido de SKU y soporte multiorigen.
+ * @fileoverview Diálogo modal para la creación y edición de repuestos en MACROLATAS.
+ * Proporciona validación reactiva de formularios, sugerencia asistida de códigos SKU
+ * basada en la libreta física del negocio y soporte para catálogos multiorigen.
  */
 
 import { Component, OnInit, inject } from '@angular/core';
@@ -23,6 +24,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 // Core
 import {
@@ -37,8 +39,13 @@ import {
 } from '../../../core/constants/categorias.constants';
 import { generarCodigoSugerido } from '../../../core/utils/sku-generator.util';
 
+/**
+ * Contrato de datos inyectados al abrir el diálogo modal.
+ */
 export interface ProductoDialogData {
+  /** Instancia del producto en caso de operación de edición */
   producto?: Producto;
+  /** Modo operativo del diálogo modal */
   modo: 'crear' | 'editar';
 }
 
@@ -54,19 +61,27 @@ export interface ProductoDialogData {
     MatButtonModule,
     MatSelectModule,
     MatIconModule,
+    MatTooltipModule,
   ],
   templateUrl: './producto-dialog.component.html',
   styleUrl: './producto-dialog.component.scss',
 })
 export class ProductoDialogComponent implements OnInit {
+  /** Constructor de formularios reactivos inyectado */
   private readonly fb: FormBuilder = inject(FormBuilder);
+
+  /** Referencia de control del diálogo modal */
   readonly dialogRef: MatDialogRef<ProductoDialogComponent> = inject(
     MatDialogRef<ProductoDialogComponent>,
   );
+
+  /** Datos contextuales transferidos al abrir el modal */
   readonly data: ProductoDialogData = inject(MAT_DIALOG_DATA);
 
+  /** Colección inmutable de categorías disponibles en el sistema */
   readonly categorias: readonly CategoriaOption[] = CATEGORIAS_REPUESTOS;
 
+  /** Marcas de fabricantes aftermarket disponibles para selección */
   readonly marcasRepuesto: readonly string[] = [
     'TYC',
     'DEPO',
@@ -77,14 +92,17 @@ export class ProductoDialogComponent implements OnInit {
     'VICC',
   ];
 
+  /** Opciones de condición física del repuesto */
   readonly condiciones: readonly CondicionRepuesto[] = ['Nuevo', 'Segunda'];
 
+  /** Procedencias de inventario admitidas */
   readonly origenes: readonly OrigenInventario[] = [
     'PROPIO_MACROLATAS',
     'ALIADO_EUROCAR',
     'ALIADO_LATAS',
   ];
 
+  /** Formulario reactivo tipado para la captura del repuesto */
   readonly form: FormGroup = this.fb.group({
     codigo: [
       this.data.producto?.codigo || '',
@@ -128,6 +146,9 @@ export class ProductoDialogComponent implements OnInit {
     ],
   });
 
+  /**
+   * Ciclo de inicialización: asigna el código en mayúsculas en modo edición.
+   */
   ngOnInit(): void {
     if (this.data.producto?.codigo) {
       this.form
@@ -139,7 +160,7 @@ export class ProductoDialogComponent implements OnInit {
   }
 
   /**
-   * Sugiere el código al perder el foco del campo nombre si el código aún está vacío.
+   * Sugiere el código al perder el foco del campo nombre si el código aún no se ha digitado.
    */
   onNombreBlur(): void {
     if (this.data.modo === 'editar') return;
@@ -156,7 +177,7 @@ export class ProductoDialogComponent implements OnInit {
   }
 
   /**
-   * Permite regenerar la sugerencia manual con el botón de varita mágica.
+   * Genera o regenera un código sugerido bajo demanda del operador mediante el botón de asistencia.
    */
   sugerirCodigoManual(): void {
     const nombreActual: string = this.form.get('nombre')?.value;
@@ -166,6 +187,9 @@ export class ProductoDialogComponent implements OnInit {
     }
   }
 
+  /**
+   * Asegura la conversión a mayúsculas y recorte de espacios del código al salir del campo.
+   */
   onCodigoBlur(): void {
     const control = this.form.get('codigo');
     if (control?.value) {
@@ -173,6 +197,21 @@ export class ProductoDialogComponent implements OnInit {
     }
   }
 
+  /**
+   * Asigna una plantilla de texto al campo nombre y genera automáticamente su código SKU representativo.
+   * @param textoEjemplo Descripción sugerida para el repuesto.
+   */
+  copiarPlantilla(textoEjemplo: string): void {
+    this.form.patchValue({ nombre: textoEjemplo });
+    const codigoSugerido: string = generarCodigoSugerido(textoEjemplo);
+    if (codigoSugerido) {
+      this.form.patchValue({ codigo: codigoSugerido });
+    }
+  }
+
+  /**
+   * Valida el formulario y emite la entidad estructurada cerrando el diálogo modal.
+   */
   onGuardar(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -201,17 +240,8 @@ export class ProductoDialogComponent implements OnInit {
   }
 
   /**
-   * Asigna una plantilla de texto de ejemplo al campo nombre y genera su respectivo SKU.
-   * @param ejemplo Texto sugerido para la pieza.
+   * Cierra el diálogo modal sin emitir cambios.
    */
-  usarPlantillaEjemplo(ejemplo: string): void {
-    this.form.patchValue({ nombre: ejemplo });
-    const sugerido = generarCodigoSugerido(ejemplo);
-    if (sugerido) {
-      this.form.patchValue({ codigo: sugerido });
-    }
-  }
-
   onCancelar(): void {
     this.dialogRef.close(null);
   }

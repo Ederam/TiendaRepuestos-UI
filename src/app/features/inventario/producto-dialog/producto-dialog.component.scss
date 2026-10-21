@@ -5,13 +5,13 @@
   box-sizing: border-box;
   background-color: #0f172a;
   color: #f8fafc;
-  overflow-x: hidden;
+  overflow: hidden;
 
   .dialog-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
+    padding: 16px 24px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
     .header-icon-title {
@@ -21,13 +21,13 @@
 
       .header-icon {
         color: #e11d48;
-        font-size: 24px;
-        width: 24px;
-        height: 24px;
+        font-size: 26px;
+        width: 26px;
+        height: 26px;
       }
 
       .header-text {
-        font-size: 1.2rem;
+        font-size: 1.25rem;
         font-weight: 700;
         margin: 0;
       }
@@ -35,22 +35,20 @@
 
     .btn-close {
       color: #94a3b8;
-      &:hover {
-        color: #ffffff;
-      }
+      &:hover { color: #ffffff; }
     }
   }
 
   .dialog-body {
-    padding: 16px 20px;
-    max-height: 82vh;
+    padding: 20px 24px;
+    max-height: 80vh;
     overflow-y: auto;
     overflow-x: hidden;
 
     .form-layout {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
 
     .w-full {
@@ -60,31 +58,29 @@
     .field-container {
       display: flex;
       flex-direction: column;
-      gap: 4px;
 
-      .ejemplo-copiable {
+      .plantillas-bar {
         display: flex;
         align-items: center;
         gap: 8px;
-        font-size: 0.75rem;
+        font-size: 0.78rem;
         color: #94a3b8;
-        margin-top: -8px;
-        margin-bottom: 6px;
+        margin-top: -10px;
+        margin-bottom: 8px;
         flex-wrap: wrap;
 
-        .btn-chip-ejemplo {
-          background: rgba(56, 189, 248, 0.12);
-          border: 1px dashed rgba(56, 189, 248, 0.4);
-          color: #38bdf8;
-          border-radius: 4px;
+        .btn-tag {
+          background: rgba(37, 99, 235, 0.15);
+          border: 1px dashed rgba(59, 130, 246, 0.5);
+          color: #60a5fa;
           padding: 2px 8px;
+          border-radius: 4px;
+          font-size: 0.75rem;
           cursor: pointer;
-          font-family: inherit;
-          font-size: 0.72rem;
-          transition: all 0.2s ease;
+          transition: all 0.2s;
 
           &:hover {
-            background: rgba(56, 189, 248, 0.25);
+            background: rgba(37, 99, 235, 0.3);
             border-style: solid;
             color: #ffffff;
           }
@@ -92,14 +88,13 @@
       }
     }
 
-    .code-generator-row {
+    .code-row {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       align-items: flex-start;
 
       .code-field {
         flex: 1;
-
         .input-code {
           font-family: monospace;
           text-transform: uppercase;
@@ -107,14 +102,14 @@
         }
       }
 
-      .btn-magic-sugerir {
+      .btn-magic {
         height: 56px;
         border-color: rgba(56, 189, 248, 0.4);
         color: #38bdf8;
         display: flex;
         align-items: center;
         gap: 6px;
-        padding: 0 14px;
+        padding: 0 16px;
 
         &:hover {
           background-color: rgba(56, 189, 248, 0.1);
@@ -122,22 +117,22 @@
       }
     }
 
-    .form-grid-3 {
+    .grid-3 {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
     }
 
-    .form-grid-2 {
+    .grid-2 {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
     }
 
-    .form-grid-4 {
+    .grid-4 {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
     }
   }
 
@@ -145,19 +140,12 @@
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    padding: 14px 20px;
+    padding: 16px 24px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     background-color: rgba(15, 23, 42, 0.7);
 
     .btn-cancel {
       color: #94a3b8;
-    }
-
-    .btn-submit {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: 600;
     }
   }
 }
