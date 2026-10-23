@@ -50,6 +50,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/pos/pos.component').then((m) => m.PosComponent),
       },
+      {
+        path: 'pos',
+        // CARGA HIJAS: Permite resolver tanto '' (/pos) como 'historial' (/pos/historial)
+        loadChildren: () =>
+          import('./features/pos/pos.routes').then((m) => m.POS_ROUTES),
+      },
       // Inventario - Exclusivo Administrador
       {
         path: 'inventario',

@@ -174,22 +174,39 @@
     box-sizing: border-box;
 
     .ticket-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 16px 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between; // Asegura que el botón quede anclado a la derecha
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
-      .ticket-icon {
-        color: #e11d48;
-      }
-      .ticket-title {
-        margin: 0;
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: #f8fafc;
-      }
+  .ticket-icon {
+    color: #e11d48;
+  }
+  .ticket-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #f8fafc;
+    flex: 1; // Toma el espacio restante
+  }
+
+  .btn-historial-nav {
+    color: #94a3b8;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; // Oculta cualquier ligando de texto antes de renderizar la fuente
+
+    &:hover {
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.1);
     }
+  }
+}
 
     .ticket-items-scroll {
       flex: 1;

@@ -54,10 +54,15 @@
 
     <!-- Panel Derecho: Ticket de Venta -->
     <div class="pos-ticket-panel">
-        <div class="ticket-header">
+        <header class="ticket-header">
             <mat-icon class="ticket-icon">receipt_long</mat-icon>
             <h2 class="ticket-title">Ticket de Venta</h2>
-        </div>
+            <!-- Botón de navegación programática robusto -->
+            <button type="button" mat-icon-button (click)="irAlHistorial()" matTooltip="Consultar Historial de Ventas"
+                aria-label="Consultar Historial de Ventas" class="btn-historial-nav">
+                <mat-icon>history</mat-icon>
+            </button>
+        </header>
 
         <!-- Lista de Artículos en el Carrito con Validación de Precio y Margen -->
         <div class="ticket-items-scroll">

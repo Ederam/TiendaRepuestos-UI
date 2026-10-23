@@ -1,0 +1,212 @@
+.historial-container {
+  padding: 20px 24px;
+  background-color: #0b1120;
+  min-height: calc(100vh - 64px);
+  box-sizing: border-box;
+
+  .historial-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    .title-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+
+      .header-icon-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: rgba(56, 189, 248, 0.1);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        mat-icon {
+          color: #38bdf8;
+          font-size: 26px;
+          width: 26px;
+          height: 26px;
+        }
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #f8fafc;
+      }
+
+      .subtitle {
+        margin: 2px 0 0;
+        font-size: 0.8rem;
+        color: #94a3b8;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+
+      .btn-back {
+        color: #94a3b8;
+        border-color: rgba(255, 255, 255, 0.12);
+      }
+    }
+  }
+
+  .toolbar-section {
+    display: grid;
+    grid-template-columns: 1fr 180px 220px;
+    gap: 14px;
+    align-items: center;
+    margin-bottom: 16px;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
+
+    .search-input {
+      width: 100%;
+    }
+
+    .kpi-card {
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 10px 16px;
+      display: flex;
+      flex-direction: column;
+
+      .kpi-label {
+        font-size: 0.72rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      .kpi-val {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #f1f5f9;
+      }
+
+      &.highlight .kpi-val {
+        color: #34d399;
+      }
+    }
+  }
+
+  .loading-bar {
+    margin-bottom: 8px;
+    border-radius: 4px;
+  }
+
+  .table-card {
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    overflow: hidden;
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    .dark-table {
+      width: 100%;
+      background: transparent;
+
+      th.mat-header-cell {
+        background: #1e293b;
+        color: #94a3b8;
+        font-weight: 700;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 14px 16px;
+      }
+
+      td.mat-cell {
+        color: #e2e8f0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 12px 16px;
+        font-size: 0.85rem;
+      }
+
+      tr.mat-row:hover {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .consecutivo-chip {
+        font-family: monospace;
+        font-weight: 700;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.12);
+        padding: 3px 8px;
+        border-radius: 6px;
+      }
+
+      .fecha-text {
+        color: #cbd5e1;
+      }
+
+      .cliente-cell {
+        display: flex;
+        flex-direction: column;
+
+        .cli-nombre {
+          font-weight: 600;
+          color: #f8fafc;
+        }
+
+        .cli-doc {
+          color: #94a3b8;
+          font-size: 0.72rem;
+        }
+      }
+
+      .metodo-badge {
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        background: rgba(255, 255, 255, 0.08);
+        color: #cbd5e1;
+
+        &.efectivo {
+          background: rgba(52, 211, 153, 0.15);
+          color: #34d399;
+        }
+
+        &.transferencia {
+          background: rgba(56, 189, 248, 0.15);
+          color: #38bdf8;
+        }
+
+        &.tarjeta {
+          background: rgba(168, 85, 247, 0.15);
+          color: #c084fc;
+        }
+      }
+
+      .total-text {
+        color: #34d399;
+        font-size: 0.95rem;
+      }
+
+      .text-right {
+        text-align: right;
+      }
+
+      .text-center {
+        text-align: center;
+      }
+    }
+  }
+}

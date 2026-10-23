@@ -546,3 +546,12 @@ La petición POST /api/Ventas responde con 200 OK (sin error 400 en metodoPago),
 
 # Resumen de Cierre de Sesión y Checkpoint de ControlPersistencia Masiva Operativa: Más de 670 repuestos de Macrolatas cargados en PostgreSQL con soporte idempotente de sinCambios.Ergonomía UI: Tema oscuro corporativo forzado en :root, modal amplio a 720px y generador de SKU según la libreta física (F-200-LH-XXX).Módulo de Clientes: Implementado de punta a punta con su entidad Cliente, repositorio, servicio y controlador REST ClientesController verificado en Swagger.   Corrección de Contratos de Venta: Identificada la causa del error 400 por tipos Guid e identificadores numéricos de MetodoPago.   
 
+# ejecucion Front
+npm start: Levanta en http://localhost:4200 consumiendo tu backend local en https://localhost:7298/api.
+
+npm run start:mock: Levanta en http://localhost:4200 simulando todas las respuestas en memoria (útil para verificar exactamente lo que verá el usuario en Vercel antes de desplegar).
+
+npm run build: Empaqueta para Vercel usando environment.prod.ts (useMocks: true).
+
+# creacion de componentes de historial
+npx ng g c features/pos/ventas-historial --skip-tests --style=scss

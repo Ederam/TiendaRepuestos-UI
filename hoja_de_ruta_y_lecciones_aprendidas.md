@@ -385,3 +385,15 @@ Copia y pega este bloque en **`hoja_de_ruta_y_lecciones_aprendidas.md`**:
 - **Lecciones Aprendidas:**
   - **Precios de Mostrador vs Catálogo:** En un entorno automotriz físico (7 de Agosto), los precios unitarios son objeto frecuente de negociación comercial. El backend nunca debe sobreescribir ciegamente el valor enviado con el precio de lista, sino verificar que el valor pactado cubra la regla fiscal y contable: `precioAplicado >= costoUnitario`.
   - **Presupuestos SCSS en Angular:** La directiva `budgets` de Angular CLI en proyectos empresariales con temas oscuros personalizados debe calibrarse en `anyComponentStyle` a 20 kB para no forzar la destrucción de estilos ergonomizados de Material.
+
+### Hito 28 — Refactorización con Signals, Historial y Despliegue Multi-Ambiente
+
+- **Fecha:** 2026-10-23
+- **Rama Git:** `feat/inventario-carga-masiva`
+- **Entregables:**
+  - Extracción de la lógica del carrito hacia `PosCartService` con Signals reactivas.
+  - Pantalla `VentasHistorialComponent` para trazabilidad de ventas y reimpresión de tickets térmicos.
+  - Navegación programática fluida mediante `Router.navigate()` para el acceso al historial desde la cabecera.
+  - Configuración multi-ambiente en `angular.json` con `environment.prod.ts` (`useMocks: true`) para despliegues autónomos en Vercel.
+- **Lecciones Aprendidas:**
+  - **Navegación en Encabezados Complejos:** En componentes Standalone de Angular Material, es preferible utilizar botones con eventos `(click)` que invoquen `Router.navigate()` en lugar de anclas con `routerLink`, garantizando la ejecución de la navegación sin interferencia de estilos de layout.

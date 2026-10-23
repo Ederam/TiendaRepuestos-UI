@@ -1,6 +1,5 @@
 /**
- * Configuración de entorno local / desarrollo para TiendaRepuestos-UI.
- * useMocks: true permite maquetar y probar la SPA de forma autónoma.
+ * @fileoverview Configuración de desarrollo local conectada al Web API Kestrel en .NET 8.
  */
 export const environment = {
   production: false,

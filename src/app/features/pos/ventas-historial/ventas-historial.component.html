@@ -1,0 +1,121 @@
+<div class="historial-container">
+    <!-- Cabecera y Resumen Métrico -->
+    <header class="historial-header">
+        <div class="title-group">
+            <div class="header-icon-box">
+                <mat-icon>receipt_long</mat-icon>
+            </div>
+            <div>
+                <h1>Historial de Comprobantes y Ventas</h1>
+                <p class="subtitle">Auditoría, trazabilidad y reimpresión de comprobantes emitidos en caja</p>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <a mat-stroked-button routerLink="/pos" class="btn-back">
+                <mat-icon>point_of_sale</mat-icon>
+                <span>Volver al POS</span>
+            </a>
+            <button mat-flat-button color="primary" (click)="cargarHistorial()" [disabled]="isLoading()">
+                <mat-icon>refresh</mat-icon>
+                <span>Actualizar</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Filtro Reactivo y Tarjetas de Estadísticas -->
+    <section class="toolbar-section">
+        <mat-form-field appearance="outline" class="search-input">
+            <mat-label>Buscar por consecutivo (VTA-00001), NIT o cliente</mat-label>
+            <input matInput [formControl]="filtroControl" placeholder="Ej: VTA-00009 o 901234567" />
+            <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+
+        <div class="kpi-card">
+            <span class="kpi-label">Comprobantes</span>
+            <span class="kpi-val">{{ ventasFiltradas().length }}</span>
+        </div>
+
+        <div class="kpi-card highlight">
+            <span class="kpi-label">Total Recaudado</span>
+            <span class="kpi-val">{{ totalRecaudado() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+    </section>
+
+    @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate" class="loading-bar"></mat-progress-bar>
+    }
+
+    <!-- Grilla de Comprobantes Emitidos -->
+    <mat-card class="table-card">
+        <div class="table-responsive">
+            <table mat-table [dataSource]="ventasFiltradas()" class="dark-table">
+                <!-- Columna: Consecutivo -->
+                <ng-container matColumnDef="numeroComprobante">
+                    <th mat-header-cell *matHeaderCellDef>Comprobante</th>
+                    <td mat-cell *matCellDef="let v">
+                        <span class="consecutivo-chip">#{{ v.numeroComprobante || v.id }}</span>
+                    </td>
+                </ng-container>
+
+                <!-- Columna: Fecha y Hora -->
+                <ng-container matColumnDef="fechaVenta">
+                    <th mat-header-cell *matHeaderCellDef>Fecha / Hora</th>
+                    <td mat-cell *matCellDef="let v">
+                        <span class="fecha-text">{{ v.fechaVenta | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </td>
+                </ng-container>
+
+                <!-- Columna: Cliente / Documento -->
+                <ng-container matColumnDef="cliente">
+                    <th mat-header-cell *matHeaderCellDef>Cliente / Facturación</th>
+                    <td mat-cell *matCellDef="let v">
+                        <div class="cliente-cell">
+                            <span class="cli-nombre">{{ v.clienteNombre || 'Consumidor Final' }}</span>
+                            <small class="cli-doc">NIT/CC: {{ v.clienteDocumento || '222222222222' }}</small>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- Columna: Método de Pago -->
+                <ng-container matColumnDef="metodoPago">
+                    <th mat-header-cell *matHeaderCellDef>Forma Pago</th>
+                    <td mat-cell *matCellDef="let v">
+                        <span class="metodo-badge" [ngClass]="v.metodoPago?.toLowerCase()">
+                            {{ v.metodoPago }}
+                        </span>
+                    </td>
+                </ng-container>
+
+                <!-- Columna: Total -->
+                <ng-container matColumnDef="total">
+                    <th mat-header-cell *matHeaderCellDef class="text-right">Total</th>
+                    <td mat-cell *matCellDef="let v" class="text-right">
+                        <strong class="total-text">{{ v.total | currency:'COP':'symbol-narrow':'1.0-0' }}</strong>
+                    </td>
+                </ng-container>
+
+                <!-- Columna: Acciones -->
+                <ng-container matColumnDef="acciones">
+                    <th mat-header-cell *matHeaderCellDef class="text-center">Reimprimir</th>
+                    <td mat-cell *matCellDef="let v" class="text-center">
+                        <button mat-icon-button color="accent" matTooltip="Reimprimir Comprobante Térmico"
+                            (click)="reimprimir(v)">
+                            <mat-icon>print</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                <!-- Estado vacío -->
+                <tr class="mat-row empty-row" *matNoDataRow>
+                    <td class="mat-cell text-center py-4" [attr.colspan]="displayedColumns.length">
+                        No se encontraron comprobantes con el criterio especificado.
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </mat-card>
+</div>

@@ -13,6 +13,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 // Angular Material
@@ -46,7 +47,7 @@ import { PosCartService, CarritoItem } from './services/pos-cart.service';
 import { TicketDialogComponent } from './ticket-dialog/ticket-dialog.component';
 import { ClienteDialogComponent } from './cliente-dialog/cliente-dialog.component';
 
-// Reexportación tipada compatible con isolatedModules
+// Reexportación tipada para aislamiento de módulos
 export type { CarritoItem };
 
 @Component({
@@ -56,6 +57,7 @@ export type { CarritoItem };
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    RouterModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -72,7 +74,8 @@ export type { CarritoItem };
   styleUrl: './pos.component.scss',
 })
 export class PosComponent implements OnInit {
-  // Inyección de servicios
+  // Inyección de dependencias
+  private readonly router = inject(Router);
   private readonly productoService = inject(ProductoService);
   private readonly ventaService = inject(VentaService);
   private readonly notify = inject(NotificationService);
@@ -91,7 +94,12 @@ export class PosComponent implements OnInit {
   readonly requiereFacturaElectronica = signal<boolean>(false);
   readonly clienteNoEncontrado = signal<boolean>(false);
 
-  // Formulario reactivo
+  // Señales reactivas sincronizadas para el comprador y medio de pago
+  readonly clienteDocSignal = signal<string>('222222222222');
+  readonly clienteNomSignal = signal<string>('Consumidor Final / Mostrador');
+  readonly metodoPagoSignal = signal<number>(1);
+
+  // Controles de formulario
   readonly searchControl = new FormControl<string>('', { nonNullable: true });
 
   readonly ventaForm: FormGroup = new FormGroup({
@@ -107,14 +115,14 @@ export class PosComponent implements OnInit {
     }),
   });
 
-  // Puentes a Signals del servicio (mantienen compatibilidad estricta con pos.component.html)
+  // Puentes a Signals del servicio
   readonly carrito = this.cartService.items;
   readonly subtotalVenta = this.cartService.subtotal;
   readonly cantidadItems = this.cartService.cantidadItems;
   readonly tienePreciosInvalidos = this.cartService.tienePreciosInvalidos;
 
   /**
-   * Cálculo visual reactivo de existencias restando lo apartado en el carrito activo.
+   * Cálculo visual reactivo de existencias restando los apartados en la canasta activa.
    */
   readonly productosDisponibles = computed(() => {
     const base: Producto[] = this._productosBase();
@@ -143,11 +151,11 @@ export class PosComponent implements OnInit {
   });
 
   /**
-   * Validador reactivo para habilitar la confirmación del pago.
+   * Validador reactivo puro que habilita o deshabilita la orden de cobro.
    */
   readonly puedeCobrar = computed(() => {
     const hayItems = this.carrito().length > 0;
-    const metodoValido = this.ventaForm.get('metodoPago')?.value;
+    const metodoValido = this.metodoPagoSignal() > 0;
     const procesando = this.isProcesandoVenta();
     const preciosValidos = !this.tienePreciosInvalidos();
 
@@ -156,11 +164,11 @@ export class PosComponent implements OnInit {
     }
 
     if (this.requiereFacturaElectronica()) {
-      const doc = this.ventaForm.get('clienteDocumento')?.value?.trim();
-      const nom = this.ventaForm.get('clienteNombre')?.value?.trim();
+      const doc = this.clienteDocSignal().trim();
+      const nom = this.clienteNomSignal().trim();
       const esMostrador =
         doc === '222222222222' || nom === 'Consumidor Final / Mostrador';
-      return !!doc && !!nom && !esMostrador;
+      return doc.length >= 3 && nom.length >= 3 && !esMostrador;
     }
 
     return true;
@@ -169,6 +177,17 @@ export class PosComponent implements OnInit {
   ngOnInit(): void {
     this.buscarProductos('');
     this.setupBuscador();
+
+    // Sincronización bidireccional reactiva
+    this.ventaForm.get('clienteDocumento')?.valueChanges.subscribe((v) => {
+      this.clienteDocSignal.set(v || '');
+    });
+    this.ventaForm.get('clienteNombre')?.valueChanges.subscribe((v) => {
+      this.clienteNomSignal.set(v || '');
+    });
+    this.ventaForm.get('metodoPago')?.valueChanges.subscribe((v) => {
+      this.metodoPagoSignal.set(Number(v) || 1);
+    });
   }
 
   private setupBuscador(): void {
@@ -228,18 +247,29 @@ export class PosComponent implements OnInit {
     this.cartService.limpiar();
   }
 
+  /**
+   * Navegación programática directa hacia la vista de historial de comprobantes.
+   */
+  irAlHistorial(): void {
+    this.router.navigate(['/pos/historial']);
+  }
+
   onToggleFacturaElectronica(requiere: boolean): void {
     this.requiereFacturaElectronica.set(requiere);
     this.clienteNoEncontrado.set(false);
 
     if (!requiere) {
       this.clienteSeleccionado.set(null);
+      this.clienteDocSignal.set('222222222222');
+      this.clienteNomSignal.set('Consumidor Final / Mostrador');
       this.ventaForm.patchValue({
         clienteDocumento: '222222222222',
         clienteNombre: 'Consumidor Final / Mostrador',
       });
     } else {
       this.clienteSeleccionado.set(null);
+      this.clienteDocSignal.set('');
+      this.clienteNomSignal.set('');
       this.ventaForm.patchValue({
         clienteDocumento: '',
         clienteNombre: '',
@@ -270,21 +300,20 @@ export class PosComponent implements OnInit {
     this.clienteSeleccionado.set(cliente);
     this.clienteNoEncontrado.set(false);
 
+    this.clienteDocSignal.set(cliente.documento);
+    this.clienteNomSignal.set(cliente.nombre);
+
     this.ventaForm.patchValue({
       clienteDocumento: cliente.documento,
       clienteNombre: cliente.nombre,
     });
 
-    this.ventaForm.get('clienteDocumento')?.markAsDirty();
-    this.ventaForm.get('clienteDocumento')?.updateValueAndValidity();
-    this.ventaForm.get('clienteNombre')?.markAsDirty();
-    this.ventaForm.get('clienteNombre')?.updateValueAndValidity();
     this.clientesSugeridos.set([]);
   }
 
   abrirModalNuevoCliente(): void {
-    const docActual = this.ventaForm.get('clienteDocumento')?.value || '';
-    const nomActual = this.ventaForm.get('clienteNombre')?.value || '';
+    const docActual = this.clienteDocSignal();
+    const nomActual = this.clienteNomSignal();
 
     const dialogRef = this.dialog.open(ClienteDialogComponent, {
       width: '520px',
@@ -316,7 +345,6 @@ export class PosComponent implements OnInit {
       return;
     }
 
-    const formVal = this.ventaForm.getRawValue();
     this.isProcesandoVenta.set(true);
 
     const detalles: DetalleVentaItem[] = this.carrito().map(
@@ -329,13 +357,16 @@ export class PosComponent implements OnInit {
     );
 
     const clienteActual = this.clienteSeleccionado();
+    const documentoFinal = this.clienteDocSignal().trim() || '222222222222';
+    const nombreFinal =
+      this.clienteNomSignal().trim() || 'Consumidor Final / Mostrador';
+    const metodoPagoFinal = this.metodoPagoSignal();
 
     const request: CreateVentaRequest = {
       clienteId: clienteActual ? String(clienteActual.id) : null,
-      clienteDocumento: formVal.clienteDocumento?.trim() || '222222222222',
-      clienteNombre:
-        formVal.clienteNombre?.trim() || 'Consumidor Final / Mostrador',
-      metodoPago: Number(formVal.metodoPago) || 1,
+      clienteDocumento: documentoFinal,
+      clienteNombre: nombreFinal,
+      metodoPago: metodoPagoFinal,
       detalles,
     };
 
@@ -352,10 +383,14 @@ export class PosComponent implements OnInit {
           data: {
             venta: res,
             items: [...this.carrito()],
-            clienteNombre: formVal.clienteNombre?.trim() || 'Consumidor Final',
-            clienteDocumento:
-              formVal.clienteDocumento?.trim() || '222222222222',
-            metodoPago: formVal.metodoPago,
+            clienteNombre: nombreFinal,
+            clienteDocumento: documentoFinal,
+            metodoPago:
+              metodoPagoFinal === 1
+                ? 'Efectivo'
+                : metodoPagoFinal === 2
+                  ? 'Transferencia'
+                  : 'Tarjeta',
           },
         });
 
