@@ -371,3 +371,17 @@ Copia y pega este bloque en **`hoja_de_ruta_y_lecciones_aprendidas.md`**:
   - Mensajes de error amigables en el interceptor global sin tecnicismos ("CORS").
 - **Lecciones Aprendidas:**
   - **Aislamiento de Configuración de Navegador:** Los sistemas para entornos operativos de mostrador deben forzar explícitamente sus variables de contraste y esquema de color en `:root` y overlays de Material para no depender de la configuración del sistema operativo del cliente.
+
+### Hito 27 — Refactorización Arquitectural del POS, Desacople con Signals y Precios Dinámicos
+
+- **Fecha:** 2026-10-23
+- **Rama Git:** `feat/inventario-carga-masiva`
+- **Entregables:**
+  - Desacoplamiento total de la lógica de carrito hacia `PosCartService` con Signals reactivas (`items`, `subtotal`, `total`, `cantidadItems`, `tienePreciosInvalidos`).
+  - Reducción ciclomática y dimensional de `pos.component.ts` de más de 450 líneas a menos de 230 líneas, cumpliendo el Principio de Responsabilidad Única (SRP).
+  - Soporte de precios negociables en mostrador: el backend valida y congela el precio pactado por el vendedor siempre que supere el costo unitario del repuesto.
+  - Generación y asignación atómica de folios consecutivos (`VTA-XXXXX`) en PostgreSQL evitando condiciones de carrera concurrentes.
+  - Sincronización fidedigna del diálogo modal del comprobante térmico (80mm) con el total efectivamente liquidado.
+- **Lecciones Aprendidas:**
+  - **Precios de Mostrador vs Catálogo:** En un entorno automotriz físico (7 de Agosto), los precios unitarios son objeto frecuente de negociación comercial. El backend nunca debe sobreescribir ciegamente el valor enviado con el precio de lista, sino verificar que el valor pactado cubra la regla fiscal y contable: `precioAplicado >= costoUnitario`.
+  - **Presupuestos SCSS en Angular:** La directiva `budgets` de Angular CLI en proyectos empresariales con temas oscuros personalizados debe calibrarse en `anyComponentStyle` a 20 kB para no forzar la destrucción de estilos ergonomizados de Material.
