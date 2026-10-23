@@ -1,86 +1,184 @@
+// =============================================================================
+// Estilos del Inicio de Sesión — MACROLATAS
+// Centrado absoluto, aislamiento de layout y tema oscuro corporativo (#0b1120 / #0f172a)
+// =============================================================================
+
+:host {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100vw !important;
+  min-height: 100vh !important;
+  background-color: #0b1120 !important;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
 .login-wrapper {
   display: flex;
-  align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+  align-items: center;
+  width: 100%;
   padding: 1.5rem;
   box-sizing: border-box;
 
   .login-card {
     width: 100%;
-    max-width: 440px;
-    border-radius: 16px;
-    padding: 2rem 1.5rem 1rem;
-    background-color: #ffffff;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    max-width: 430px;
+    background: #0f172a !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 14px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.65) !important;
+    padding: 2.25rem 2rem;
+    box-sizing: border-box;
+    color: #f8fafc;
 
     .login-header {
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
+      padding: 0;
 
       .logo-container {
-        display: flex;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 64px;
-        height: 64px;
+        width: 52px;
+        height: 52px;
         border-radius: 50%;
-        background-color: #e0f2fe;
-        color: #0284c7;
-        margin-bottom: 1rem;
+        background: rgba(56, 189, 248, 0.12);
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        margin-bottom: 0.85rem;
 
         .app-icon {
-          font-size: 36px;
-          width: 36px;
-          height: 36px;
+          color: #38bdf8;
+          font-size: 28px;
+          width: 28px;
+          height: 28px;
         }
       }
 
       .app-title {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #0f172a;
-        margin: 0;
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: #f8fafc !important;
+        margin: 0 0 4px 0;
+        letter-spacing: -0.5px;
       }
 
       .app-subtitle {
-        font-size: 0.9rem;
-        color: #64748b;
-        margin-top: 0.25rem;
+        font-size: 0.86rem;
+        color: #94a3b8 !important;
+        margin: 0;
       }
     }
 
-    .login-form {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+    mat-card-content {
+      padding: 0;
 
-      .full-width {
-        width: 100%;
-      }
-
-      .field-icon {
-        color: #64748b;
-        margin-right: 0.5rem;
-      }
-
-      .submit-button {
-        margin-top: 1rem;
-        height: 48px;
-        font-size: 1rem;
-        font-weight: 600;
-        border-radius: 8px;
+      .login-form {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.75rem;
+        flex-direction: column;
+        gap: 1.15rem;
 
-        .spinner-btn {
-          display: inline-block;
+        .full-width {
+          width: 100%;
+
+          mat-label {
+            color: #94a3b8 !important;
+          }
+
+          input {
+            color: #f8fafc !important;
+
+            &::placeholder {
+              color: rgba(148, 163, 184, 0.5) !important;
+            }
+          }
+
+          .field-icon {
+            color: #94a3b8 !important;
+          }
+
+          mat-error {
+            font-size: 0.75rem;
+            color: #f87171 !important;
+          }
+        }
+
+        .demo-login-box {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          margin-top: 0.5rem;
+          padding-top: 1.25rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+          .btn-demo {
+            height: 42px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: transparent;
+            border-radius: 8px;
+            border: 1px solid rgba(248, 113, 113, 0.4) !important;
+            color: #f87171 !important;
+            transition: background 0.15s ease;
+
+            &:hover {
+              background: rgba(248, 113, 113, 0.12) !important;
+            }
+
+            &.btn-vendedor {
+              border-color: rgba(52, 211, 153, 0.4) !important;
+              color: #34d399 !important;
+
+              &:hover {
+                background: rgba(52, 211, 153, 0.12) !important;
+              }
+            }
+
+            mat-icon {
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+            }
+          }
+        }
+
+        .submit-button {
+          height: 48px;
+          font-size: 1rem;
+          font-weight: 700;
+          letter-spacing: 0.5px;
+          margin-top: 0.5rem;
+          background-color: #2563eb !important;
+          color: #ffffff !important;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+
+          &:hover:not([disabled]) {
+            background-color: #1d4ed8 !important;
+          }
+
+          &[disabled] {
+            background-color: rgba(255, 255, 255, 0.08) !important;
+            color: #64748b !important;
+          }
+
+          .spinner-btn {
+            ::ng-deep circle {
+              stroke: #ffffff !important;
+            }
+          }
         }
       }
     }
@@ -88,24 +186,13 @@
     .login-footer {
       display: flex;
       justify-content: center;
-      padding: 1.5rem 0 0.5rem;
-      color: #94a3b8;
-      font-size: 0.75rem;
       text-align: center;
-    }
+      margin-top: 1.75rem;
+      padding: 0;
 
-    .demo-login-box {
-      margin-top: 0.5rem;
-
-      .btn-demo {
-        width: 100%;
-        height: 40px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        border-radius: 8px;
-        color: #d92525;
-        border-color: #fca5a5;
-        background-color: #fff1f2;
+      small {
+        font-size: 0.72rem;
+        color: #64748b !important;
       }
     }
   }

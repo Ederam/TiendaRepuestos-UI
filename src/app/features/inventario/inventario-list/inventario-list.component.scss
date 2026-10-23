@@ -1,178 +1,235 @@
-.inventario-page {
+// =============================================================================
+// Estilos del Catálogo de Inventario — MACROLATAS
+// Tema oscuro corporativo, fondo unificado y alineación visual correcta
+// =============================================================================
+
+:host {
+  display: block;
+  background-color: #0b1120;
+  min-height: calc(100vh - 64px);
+}
+
+.inventario-container {
+  padding: 20px 24px;
+  background-color: #0b1120;
+  min-height: calc(100vh - 64px);
+  box-sizing: border-box;
+
+  .inventario-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    .title-group {
+      h1 {
+        margin: 0;
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: #f8fafc;
+        letter-spacing: -0.5px;
+      }
+
+      .subtitle {
+        margin: 4px 0 0;
+        font-size: 0.82rem;
+        color: #94a3b8;
+      }
+    }
+
+    // Botones alineados a la derecha
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: auto;
+
+      .btn-import {
+        color: #38bdf8;
+        border-color: rgba(56, 189, 248, 0.35);
+
+        &:hover {
+          background: rgba(56, 189, 248, 0.08);
+        }
+      }
+
+      .btn-create {
+        background-color: #2563eb;
+        color: #ffffff;
+        font-weight: 700;
+
+        &:hover {
+          background-color: #1d4ed8;
+        }
+      }
+    }
+  }
+
+  .filters-section {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 12px;
+    margin-bottom: 16px;
 
-    .page-header {
+    .search-card {
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px 16px;
+
+      mat-form-field {
+        width: 100%;
+      }
+    }
+
+    .chips-filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .filter-chip {
+        background: #1e293b;
+        color: #cbd5e1;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 5px 14px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s ease;
+
+        &:hover {
+          background: #334155;
+          color: #fff;
+        }
+
+        &.active {
+          background: #38bdf8;
+          color: #0f172a;
+          font-weight: 700;
+          border-color: #38bdf8;
+        }
+      }
+    }
+  }
+
+  .table-card {
+    background: #0f172a !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 10px;
+    overflow: hidden;
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      background: transparent !important;
+
+      th.mat-header-cell {
+        background: #1e293b !important;
+        color: #94a3b8 !important;
+        font-weight: 700;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 14px 16px;
+      }
+
+      td.mat-cell {
+        color: #f1f5f9 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 12px 16px;
+        font-size: 0.85rem;
+      }
+
+      tr.mat-row:hover {
+        background: rgba(255, 255, 255, 0.02) !important;
+      }
+
+      .code-badge {
+        font-family: monospace;
+        font-weight: 700;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.12);
+        padding: 3px 8px;
+        border-radius: 6px;
+      }
+
+      .prod-desc-cell {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
+        flex-direction: column;
+        gap: 3px;
 
-        .page-title {
-            margin: 0;
-            font-size: 1.5rem;
+        .main-desc {
+          font-weight: 600;
+          color: #f8fafc;
+        }
+
+        .sub-desc {
+          font-size: 0.72rem;
+          color: #94a3b8;
+        }
+
+        .badges-row {
+          display: flex;
+          gap: 6px;
+          margin-top: 2px;
+
+          .tag {
+            font-size: 0.65rem;
             font-weight: 700;
-            color: #0f172a;
-        }
+            padding: 1px 6px;
+            border-radius: 4px;
 
-        .page-subtitle {
-            margin: 0.25rem 0 0;
-            font-size: 0.875rem;
-            color: #64748b;
+            &.gen {
+              background: rgba(56, 189, 248, 0.15);
+              color: #38bdf8;
+            }
+            &.cond {
+              background: rgba(52, 211, 153, 0.15);
+              color: #34d399;
+            }
+          }
         }
+      }
 
-        .btn-nuevo {
-            height: 42px;
-            font-weight: 600;
-            border-radius: 8px;
+      .price-cell {
+        font-weight: 700;
+        color: #34d399;
+        font-size: 0.95rem;
+      }
+
+      .stock-chip {
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+
+        &.good {
+          color: #34d399;
+          background: rgba(52, 211, 153, 0.12);
         }
+        &.warning {
+          color: #fbbf24;
+          background: rgba(245, 158, 11, 0.15);
+        }
+        &.danger {
+          color: #f87171;
+          background: rgba(239, 68, 68, 0.15);
+        }
+      }
+
+      .btn-action-edit {
+        color: #94a3b8;
+
+        &:hover {
+          color: #38bdf8;
+        }
+      }
     }
-
-    .filters-card {
-        background-color: #ffffff;
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        border: 1px solid #e2e8f0;
-
-        .search-field {
-            width: 100%;
-            max-width: 480px;
-        }
-    }
-
-    .loading-bar {
-        border-radius: 4px;
-    }
-
-    .table-container {
-        background-color: #ffffff;
-        border-radius: 8px;
-        overflow: hidden;
-        border: 1px solid #e2e8f0;
-
-        .inventory-table {
-            width: 100%;
-
-            th.mat-header-cell {
-                background-color: #f1f5f9;
-                color: #334155;
-                font-weight: 600;
-                font-size: 0.85rem;
-                padding: 1rem;
-            }
-
-            td.mat-cell {
-                padding: 0.85rem 1rem;
-                color: #1e293b;
-                font-size: 0.875rem;
-            }
-
-            .table-row:hover {
-                background-color: #f8fafc;
-            }
-
-            .text-right {
-                text-align: right;
-            }
-
-            .text-center {
-                text-align: center;
-            }
-
-            .badge-code {
-                font-family: monospace;
-                font-weight: 600;
-                background-color: #f1f5f9;
-                color: #0f172a;
-                padding: 4px 8px;
-                border-radius: 4px;
-                border: 1px solid #cbd5e1;
-            }
-
-            .product-info {
-                display: flex;
-                flex-direction: column;
-
-                .product-name {
-                    font-weight: 600;
-                    color: #0f172a;
-                }
-
-                .product-desc {
-                    color: #64748b;
-                    font-size: 0.75rem;
-                }
-            }
-
-            .price-tag {
-                font-weight: 700;
-                color: #047857;
-            }
-
-            .stock-indicator {
-                display: inline-flex;
-                align-items: center;
-                gap: 0.35rem;
-                padding: 4px 10px;
-                border-radius: 16px;
-                background-color: #f1f5f9;
-                color: #334155;
-
-                &.stock-critical {
-                    background-color: #fee2e2;
-                    color: #b91c1c;
-
-                    .stock-warn-icon {
-                        font-size: 16px;
-                        width: 16px;
-                        height: 16px;
-                        color: #dc2626;
-                    }
-                }
-            }
-
-            .status-pill {
-                padding: 2px 8px;
-                border-radius: 12px;
-                font-size: 0.75rem;
-                font-weight: 500;
-
-                &.status-active {
-                    background-color: #dcfce7;
-                    color: #15803d;
-                }
-
-                &.status-inactive {
-                    background-color: #f1f5f9;
-                    color: #64748b;
-                }
-            }
-
-            .empty-table-cell {
-                padding: 3rem 1rem;
-                text-align: center;
-
-                .empty-state {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    color: #94a3b8;
-
-                    .empty-icon {
-                        font-size: 48px;
-                        width: 48px;
-                        height: 48px;
-                        margin-bottom: 0.5rem;
-                    }
-
-                    p {
-                        margin: 0;
-                        font-size: 0.95rem;
-                    }
-                }
-            }
-        }
-    }
+  }
 }

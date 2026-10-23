@@ -1,47 +1,275 @@
-/* ==========================================================================
-   TEMA CORPORATIVO UNIFICADO MACROLATAS (Dark Theme Obligatorio)
-   Evita que navegadores en modo claro dañen contrastes o dejen textos invisibles.
-   ========================================================================== */
+// =============================================================================
+// Estilos Globales y Tema Oscuro Corporativo — MACROLATAS
+// Forzado universal de alto contraste en Overlays, Modales, SnackBar y Tablas
+// =============================================================================
+
+@use '@angular/material' as mat;
 
 :root {
   color-scheme: dark !important;
+  --bg-app: #0b1120;
+  --bg-card: #0f172a;
+  --bg-input: #1e293b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --primary-accent: #38bdf8;
+  --success-accent: #34d399;
+  --danger-accent: #f87171;
+  --border-subtle: rgba(255, 255, 255, 0.1);
 }
 
 html, body {
   height: 100%;
   margin: 0;
-  background-color: #0b1120 !important; // Azul noche profundo corporativo
-  color: #f1f5f9 !important;
-  font-family: 'Roboto', 'Inter', system-ui, -apple-system, sans-serif;
+  padding: 0;
+  background-color: #0b1120 !important;
+  color: #f8fafc !important;
+  font-family: Roboto, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color-scheme: dark !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-// Fondo de diálogos y modales de Angular Material
+// -----------------------------------------------------------------------------
+// Forzado del Shell Principal (Main Layout)
+// -----------------------------------------------------------------------------
+app-main-layout,
+.main-layout-container,
+.main-content,
+main {
+  background-color: #0b1120 !important;
+  color: #f8fafc !important;
+  min-height: calc(100vh - 64px);
+}
+
+// -----------------------------------------------------------------------------
+// Overlays Globales: Menús Flotantes (Perfil y Cerrar Sesión)
+// -----------------------------------------------------------------------------
 .cdk-overlay-pane {
-  .mat-mdc-dialog-container .mdc-dialog__surface {
-    background-color: #0f172a !important; // Slate-900 sólido
+  .mat-mdc-menu-panel {
+    background-color: #0f172a !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8) !important;
+
+    // Forzar texto de cada ítem del menú
+    .mat-mdc-menu-item {
+      color: #f8fafc !important;
+
+      .mat-mdc-menu-item-text {
+        color: #f8fafc !important;
+      }
+
+      .mat-icon {
+        color: #94a3b8 !important;
+      }
+
+      &:hover:not([disabled]) {
+        background-color: #1e293b !important;
+
+        .mat-mdc-menu-item-text,
+        .mat-icon {
+          color: #38bdf8 !important;
+        }
+      }
+
+      // Ítem especial Cerrar Sesión
+      &.btn-logout,
+      &:last-child {
+        color: #f87171 !important;
+
+        .mat-mdc-menu-item-text,
+        .mat-icon {
+          color: #f87171 !important;
+        }
+
+        &:hover:not([disabled]) {
+          background-color: rgba(248, 113, 113, 0.15) !important;
+
+          .mat-mdc-menu-item-text,
+          .mat-icon {
+            color: #ef4444 !important;
+          }
+        }
+      }
+    }
+  }
+
+  // Panel de Autocompletado de Clientes y Repuestos
+  .mat-mdc-autocomplete-panel {
+    background-color: #0f172a !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7) !important;
+
+    .mat-mdc-option {
+      color: #f8fafc !important;
+
+      .mdc-list-item__primary-text {
+        color: #f8fafc !important;
+        font-weight: 500 !important;
+      }
+
+      &:hover:not(.mdc-list-item--disabled),
+      &.mat-mdc-option-active {
+        background-color: #1e293b !important;
+
+        .mdc-list-item__primary-text {
+          color: #38bdf8 !important;
+        }
+      }
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Notificaciones Toast (MatSnackBar)
+// -----------------------------------------------------------------------------
+.mat-mdc-snack-bar-container {
+  &.mdc-snackbar {
+    .mdc-snackbar__surface {
+      background-color: #1e293b !important;
+      border: 1px solid rgba(56, 189, 248, 0.3) !important;
+      border-radius: 8px !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+    }
+
+    .mdc-snackbar__label {
+      color: #f8fafc !important;
+      font-weight: 600 !important;
+    }
+
+    .mdc-snackbar__actions button {
+      color: #38bdf8 !important;
+      font-weight: 700 !important;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Componentes y Tablas de Angular Material
+// -----------------------------------------------------------------------------
+.mat-mdc-card,
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+// Tablas Globales
+.mat-mdc-table {
+  background-color: transparent !important;
+
+  th.mat-mdc-header-cell {
+    background-color: #1e293b !important;
+    color: #94a3b8 !important;
+    font-weight: 700 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+
+  td.mat-mdc-cell {
+    color: #f1f5f9 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+
+  tr.mat-mdc-row:hover {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+  }
+}
+
+// Formularios
+.mat-mdc-form-field {
+  .mdc-floating-label,
+  .mat-mdc-floating-label {
+    color: #94a3b8 !important;
+  }
+
+  &.mat-focused .mdc-floating-label,
+  &.mat-focused .mat-mdc-floating-label {
+    color: #38bdf8 !important;
+  }
+
+  .mat-mdc-input-element,
+  input.mat-mdc-input-element {
     color: #f8fafc !important;
-    border-radius: 14px !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+    caret-color: #38bdf8 !important;
+
+    &::placeholder {
+      color: rgba(148, 163, 184, 0.6) !important;
+    }
+  }
+
+  .mat-icon {
+    color: #94a3b8 !important;
+  }
+
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  &:hover .mdc-notched-outline__leading,
+  &:hover .mdc-notched-outline__notch,
+  &:hover .mdc-notched-outline__trailing {
+    border-color: rgba(56, 189, 248, 0.4) !important;
+  }
+
+  &.mat-focused .mdc-notched-outline__leading,
+  &.mat-focused .mdc-notched-outline__notch,
+  &.mat-focused .mdc-notched-outline__trailing {
+    border-color: #38bdf8 !important;
+    border-width: 2px !important;
   }
 }
 
-// Corrección de contraste en botones primarios (Guardar Cliente / Registrar)
-.btn-primary-fix,
-button[mat-flat-button][color="primary"] {
-  background-color: #2563eb !important; // Azul corporativo visible
-  color: #ffffff !important; // Texto blanco de alto contraste garantizado
-  font-weight: 600 !important;
+// Selectores
+.mat-mdc-select-value,
+.mat-mdc-select-value-text {
+  color: #f8fafc !important;
+}
 
-  &:disabled {
-    background-color: rgba(255, 255, 255, 0.12) !important;
-    color: rgba(255, 255, 255, 0.38) !important;
+.mat-mdc-select-arrow {
+  color: #94a3b8 !important;
+}
+
+// Paginadores
+.mat-mdc-paginator {
+  background-color: #0f172a !important;
+  color: #94a3b8 !important;
+
+  .mat-mdc-paginator-range-label,
+  .mat-mdc-select-value-text {
+    color: #cbd5e1 !important;
+  }
+
+  .mat-mdc-icon-button[disabled] {
+    color: rgba(255, 255, 255, 0.2) !important;
   }
 }
 
-// Evitar scrolls no deseados en modales
-.modal-sin-scroll {
-  .mat-mdc-dialog-content {
-    overflow-x: hidden !important;
+// Switches
+.mat-mdc-slide-toggle {
+  .mdc-label {
+    color: #cbd5e1 !important;
+  }
+}
+
+// Scrollbars
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0b1120;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+
+  &:hover {
+    background: #334155;
   }
 }
