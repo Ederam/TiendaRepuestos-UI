@@ -1,6 +1,6 @@
 /**
  * @fileoverview Adaptador HTTP real de ProductoService que consume la Web API de ASP.NET Core 8.
- * Normaliza las propiedades entre el backend (codigoParte) y el modelo de Angular (codigo).
+ * Normaliza contratos entre el backend y el frontend, mapeando GUIDs y entidades de catálogo.
  */
 
 import { Injectable, inject } from '@angular/core';
@@ -19,11 +19,8 @@ import {
   ProductoFilterParams,
 } from '../../models/api-response.models';
 
-/**
- * Interfaz interna que refleja la respuesta cruda de C# para ProductoResponseDto.
- */
 interface BackendProductoDto {
-  id: string | number;
+  id: string;
   nombre: string;
   codigoParte?: string;
   codigo?: string;
@@ -48,16 +45,18 @@ export class ProductoHttpService extends ProductoService {
   private readonly http: HttpClient = inject(HttpClient);
   private readonly apiUrl: string = `${environment.apiUrl}/Productos`;
 
-  /**
-   * Mapea un DTO de backend al modelo de dominio unificado de Angular.
-   */
   private normalizarProducto(dto: BackendProductoDto): Producto {
+    const parsedCategoriaId = Number(dto.categoriaId);
+
     return {
-      id: typeof dto.id === 'number' ? dto.id : 0,
+      id: dto.id ? dto.id.toString() : '00000000-0000-0000-0000-000000000000',
       codigo: (dto.codigoParte || dto.codigo || '').trim().toUpperCase(),
       nombre: dto.nombre,
       descripcion: dto.descripcion,
-      categoriaId: typeof dto.categoriaId === 'number' ? dto.categoriaId : 1,
+      categoriaId:
+        !isNaN(parsedCategoriaId) && parsedCategoriaId > 0
+          ? parsedCategoriaId
+          : 1,
       nombreCategoria: dto.nombreCategoria || 'General',
       marcaRepuesto: dto.marcaRepuesto || 'GENÉRICO',
       marcaVehiculo: dto.marcaVehiculo || 'MULTIMARCA',
@@ -65,9 +64,9 @@ export class ProductoHttpService extends ProductoService {
       origen: (dto.origen as any) || 'PROPIO_MACROLATAS',
       ubicacion: dto.ubicacion || 'BODEGA PRINCIPAL',
       costo: dto.costo || 0,
-      precioVenta: dto.precioVenta,
-      stockActual: dto.stockActual,
-      stockMinimo: dto.stockMinimo,
+      precioVenta: dto.precioVenta || 0,
+      stockActual: dto.stockActual || 0,
+      stockMinimo: dto.stockMinimo || 2,
       activo: dto.activo ?? true,
     };
   }
@@ -146,6 +145,23 @@ export class ProductoHttpService extends ProductoService {
 
     return this.http
       .post<BackendProductoDto>(this.apiUrl, payload)
+      .pipe(map((dto) => this.normalizarProducto(dto)));
+  }
+
+  override updateProducto(
+    id: string,
+    request: CreateProductoRequest,
+  ): Observable<Producto> {
+    const payload = {
+      nombre: request.nombre.trim(),
+      codigoParte: request.codigo.trim().toUpperCase(),
+      precioVenta: request.precioVenta,
+      costo: request.costo,
+      categoriaId: '00000000-0000-0000-0000-000000000000',
+    };
+
+    return this.http
+      .put<BackendProductoDto>(`${this.apiUrl}/${id}`, payload)
       .pipe(map((dto) => this.normalizarProducto(dto)));
   }
 }

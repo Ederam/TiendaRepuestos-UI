@@ -21,7 +21,7 @@ export type OrigenInventario =
  */
 export interface Producto {
   /** Identificador único autonumérico o subrogado */
-  id: number;
+  id: string;
   /** Código técnico o referencia de fabricante */
   codigo: string;
   /** Nombre comercial o descripción principal */

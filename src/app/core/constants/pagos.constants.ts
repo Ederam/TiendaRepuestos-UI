@@ -4,11 +4,16 @@
  */
 
 export const METODOS_PAGO = {
-    EFECTIVO: { id: 'Efectivo', label: 'Efectivo' },
-    TRANSFERENCIA: { id: 'Transferencia', label: 'Transferencia (Nequi / Daviplata / Bancolombia)' },
-    TARJETA: { id: 'Tarjeta', label: 'Tarjeta Débito / Crédito' }
+  EFECTIVO: { id: 1, label: 'Efectivo', code: 'Efectivo' },
+  TRANSFERENCIA: {
+    id: 2,
+    label: 'Transferencia (Nequi / Daviplata / Bancolombia)',
+    code: 'Transferencia',
+  },
+  TARJETA: { id: 3, label: 'Tarjeta Débito / Crédito', code: 'Tarjeta' },
 } as const;
 
-export type MetodoPagoId = typeof METODOS_PAGO[keyof typeof METODOS_PAGO]['id'];
+export type MetodoPagoId =
+  (typeof METODOS_PAGO)[keyof typeof METODOS_PAGO]['id'];
 
 export const LISTA_METODOS_PAGO = Object.values(METODOS_PAGO);

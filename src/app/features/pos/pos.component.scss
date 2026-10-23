@@ -1,3 +1,8 @@
+// =============================================================================
+// Estilos del Punto de Venta (POS) - MACROLATAS
+// Restauración de clases originales con tema oscuro corporativo
+// =============================================================================
+
 .pos-layout {
   display: flex;
   height: calc(100vh - 64px);
@@ -14,7 +19,9 @@
     margin-top: 10px;
   }
 
-  // Panel Catálogo
+  // ---------------------------------------------------------------------------
+  // Panel Catálogo (Izquierda)
+  // ---------------------------------------------------------------------------
   .pos-catalog-section {
     flex: 1;
     display: flex;
@@ -50,7 +57,7 @@
         flex-direction: column;
         justify-content: space-between;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 
         &:hover:not(.disabled-card) {
           border-color: #3b82f6;
@@ -154,9 +161,11 @@
     }
   }
 
-  // Panel Ticket
+  // ---------------------------------------------------------------------------
+  // Panel Ticket de Venta (Derecha)
+  // ---------------------------------------------------------------------------
   .pos-ticket-panel {
-    width: 440px; // Espaciado ampliado para eliminar la sensación de apretado
+    width: 440px;
     background: #0f172a;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;

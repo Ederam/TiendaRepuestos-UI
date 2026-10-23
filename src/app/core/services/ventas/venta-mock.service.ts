@@ -1,33 +1,90 @@
 /**
- * @fileoverview Adaptador en memoria (Mock) de VentaService para simular facturación.
+ * @fileoverview Adaptador en memoria (Mock) de VentaService para pruebas unitarias y desarrollo offline.
  */
 
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
 import { VentaService } from './venta.service';
-import { CreateVentaRequest, VentaResponse } from '../../models/venta.models';
+import {
+  CreateVentaRequest,
+  VentaResponse,
+  DetalleVentaResponse,
+} from '../../models/venta.models';
 import { MOCK_PRODUCTOS } from '../../mocks/repuestos.mock';
 
-@Injectable()
+/**
+ * Simula el comportamiento del backend persistiendo en memoria local durante la sesión.
+ */
+@Injectable({
+  providedIn: 'root',
+})
 export class VentaMockService extends VentaService {
-    override registrarVenta(request: CreateVentaRequest): Observable<VentaResponse> {
-        // Descontar inventario en el mock para verificar reactividad de stock
-        request.detalles.forEach((d) => {
-            const prod = MOCK_PRODUCTOS.find((p) => p.id === d.productoId);
-            if (prod) {
-                prod.stockActual = Math.max(0, prod.stockActual - d.cantidad);
-            }
-        });
+  private mockVentas: VentaResponse[] = [];
+  private contadorConsecutivo = 1;
 
-        const total = request.detalles.reduce((acc, d) => acc + d.cantidad * d.precioUnitario, 0);
+  override registrarVenta(
+    request: CreateVentaRequest,
+  ): Observable<VentaResponse> {
+    const detallesProcesados: DetalleVentaResponse[] = [];
+    let subtotalCalculado = 0;
 
-        const response: VentaResponse = {
-            id: Math.floor(Math.random() * 9000) + 1000,
-            numeroFactura: `FAC-${Math.floor(Math.random() * 90000) + 10000}`,
-            fecha: new Date().toISOString(),
-            total
-        };
+    request.detalles.forEach((d) => {
+      const prod = MOCK_PRODUCTOS.find((p) => p.id === d.productoId);
+      if (prod) {
+        prod.stockActual = Math.max(0, prod.stockActual - d.cantidad);
+      }
 
-        return of(response).pipe(delay(300));
+      const precioUnitario = d.precioUnitario ?? prod?.precioVenta ?? 0;
+      const subtotalItem = d.cantidad * precioUnitario;
+      subtotalCalculado += subtotalItem;
+
+      detallesProcesados.push({
+        id: crypto.randomUUID(),
+        productoId: d.productoId,
+        nombreProducto: prod ? prod.nombre : 'Repuesto Automotriz',
+        cantidad: d.cantidad,
+        precioUnitario,
+        subtotal: subtotalItem,
+      });
+    });
+
+    const metodoTexto =
+      request.metodoPago === 1
+        ? 'Efectivo'
+        : request.metodoPago === 2
+          ? 'Transferencia'
+          : 'Tarjeta';
+
+    const response: VentaResponse = {
+      id: crypto.randomUUID(),
+      numeroComprobante: `VTA-${this.contadorConsecutivo.toString().padStart(5, '0')}`,
+      fechaVenta: new Date().toISOString(),
+      metodoPago: metodoTexto,
+      estado: 'Completada',
+      clienteId: request.clienteId ?? null,
+      clienteDocumento: request.clienteDocumento || '222222222222',
+      clienteNombre: request.clienteNombre || 'Consumidor Final',
+      subtotal: subtotalCalculado,
+      impuesto: 0,
+      total: subtotalCalculado,
+      detalles: detallesProcesados,
+    };
+
+    this.contadorConsecutivo++;
+    this.mockVentas.unshift(response);
+
+    return of(response).pipe(delay(300));
+  }
+
+  override obtenerVentas(): Observable<VentaResponse[]> {
+    return of(this.mockVentas).pipe(delay(200));
+  }
+
+  override obtenerVentaPorId(id: string): Observable<VentaResponse> {
+    const venta = this.mockVentas.find((v) => v.id === id);
+    if (!venta) {
+      throw new Error(`Comprobante no localizado con id: ${id}`);
     }
+    return of(venta).pipe(delay(200));
+  }
 }

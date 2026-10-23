@@ -1,7 +1,7 @@
 /**
  * @fileoverview Componente de vista principal para el catálogo de inventario de MACROLATAS.
  * Administra la consulta paginada en servidor, búsqueda reactiva con debounce,
- * filtros rápidos por familias de colisión y orquestación de creación/edición de repuestos.
+ * filtros rápidos por familias de colisión y persistencia de creación y edición de repuestos.
  */
 
 import {
@@ -60,16 +60,10 @@ import { CATEGORIAS_REPUESTOS } from '@core/constants/categorias.constants';
   styleUrl: './inventario-list.component.scss',
 })
 export class InventarioListComponent implements OnInit {
-  /** Servicio abstracto de productos inyectado */
   private readonly productoService: ProductoService = inject(ProductoService);
-
-  /** Servicio de diálogos de Angular Material */
   private readonly dialog: MatDialog = inject(MatDialog);
-
-  /** Servicio de notificaciones y avisos */
   private readonly notify: NotificationService = inject(NotificationService);
 
-  /** Columnas proyectadas en la grilla principal */
   readonly displayedColumns: string[] = [
     'codigo',
     'nombre',
@@ -80,7 +74,6 @@ export class InventarioListComponent implements OnInit {
     'acciones',
   ];
 
-  /** Lista de filtros rápidos por familia para acceso de un clic */
   readonly filtrosRapidos: readonly string[] = [
     'Todas',
     'Farolas',
@@ -91,40 +84,22 @@ export class InventarioListComponent implements OnInit {
     'Persianas',
   ];
 
-  /** Colección reactiva de productos visibles en la página actual */
   readonly productos: WritableSignal<Producto[]> = signal<Producto[]>([]);
-
-  /** Conteo global de registros que satisfacen el filtro actual */
   readonly totalItems: WritableSignal<number> = signal<number>(0);
-
-  /** Tamaño de página para paginación de servidor */
   readonly pageSize: WritableSignal<number> = signal<number>(10);
-
-  /** Índice de página actual (base cero) */
   readonly pageIndex: WritableSignal<number> = signal<number>(0);
-
-  /** Indicador reactivo de operación de red en progreso */
   readonly isLoading: WritableSignal<boolean> = signal<boolean>(false);
-
-  /** Filtro de familia rápida actualmente seleccionado */
   readonly filtroSeleccionado: WritableSignal<string> = signal<string>('Todas');
 
-  /** Control reactivo para la entrada del buscador */
   readonly searchControl: FormControl<string> = new FormControl<string>('', {
     nonNullable: true,
   });
 
-  /**
-   * Ciclo de vida inicial: suscribe el buscador con debounce y ejecuta la primera carga.
-   */
   ngOnInit(): void {
     this.cargarProductos();
     this.setupBuscador();
   }
 
-  /**
-   * Configura la escucha del buscador con debounce para evitar saturación de peticiones.
-   */
   private setupBuscador(): void {
     this.searchControl.valueChanges
       .pipe(debounceTime(400), distinctUntilChanged())
@@ -134,10 +109,6 @@ export class InventarioListComponent implements OnInit {
       });
   }
 
-  /**
-   * Aplica un filtro rápido por familia combinándolo con el texto del buscador.
-   * @param filtro Nombre de la familia seleccionada (ej: 'Farolas', 'Stops').
-   */
   seleccionarFiltroRapido(filtro: string): void {
     this.filtroSeleccionado.set(filtro);
     this.pageIndex.set(0);
@@ -149,10 +120,6 @@ export class InventarioListComponent implements OnInit {
     }
   }
 
-  /**
-   * Construye la consulta combinada y dispara la llamada paginada al servidor.
-   * @param familia Término de familia a incorporar en la búsqueda.
-   */
   private cargarProductosConFiltro(familia: string): void {
     const busquedaTexto: string = this.searchControl.value.trim();
     const queryFinal: string = busquedaTexto
@@ -177,9 +144,6 @@ export class InventarioListComponent implements OnInit {
       });
   }
 
-  /**
-   * Consulta el catálogo paginado desde el servidor según los parámetros activos.
-   */
   cargarProductos(): void {
     this.isLoading.set(true);
 
@@ -202,35 +166,20 @@ export class InventarioListComponent implements OnInit {
       });
   }
 
-  /**
-   * Manejador del evento de paginación de Angular Material.
-   * @param event Parámetros de la nueva página seleccionada.
-   */
   onPageChange(event: PageEvent): void {
     this.pageIndex.set(event.pageIndex);
     this.pageSize.set(event.pageSize);
     this.cargarProductos();
   }
 
-  /**
-   * Determina si el repuesto se encuentra en umbral de existencias crítico.
-   * @param prod Instancia del producto evaluado.
-   * @returns Verdadero si las existencias son inferiores o iguales al mínimo.
-   */
   esStockCritico(prod: Producto): boolean {
     return prod.stockActual <= prod.stockMinimo;
   }
 
-  /**
-   * Restablece el valor del campo de búsqueda textual.
-   */
   limpiarFiltro(): void {
     this.searchControl.setValue('');
   }
 
-  /**
-   * Abre el diálogo modal para crear un nuevo repuesto en inventario.
-   */
   abrirModalCrear(): void {
     const dialogRef = this.dialog.open(ProductoDialogComponent, {
       width: '720px',
@@ -256,10 +205,6 @@ export class InventarioListComponent implements OnInit {
       });
   }
 
-  /**
-   * Abre el diálogo modal en modo edición con los datos del repuesto cargados.
-   * @param prod Instancia del producto a modificar.
-   */
   abrirModalEditar(prod: Producto): void {
     const dialogRef = this.dialog.open(ProductoDialogComponent, {
       width: '720px',
@@ -272,16 +217,19 @@ export class InventarioListComponent implements OnInit {
       .afterClosed()
       .subscribe((result: CreateProductoRequest | null) => {
         if (result) {
-          const cat = CATEGORIAS_REPUESTOS.find(
-            (c) => c.id === result.categoriaId,
-          );
-          Object.assign(prod, {
-            ...result,
-            codigo: result.codigo.toUpperCase().trim(),
-            nombreCategoria: cat?.nombre || prod.nombreCategoria,
+          this.productoService.updateProducto(prod.id, result).subscribe({
+            next: (actualizado: Producto) => {
+              this.notify.showSuccess(
+                `Repuesto "${actualizado.nombre}" actualizado en base de datos.`,
+              );
+              this.cargarProductos();
+            },
+            error: () => {
+              this.notify.showError(
+                'No se pudo actualizar el repuesto en el servidor.',
+              );
+            },
           });
-          this.notify.showSuccess(`Repuesto "${prod.nombre}" actualizado.`);
-          this.cargarProductos();
         }
       });
   }

@@ -525,4 +525,24 @@ docker exec -i tienda_repuestos_db psql -U dev_user -d pos_repuestos_db < backup
 PowerShell
 docker exec -i tienda_repuestos_db psql -U dev_user -d pos_repuestos_db -c 'SELECT "Origen", count(*) FROM productos GROUP BY "Origen";'
 
+# Protocolo de Pruebas de Verificación
+
+## Prueba de Bloqueo y Resaltado en Rojo:
+Agrega un repuesto con costo registrado (ej. $250.000).   
+En P. Unit, cambia el precio a $100.000 o $0.   
+Resultado esperado:
+La fila y el input se resaltan en rojo con el aviso ⚠️ Precio menor al costo o ⚠️ El precio debe ser mayor a cero.
+El botón inferior Cobrar se deshabilita automáticamente.
+Al volver a subir el precio por encima del costo, el borde rojo desaparece y el botón se activa.
+
+## Prueba de Activación de Cobro con Factura Electrónica:
+Activa el switch ¿Factura Electrónica (DIAN)?.
+Selecciona el cliente recién creado (1015394044 / Eder Camilo Ramirez).
+Resultado esperado: El botón Cobrar $1,250,000 se activa de inmediato en azul/rojo.
+
+## Prueba de Cobro Exitoso en Backend:
+Haz clic en Cobrar $1,250,000.
+La petición POST /api/Ventas responde con 200 OK (sin error 400 en metodoPago), se abre el modal del ticket térmico para impresión y la orden queda guardada en PostgreSQL.
+
+# Resumen de Cierre de Sesión y Checkpoint de ControlPersistencia Masiva Operativa: Más de 670 repuestos de Macrolatas cargados en PostgreSQL con soporte idempotente de sinCambios.Ergonomía UI: Tema oscuro corporativo forzado en :root, modal amplio a 720px y generador de SKU según la libreta física (F-200-LH-XXX).Módulo de Clientes: Implementado de punta a punta con su entidad Cliente, repositorio, servicio y controlador REST ClientesController verificado en Swagger.   Corrección de Contratos de Venta: Identificada la causa del error 400 por tipos Guid e identificadores numéricos de MetodoPago.   
 

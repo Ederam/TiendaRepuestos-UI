@@ -59,7 +59,7 @@
             <h2 class="ticket-title">Ticket de Venta</h2>
         </div>
 
-        <!-- Lista de Artículos en el Carrito con Precio Editable -->
+        <!-- Lista de Artículos en el Carrito con Validación de Precio y Margen -->
         <div class="ticket-items-scroll">
             @if (carrito().length === 0) {
             <div class="empty-ticket-state">
@@ -69,7 +69,7 @@
             } @else {
             <div class="ticket-items-list">
                 @for (item of carrito(); track item.producto.codigo) {
-                <div class="ticket-item-row" [class.warning-cost]="item.esBajoCosto">
+                <div class="ticket-item-row" [class.warning-cost]="item.esBajoCosto || item.esPrecioInvalido">
                     <div class="item-info">
                         <span class="item-name">{{ item.producto.nombre }}</span>
                         <span class="item-code">{{ item.producto.codigo || 'SIN-COD' }}</span>
@@ -88,12 +88,12 @@
                         </button>
                     </div>
 
-                    <!-- Precio Unitario Negociable (Editable) -->
+                    <!-- Precio Unitario Negociable con Validación de Costo -->
                     <div class="price-edit-box">
                         <span class="lbl-unit">P. Unit:</span>
                         <input type="number" [ngModel]="item.precioUnitario"
                             (ngModelChange)="actualizarPrecioUnitario(item.producto.codigo, $event)"
-                            class="input-unit-price" [class.under-cost]="item.esBajoCosto"
+                            class="input-unit-price" [class.under-cost]="item.esBajoCosto || item.esPrecioInvalido"
                             matTooltip="Editar precio unitario acordado en mostrador" />
                     </div>
 
@@ -106,9 +106,16 @@
                         </button>
                     </div>
 
+                    <!-- Mensajes de Alerta -->
                     @if (item.esBajoCosto) {
                     <div class="cost-alert-msg">
-                        ⚠️ Por debajo del costo ($ {{ item.costoUnitario | number:'1.0-0' }})
+                        ⚠️ Precio menor al costo ($ {{ item.costoUnitario | number:'1.0-0' }}). Ajuste el precio para
+                        cobrar.
+                    </div>
+                    }
+                    @if (item.esPrecioInvalido) {
+                    <div class="cost-alert-msg">
+                        ⚠️ El precio debe ser mayor a cero.
                     </div>
                     }
                 </div>
@@ -158,7 +165,7 @@
                     </button>
                 </div>
 
-                <!-- Alerta visual clara cuando el cliente no existe -->
+                <!-- Alerta visual si no existe el cliente -->
                 @if (clienteNoEncontrado()) {
                 <div class="cliente-not-found-banner">
                     <span>Cliente no registrado.</span>

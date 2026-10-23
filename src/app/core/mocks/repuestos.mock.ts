@@ -7,7 +7,7 @@ import { Producto } from '../models/producto.models';
 
 export const MOCK_PRODUCTOS: Producto[] = [
   {
-    id: 1,
+    id: '1',
     codigo: 'HLX-CAP-001',
     nombre: 'Capó Delantero Toyota Hilux 2021-2024',
     descripcion:
@@ -26,7 +26,7 @@ export const MOCK_PRODUCTOS: Producto[] = [
     ubicacion: 'BODEGA PRINCIPAL',
   },
   {
-    id: 2,
+    id: '2',
     codigo: 'HLX-PTR-002',
     nombre: 'Puerta Delantera Derecha Hilux Revo',
     descripcion: 'Puerta nueva en lámina reforzada para modelo doble cabina',
@@ -44,7 +44,7 @@ export const MOCK_PRODUCTOS: Producto[] = [
     ubicacion: 'BODEGA PRINCIPAL',
   },
   {
-    id: 3,
+    id: '3',
     codigo: 'DMX-BMP-003',
     nombre: 'Bumper Delantero Chevrolet D-Max 2018-2022',
     descripcion:
@@ -63,7 +63,7 @@ export const MOCK_PRODUCTOS: Producto[] = [
     ubicacion: 'BODEGA PRINCIPAL',
   },
   {
-    id: 4,
+    id: '4',
     codigo: 'HLX-FAR-004',
     nombre: 'Farola Izquierda Toyota Hilux LED',
     descripcion: 'Conjunto óptico principal con luz diurna DRL integrada',
@@ -81,7 +81,7 @@ export const MOCK_PRODUCTOS: Producto[] = [
     ubicacion: 'BODEGA PRINCIPAL',
   },
   {
-    id: 5,
+    id: '5',
     codigo: 'REN-GDB-005',
     nombre: 'Guardabarro Izquierdo Renault Duster',
     descripcion: 'Lámina de guardabarro delantero original',
@@ -99,7 +99,7 @@ export const MOCK_PRODUCTOS: Producto[] = [
     ubicacion: 'BODEGA PRINCIPAL',
   },
   {
-    id: 6,
+    id: '6',
     codigo: 'GEN-PRS-006',
     nombre: 'Persiana Frontal Cromada Hilux Rocco',
     descripcion: 'Rejilla persiana con emblema y apliques cromados',
@@ -117,7 +117,7 @@ export const MOCK_PRODUCTOS: Producto[] = [
     ubicacion: 'BODEGA PRINCIPAL',
   },
   {
-    id: 7,
+    id: '7',
     codigo: 'CHV-CMP-007',
     nombre: 'Compuerta Trasera Chevrolet Luv D-Max',
     descripcion: 'Compuerta de platón con manija central y herrajes',
@@ -135,7 +135,7 @@ export const MOCK_PRODUCTOS: Producto[] = [
     ubicacion: 'BODEGA PRINCIPAL',
   },
   {
-    id: 8,
+    id: '8',
     codigo: 'TOY-STP-008',
     nombre: 'Stop Trasero Derecho Hilux 2020+',
     descripcion: 'Lámpara trasera con mica bicolor y arnés',
