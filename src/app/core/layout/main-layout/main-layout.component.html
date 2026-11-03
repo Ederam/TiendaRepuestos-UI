@@ -1,74 +1,67 @@
 <mat-sidenav-container class="layout-container" autosize>
-    <!-- Menú Lateral -->
-    <mat-sidenav #sidenav mode="side" opened class="layout-sidenav" [fixedInViewport]="true">
-        <div class="brand-header">
-            <div class="brand-icon-wrapper">
-                <mat-icon>directions_car</mat-icon>
+    <!-- Barra Lateral Integrada (Sidenav) -->
+    <mat-sidenav mode="side" opened class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-box">
+                <mat-icon class="brand-icon">directions_car</mat-icon>
             </div>
-            <div class="brand-text">
-                <span class="brand-title">MACROLATAS</span>
-                <span class="brand-subtitle">Repuestos de Colisión para Carros</span>
+            <div class="brand-info">
+                <h2 class="brand-name">MACROLATAS</h2>
+                <span class="brand-sub">Repuestos de Colisión para Carros</span>
             </div>
         </div>
 
-        <mat-divider></mat-divider>
-
-        <!-- Enlaces del Menú -->
-        <mat-nav-list class="nav-list">
+        <!-- Menú de Navegación -->
+        <mat-nav-list class="nav-menu">
             @for (item of navItems; track item.route) {
-            @if (!item.adminOnly || isAdmin()) {
-            <a mat-list-item [routerLink]="item.route" routerLinkActive="active-link" class="nav-item">
+            <a mat-list-item [routerLink]="item.route" routerLinkActive="active-link"
+                [routerLinkActiveOptions]="{ exact: item.exact || false }" class="nav-link">
                 <mat-icon matListItemIcon class="nav-icon">{{ item.icon }}</mat-icon>
                 <span matListItemTitle class="nav-label">{{ item.label }}</span>
             </a>
             }
-            }
         </mat-nav-list>
 
-        <div class="sidenav-footer">
-            <span class="store-location">7 de Agosto — Bogotá D.C.</span>
-            <small>v1.0.0 — POS & Inventario</small>
+        <div class="sidebar-footer">
+            <small>7 de Agosto — Bogotá D.C.</small>
+            <small class="version">v1.0.0 — POS & Inventario</small>
         </div>
     </mat-sidenav>
 
-    <!-- Área de Contenido Principal -->
-    <mat-sidenav-content class="layout-content">
-        <mat-toolbar class="layout-toolbar elevation-z2">
-            <button mat-icon-button (click)="sidenav.toggle()" aria-label="Alternar menú lateral">
-                <mat-icon>menu</mat-icon>
-            </button>
-
-            <span class="toolbar-title-active">Sistema de Gestión Comercial</span>
-
+    <!-- Contenedor Principal (Toolbar + Vistas) -->
+    <mat-sidenav-content class="main-content-wrapper">
+        <!-- Toolbar Superior -->
+        <mat-toolbar class="top-toolbar">
+            <span class="system-title">Sistema de Gestión Comercial</span>
             <span class="toolbar-spacer"></span>
 
-            <!-- Perfil de Usuario -->
-            <div class="user-profile-section">
-                <div class="user-meta">
+            <!-- Datos de Usuario y Menú -->
+            <div class="user-chip">
+                <div class="user-text">
                     <span class="user-name">{{ currentUser()?.nombreCompleto || 'Usuario' }}</span>
-                    <span class="user-role-badge" [class.badge-admin]="isAdmin()">
-                        {{ currentUser()?.rol }}
-                    </span>
+                    <span class="user-role" [class.admin]="isAdmin()">{{ currentUser()?.rol || 'Operador' }}</span>
                 </div>
 
-                <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="Menú de usuario" class="btn-avatar">
+                <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="Menú de usuario"
+                    class="avatar-button">
                     <mat-icon>account_circle</mat-icon>
                 </button>
 
-                <mat-menu #userMenu="matMenu" xPosition="before">
-                    <div class="menu-header">
-                        <p class="menu-user-email">{{ currentUser()?.email }}</p>
+                <mat-menu #userMenu="matMenu" class="user-dropdown-panel" xPosition="before">
+                    <div class="menu-user-header">
+                        <strong>{{ currentUser()?.nombreCompleto || 'Usuario' }}</strong>
+                        <small>{{ currentUser()?.email || 'admin@macrolatas.com' }}</small>
                     </div>
                     <mat-divider></mat-divider>
-                    <button mat-menu-item (click)="onLogout()">
-                        <mat-icon color="warn">logout</mat-icon>
+                    <button mat-menu-item (click)="onLogout()" class="logout-item">
+                        <mat-icon>logout</mat-icon>
                         <span>Cerrar Sesión</span>
                     </button>
                 </mat-menu>
             </div>
         </mat-toolbar>
 
-        <!-- AQUÍ SE RENDERIZAN POS, INVENTARIO Y REPORTES -->
+        <!-- Enrutador de Contenido -->
         <main class="page-container">
             <router-outlet></router-outlet>
         </main>

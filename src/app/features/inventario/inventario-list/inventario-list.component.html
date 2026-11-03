@@ -1,11 +1,12 @@
 <div class="inventario-page">
-    <!-- Encabezado de Sección -->
-    <div class="page-header">
+    <!-- Encabezado con Botones a la Derecha -->
+    <header class="inventario-header">
         <div class="header-titles">
-            <h1 class="page-title">Inventario de Repuestos</h1>
-            <p class="page-subtitle">Consulta de existencias, precios y catálogo general de repuestos.</p>
+            <h1>Inventario de Repuestos</h1>
+            <p class="subtitle">Consulta de existencias, precios y catálogo general de repuestos.</p>
         </div>
-        <div class="header-actions">
+
+        <div class="header-buttons">
             <a mat-stroked-button routerLink="/inventario/importar" class="btn-importar">
                 <mat-icon>upload_file</mat-icon>
                 <span>Importar Excel</span>
@@ -15,173 +16,129 @@
                 <span>Nuevo Repuesto</span>
             </button>
         </div>
-    </div>
+    </header>
 
-    <!-- Barra de Filtros y Búsqueda -->
-    <div class="filters-card elevation-z1">
-        <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
-            <mat-label>Buscar por código o nombre de repuesto</mat-label>
-            <input matInput [formControl]="searchControl" placeholder="Ej: Farola Accent, F-200..."
-                autocomplete="off" />
-            <mat-icon matPrefix>search</mat-icon>
+    <!-- Filtros y Buscador Reactivo -->
+    <section class="controls-panel">
+        <div class="search-box-card">
+            <mat-icon class="search-icon">search</mat-icon>
+            <input type="text" [formControl]="searchControl" placeholder="Buscar por código o nombre de repuesto..."
+                class="native-search-input" />
             @if (searchControl.value) {
-            <button mat-icon-button matSuffix (click)="limpiarFiltro()" aria-label="Limpiar búsqueda">
+            <button mat-icon-button (click)="limpiarFiltro()" class="btn-clear-search">
                 <mat-icon>close</mat-icon>
             </button>
             }
-        </mat-form-field>
-    </div>
+        </div>
 
-    <div class="chips-filtros-rapidos" style="display: flex; gap: 8px; margin: 12px 0; overflow-x: auto;">
-        @for (f of filtrosRapidos; track f) {
-        <button type="button" class="chip-filtro"
-            [style.background]="filtroSeleccionado() === f ? '#2563eb' : 'rgba(255, 255, 255, 0.06)'"
-            [style.color]="filtroSeleccionado() === f ? '#ffffff' : '#94a3b8'"
-            [style.border]="filtroSeleccionado() === f ? '1px solid #3b82f6' : '1px solid rgba(255, 255, 255, 0.1)'"
-            style="border-radius: 20px; padding: 4px 14px; font-size: 0.82rem; font-weight: 500; cursor: pointer;"
-            (click)="seleccionarFiltroRapido(f)">
-            {{ f }}
-        </button>
-        }
-    </div>
+        <!-- Píldoras de Filtro Rápido con Margen y Contraste -->
+        <div class="pills-wrapper">
+            @for (filtro of filtrosRapidos; track filtro) {
+            <button type="button" class="pill-chip" [class.active]="filtroSeleccionado() === filtro"
+                (click)="seleccionarFiltroRapido(filtro)">
+                {{ filtro }}
+            </button>
+            }
+        </div>
+    </section>
 
-    <!-- Barra de Progreso durante Cargas -->
     @if (isLoading()) {
     <mat-progress-bar mode="indeterminate" class="loading-bar"></mat-progress-bar>
     }
 
-    <!-- Tabla de Inventario de Angular Material -->
-    <div class="table-container elevation-z1">
-        <table mat-table [dataSource]="productos()" class="inventory-table">
-            <!-- Columna Código -->
-            <ng-container matColumnDef="codigo">
-                <th mat-header-cell *matHeaderCellDef>Código</th>
-                <td mat-cell *matCellDef="let prod">
-                    @if (prod.codigo && prod.codigo.trim() !== '') {
-                    <span class="badge-code">{{ prod.codigo }}</span>
-                    } @else {
-                    <span class="badge-code"
-                        style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">
-                        Sin código
-                    </span>
-                    }
-                </td>
-            </ng-container>
+    <!-- Grilla de Repuestos -->
+    <div class="table-container-card">
+        <div class="table-responsive">
+            <table mat-table [dataSource]="productos()" class="custom-dark-table">
+                <!-- Código / SKU -->
+                <ng-container matColumnDef="codigo">
+                    <th mat-header-cell *matHeaderCellDef>Código</th>
+                    <td mat-cell *matCellDef="let p">
+                        <span class="code-pill">{{ p.codigo }}</span>
+                    </td>
+                </ng-container>
 
-            <!-- Columna Nombre con Badges de Marca y Condición -->
-            <ng-container matColumnDef="nombre">
-                <th mat-header-cell *matHeaderCellDef>Descripción / Nombre</th>
-                <td mat-cell *matCellDef="let prod">
-                    <div class="product-info" style="display: flex; flex-direction: column; gap: 4px; padding: 4px 0;">
-                        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                            <span class="product-name" style="font-weight: 500;">{{ prod.nombre }}</span>
-
-                            <!-- Badge Marca Aftermarket -->
-                            @if (prod.marcaRepuesto) {
-                            <span
-                                style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); text-transform: uppercase;">
-                                {{ prod.marcaRepuesto }}
-                            </span>
-                            }
-
-                            <!-- Badge Condición -->
-                            <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;"
-                                [style.background]="prod.condicion === 'Nuevo' ? 'rgba(52, 211, 153, 0.15)' : 'rgba(251, 191, 36, 0.15)'"
-                                [style.color]="prod.condicion === 'Nuevo' ? '#34d399' : '#fbbf24'"
-                                [style.border]="prod.condicion === 'Nuevo' ? '1px solid rgba(52, 211, 153, 0.3)' : '1px solid rgba(251, 191, 36, 0.3)'">
-                                {{ prod.condicion }}
-                            </span>
-
-                            <!-- Badge Origen Aliado -->
-                            @if (prod.origen && prod.origen !== 'PROPIO_MACROLATAS') {
-                            <span
-                                style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: rgba(192, 132, 252, 0.15); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.3);">
-                                Aliado
-                            </span>
-                            }
+                <!-- Descripción / Nombre -->
+                <ng-container matColumnDef="nombre">
+                    <th mat-header-cell *matHeaderCellDef>Descripción / Nombre</th>
+                    <td mat-cell *matCellDef="let p">
+                        <div class="prod-desc-col">
+                            <span class="name-text">{{ p.nombre }}</span>
+                            <div class="tags-group">
+                                <span class="tag gen">GENÉRICO</span>
+                                <span class="tag cond">{{ p.condicion || 'Nuevo' }}</span>
+                            </div>
                         </div>
+                    </td>
+                </ng-container>
 
-                        @if (prod.descripcion) {
-                        <small class="product-desc" style="color: #94a3b8; font-size: 0.75rem;">{{ prod.descripcion
-                            }}</small>
-                        }
-                    </div>
-                </td>
-            </ng-container>
+                <!-- Categoría -->
+                <ng-container matColumnDef="categoria">
+                    <th mat-header-cell *matHeaderCellDef>Categoría</th>
+                    <td mat-cell *matCellDef="let p">
+                        <span class="cat-text">General</span>
+                    </td>
+                </ng-container>
 
-            <!-- Columna Categoría -->
-            <ng-container matColumnDef="categoria">
-                <th mat-header-cell *matHeaderCellDef>Categoría</th>
-                <td mat-cell *matCellDef="let prod">
-                    {{ prod.nombreCategoria || 'General' }}
-                </td>
-            </ng-container>
+                <!-- Ubicación -->
+                <ng-container matColumnDef="ubicacion">
+                    <th mat-header-cell *matHeaderCellDef>Ubicación</th>
+                    <td mat-cell *matCellDef="let p">
+                        <span class="location-badge">
+                            <mat-icon>place</mat-icon>
+                            <span>{{ p.ubicacion || 'BODEGA PRINCIPAL' }}</span>
+                        </span>
+                    </td>
+                </ng-container>
 
-            <!-- Columna Precio Venta -->
-            <ng-container matColumnDef="precioVenta">
-                <th mat-header-cell *matHeaderCellDef class="text-right">Precio Venta</th>
-                <td mat-cell *matCellDef="let prod" class="text-right">
-                    <span class="price-tag">{{ prod.precioVenta | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                </td>
-            </ng-container>
+                <!-- Precio Venta -->
+                <ng-container matColumnDef="precioVenta">
+                    <th mat-header-cell *matHeaderCellDef class="text-right">Precio Venta</th>
+                    <td mat-cell *matCellDef="let p" class="text-right">
+                        <span class="price-val">{{ p.precioVenta | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                    </td>
+                </ng-container>
 
-            <!-- Columna Stock -->
-            <ng-container matColumnDef="stock">
-                <th mat-header-cell *matHeaderCellDef class="text-center">Stock</th>
-                <td mat-cell *matCellDef="let prod" class="text-center">
-                    <span class="stock-indicator" [class.stock-critical]="esStockCritico(prod)"
-                        [matTooltip]="esStockCritico(prod) ? '¡Stock bajo o crítico! Mínimo: ' + prod.stockMinimo : 'Stock óptimo'">
-                        @if (esStockCritico(prod)) {
-                        <mat-icon class="stock-warn-icon">warning</mat-icon>
-                        }
-                        <strong>{{ prod.stockActual }}</strong> u.
-                    </span>
-                </td>
-            </ng-container>
+                <!-- Stock -->
+                <ng-container matColumnDef="stock">
+                    <th mat-header-cell *matHeaderCellDef class="text-center">Stock</th>
+                    <td mat-cell *matCellDef="let p" class="text-center">
+                        <span class="stock-badge" [class.out]="p.stockActual === 0"
+                            [class.low]="p.stockActual > 0 && esStockCritico(p)"
+                            [class.good]="p.stockActual > p.stockMinimo">
+                            @if (esStockCritico(p)) {
+                            <mat-icon class="warn-icon">warning</mat-icon>
+                            }
+                            <span>{{ p.stockActual }} u.</span>
+                        </span>
+                    </td>
+                </ng-container>
 
-            <!-- Columna Ubicación -->
-            <ng-container matColumnDef="ubicacion">
-                <th mat-header-cell *matHeaderCellDef class="text-center">Ubicación</th>
-                <td mat-cell *matCellDef="let prod" class="text-center">
-                    <span class="badge-code" style="background: rgba(255, 255, 255, 0.06); font-size: 0.8rem;">
-                        <mat-icon
-                            style="font-size: 14px; height: 14px; width: 14px; vertical-align: middle; margin-right: 4px;">place</mat-icon>
-                        {{ prod.ubicacion || 'BODEGA' }}
-                    </span>
-                </td>
-            </ng-container>
+                <!-- Acciones -->
+                <ng-container matColumnDef="acciones">
+                    <th mat-header-cell *matHeaderCellDef class="text-center">Acciones</th>
+                    <td mat-cell *matCellDef="let p" class="text-center">
+                        <button mat-icon-button (click)="abrirModalEditar(p)" class="btn-edit"
+                            matTooltip="Editar Repuesto">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
 
-            <!-- Columna Acciones -->
-            <ng-container matColumnDef="acciones">
-                <th mat-header-cell *matHeaderCellDef class="text-center">Acciones</th>
-                <td mat-cell *matCellDef="let prod" class="text-center">
-                    <button mat-icon-button color="primary" matTooltip="Editar repuesto"
-                        (click)="abrirModalEditar(prod)" aria-label="Editar repuesto">
-                        <mat-icon>edit</mat-icon>
-                    </button>
-                </td>
-            </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+                <tr class="mat-row empty-row" *matNoDataRow>
+                    <td class="mat-cell text-center py-4" [attr.colspan]="displayedColumns.length">
+                        No se encontraron repuestos con los criterios de búsqueda.
+                    </td>
+                </tr>
+            </table>
+        </div>
 
-            <!-- Mensaje cuando no hay registros -->
-            <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell empty-table-cell" [attr.colspan]="displayedColumns.length">
-                    @if (!isLoading()) {
-                    <div class="empty-state">
-                        <mat-icon class="empty-icon">inventory</mat-icon>
-                        <p>No se encontraron repuestos con los criterios aplicados.</p>
-                    </div>
-                    }
-                </td>
-            </tr>
-        </table>
-
-        <!-- Paginador del Servidor -->
+        <!-- Paginador Sincronizado -->
         <mat-paginator [length]="totalItems()" [pageSize]="pageSize()" [pageIndex]="pageIndex()"
-            [pageSizeOptions]="[5, 10, 25, 50]" (page)="onPageChange($event)"
-            aria-label="Seleccionar página de productos">
+            [pageSizeOptions]="[10, 20, 50]" (page)="onPageChange($event)" showFirstLastButtons>
         </mat-paginator>
     </div>
 </div>

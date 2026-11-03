@@ -1,199 +1,223 @@
-$brand-navy: #18215d;
-$brand-navy-dark: #0f153d;
-$brand-red: #d92525;
-
 :host {
   display: block;
-  height: 100vh;
   width: 100vw;
-  overflow: hidden;
+  height: 100vh;
+  background-color: #0b1120;
 }
 
 .layout-container {
-  height: 100vh;
-  width: 100vw;
-  background-color: #f1f5f9 !important;
+  width: 100%;
+  height: 100%;
+  background-color: #0b1120;
 
-  .layout-sidenav {
-    width: 270px;
-    background-color: $brand-navy-dark !important;
-    color: #ffffff !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+  .sidebar {
+    width: 250px;
+    background-color: #080d1a !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     flex-direction: column;
 
-    .brand-header {
-      padding: 1.5rem 1.25rem;
+    .sidebar-header {
+      padding: 20px 16px;
       display: flex;
       align-items: center;
-      gap: 0.85rem;
-      background: linear-gradient(135deg, $brand-navy 0%, $brand-navy-dark 100%);
+      gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
-      .brand-icon-wrapper {
-        background-color: $brand-red;
-        color: #ffffff;
-        width: 44px;
-        height: 44px;
-        border-radius: 10px;
+      .logo-box {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        background: #dc2626;
         display: flex;
         align-items: center;
         justify-content: center;
 
-        mat-icon {
-          font-size: 26px;
-          width: 26px;
-          height: 26px;
+        .brand-icon {
+          color: #fff;
+          font-size: 22px;
+          width: 22px;
+          height: 22px;
         }
       }
 
-      .brand-text {
+      .brand-info {
         display: flex;
         flex-direction: column;
 
-        .brand-title {
+        .brand-name {
+          margin: 0;
+          font-size: 1rem;
           font-weight: 800;
-          font-size: 1.15rem;
-          color: #ffffff;
+          color: #f8fafc;
+          letter-spacing: 0.5px;
         }
 
-        .brand-subtitle {
-          font-size: 0.72rem;
-          color: #cbd5e1;
+        .brand-sub {
+          font-size: 0.65rem;
+          color: #94a3b8;
         }
       }
     }
 
-    .nav-list {
-      padding: 1rem 0.65rem;
+    .nav-menu {
       flex: 1;
+      padding: 16px 8px;
 
-      .nav-item {
+      .nav-link {
         border-radius: 8px;
-        margin-bottom: 0.4rem;
-        color: #e2e8f0 !important;
+        margin-bottom: 6px;
+        color: #94a3b8;
+        transition: all 0.15s ease;
 
         .nav-icon {
-          color: #cbd5e1 !important;
+          color: #94a3b8;
         }
 
         .nav-label {
-          font-weight: 500;
-          font-size: 0.92rem;
-          color: #f8fafc !important;
+          font-size: 0.88rem;
+          font-weight: 600;
         }
 
         &:hover {
-          background-color: rgba(255, 255, 255, 0.12) !important;
+          background: rgba(255, 255, 255, 0.04);
+          color: #f8fafc;
+
+          .nav-icon {
+            color: #38bdf8;
+          }
         }
 
         &.active-link {
-          background-color: $brand-red !important;
+          background: #dc2626 !important;
           color: #ffffff !important;
 
-          .nav-icon, .nav-label {
+          .nav-icon {
             color: #ffffff !important;
-            font-weight: 700;
           }
         }
       }
     }
 
-    .sidenav-footer {
-      padding: 1rem;
-      text-align: center;
-      color: #94a3b8;
+    .sidebar-footer {
+      padding: 16px;
       border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      color: #64748b;
+      font-size: 0.72rem;
 
-      .store-location {
-        font-size: 0.75rem;
-        color: #cbd5e1;
-        font-weight: 600;
-        display: block;
-      }
-      small {
-        font-size: 0.7rem;
+      .version {
+        color: #475569;
       }
     }
   }
 
-  .layout-content {
+  .main-content-wrapper {
+    background-color: #0b1120;
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    overflow-y: auto;
-    background-color: #f1f5f9 !important;
+    height: 100%;
+    overflow: hidden;
 
-    .layout-toolbar {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      height: 64px;
-      background-color: #ffffff !important;
-      color: #0f172a !important;
-      border-bottom: 1px solid #e2e8f0;
+    .top-toolbar {
+      background-color: #0f172a !important;
+      color: #f8fafc;
+      height: 56px;
+      min-height: 56px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0 20px;
 
-      .toolbar-title-active {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #475569 !important;
-        margin-left: 0.75rem;
+      .system-title {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #e2e8f0;
       }
 
       .toolbar-spacer {
-        flex: 1 1 auto;
+        flex: 1;
       }
 
-      .user-profile-section {
+      .user-chip {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 10px;
 
-        .user-meta {
+        .user-text {
           display: flex;
           flex-direction: column;
           align-items: flex-end;
 
           .user-name {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #1e293b !important;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #f8fafc;
           }
 
-          .user-role-badge {
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 2px 8px;
+          .user-role {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 1px 6px;
             border-radius: 4px;
-            background-color: #e2e8f0;
-            color: #475569;
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            text-transform: uppercase;
 
-            &.badge-admin {
-              background-color: #fee2e2;
-              color: $brand-red;
+            &.admin {
+              background: rgba(239, 68, 68, 0.18);
+              color: #f87171;
             }
           }
         }
 
-        .btn-avatar {
-          color: $brand-navy;
+        .avatar-button {
+          color: #f8fafc;
         }
       }
     }
 
     .page-container {
-      padding: 1.5rem;
       flex: 1;
-      box-sizing: border-box;
-      background-color: #f1f5f9 !important;
+      background-color: #0b1120;
+      overflow-y: auto;
     }
   }
 }
 
-.menu-header {
-  padding: 0.5rem 1rem;
-  .menu-user-email {
-    margin: 0;
-    font-size: 0.8rem;
-    color: #64748b;
+// Menú Flotante de Usuario
+::ng-deep .user-dropdown-panel {
+  background-color: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+
+  .menu-user-header {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    strong {
+      color: #f8fafc;
+      font-size: 0.88rem;
+    }
+
+    small {
+      color: #94a3b8;
+      font-size: 0.75rem;
+    }
+  }
+
+  .logout-item {
+    color: #f87171 !important;
+
+    .mat-icon {
+      color: #f87171 !important;
+    }
+
+    &:hover {
+      background-color: rgba(248, 113, 113, 0.12) !important;
+      color: #ef4444 !important;
+    }
   }
 }
