@@ -1,0 +1,218 @@
+<div class="catalog-container">
+    <!-- Buscador Reactivo, Selector de Modo de Vista y Doble Fila de Píldoras -->
+    <div class="search-bar-card">
+        <div class="search-row-wrapper">
+            <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+                <mat-label>Buscar repuesto por código, marca o descripción (ej: Farola Optra, F-200)</mat-label>
+                <input matInput [formControl]="searchControl" placeholder="Escriba para filtrar repuestos..."
+                    autocomplete="off" />
+                <mat-icon matPrefix>search</mat-icon>
+                @if (searchControl.value || filtroMarca() || filtroTipo()) {
+                <button mat-icon-button matSuffix (click)="limpiarFiltros()" matTooltip="Restablecer filtros">
+                    <mat-icon>close</mat-icon>
+                </button>
+                }
+            </mat-form-field>
+
+            <!-- Selector Ergonómico de Modo de Vista (Tarjetas vs Lista Mostrador) -->
+            <div class="view-mode-buttons">
+                <button type="button" class="mode-btn" [class.active]="modoVista() === 'grid'"
+                    (click)="alternarModoVista('grid')" matTooltip="Vista de Tarjetas">
+                    <mat-icon>grid_view</mat-icon>
+                </button>
+                <button type="button" class="mode-btn" [class.active]="modoVista() === 'list'"
+                    (click)="alternarModoVista('list')" matTooltip="Vista Lista Mostrador (Nombres Completos)">
+                    <mat-icon>view_list</mat-icon>
+                </button>
+            </div>
+        </div>
+
+        <!-- Doble Fila de Píldoras Ergonómicas para Mostrador -->
+        <div class="pos-filters-container">
+            <!-- Fila 1: Marcas Populares -->
+            <div class="filters-pills-row brand-row">
+                <span class="pills-row-title">Marca:</span>
+                <div class="pills-scroll">
+                    @for (marca of filtrosMarca; track marca.label) {
+                    <button type="button" class="pos-pill-btn brand-pill notranslate" translate="no"
+                        [class.active]="filtroMarca() === marca.valor"
+                        (click)="seleccionarFiltroMarca(marca.valor)">
+                        {{ marca.label }}
+                    </button>
+                    }
+                </div>
+            </div>
+
+            <!-- Fila 2: Tipos de Autoparte -->
+            <div class="filters-pills-row">
+                <span class="pills-row-title">Tipo:</span>
+                <div class="pills-scroll">
+                    @for (tipo of filtrosTipo; track tipo.label) {
+                    <button type="button" class="pos-pill-btn notranslate" translate="no"
+                        [class.active]="filtroTipo() === tipo.valor"
+                        (click)="seleccionarFiltroTipo(tipo.valor)">
+                        {{ tipo.label }}
+                    </button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (isBuscando()) {
+    <mat-progress-bar mode="indeterminate" class="loading-bar"></mat-progress-bar>
+    }
+
+    <!-- Catálogo de Productos: Vista Cuadrícula -->
+    @if (modoVista() === 'grid') {
+    <div class="products-grid">
+        @for (prod of productosDisponibles(); track prod.codigo) {
+        <div class="product-pos-card"
+            [class.in-cart-card]="obtenerCantidadEnCarrito(prod) > 0"
+            [class.disabled-card]="prod.stockDisponibleVisual <= 0"
+            [matTooltip]="prod.nombre + ' (' + prod.codigo + ')'" matTooltipPosition="above"
+            (click)="agregarAlCarrito(prod)">
+
+            <!-- 1. Cabecera de la Tarjeta: Código, Badge LH/RH y Stock -->
+            <div class="card-header">
+                <span class="code-chip notranslate" translate="no">{{ prod.codigo || 'SIN-COD' }}</span>
+
+                <!-- Badge Destacado de Posición de Colisión (LH Azul Cian / RH Naranja) -->
+                @if (obtenerPosicionLado(prod.nombre); as lado) {
+                <span class="side-chip" [ngClass]="lado.clase">
+                    {{ lado.texto }}
+                </span>
+                }
+
+                <!-- Stock Disponible o Unidades en Ticket -->
+                @if (obtenerCantidadEnCarrito(prod); as cantEnCarrito) {
+                <span class="stock-chip in-cart-badge">
+                    En ticket ({{ cantEnCarrito }})
+                </span>
+                } @else {
+                <span class="stock-chip" [class.out-of-stock]="prod.stockActual <= 0"
+                    [class.low-stock]="prod.stockActual > 0 && prod.stockActual <= prod.stockMinimo">
+                    {{ prod.stockActual }} disp.
+                </span>
+                }
+            </div>
+
+            <!-- 2. Cuerpo de la Tarjeta: Título Comercial y Metadatos -->
+            <div class="card-body">
+                <h3 class="prod-title notranslate" translate="no" [matTooltip]="prod.nombre" matTooltipPosition="below">
+                    {{ prod.nombre }}
+                </h3>
+
+                <div class="card-meta">
+                    @if (prod.marcaRepuesto) {
+                    <span class="badge-tag notranslate" translate="no">{{ prod.marcaRepuesto }}</span>
+                    }
+                    <span class="badge-tag condition notranslate" translate="no">{{ prod.condicion }}</span>
+                    @if (prod.ubicacion) {
+                    <span class="location-tag notranslate" translate="no">{{ prod.ubicacion }}</span>
+                    }
+                </div>
+            </div>
+
+            <!-- 3. Pie de Tarjeta (.card-footer): Separador sutil, precio alineado a la izq y botón de agregar a la der -->
+            <div class="card-footer">
+                @if (prod.precioVenta > 0) {
+                <span class="price-val">{{ prod.precioVenta | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                } @else {
+                <span class="price-val price-quote" matTooltip="Precio a cotizar en mostrador">
+                    $0 <small>(Por cotizar)</small>
+                </span>
+                }
+                <button mat-icon-button class="btn-add"
+                    [disabled]="prod.stockDisponibleVisual <= 0"
+                    (click)="$event.stopPropagation(); agregarAlCarrito(prod)"
+                    aria-label="Agregar al carrito" matTooltip="Agregar al ticket">
+                    <mat-icon>add_shopping_cart</mat-icon>
+                </button>
+            </div>
+        </div>
+        } @empty {
+        <div class="empty-products-notice">
+            <mat-icon>inventory_2</mat-icon>
+            <p>No se encontraron repuestos con los filtros seleccionados.</p>
+            <button mat-stroked-button color="primary" (click)="limpiarFiltros()">Limpiar Filtros</button>
+        </div>
+        }
+    </div>
+    } @else {
+    <!-- Vista Lista Detallada de Mostrador -->
+    <div class="products-list">
+        @for (prod of productosDisponibles(); track prod.codigo) {
+        <div class="product-pos-row"
+            [class.in-cart-row]="obtenerCantidadEnCarrito(prod) > 0"
+            [class.disabled-row]="prod.stockDisponibleVisual <= 0"
+            [matTooltip]="prod.nombre" matTooltipPosition="above"
+            (click)="agregarAlCarrito(prod)">
+
+            <!-- Código y Lado LH / RH -->
+            <div class="row-col-identity">
+                <span class="code-chip notranslate" translate="no">{{ prod.codigo || 'SIN-COD' }}</span>
+                @if (obtenerPosicionLado(prod.nombre); as lado) {
+                <span class="side-chip" [ngClass]="lado.clase">
+                    {{ lado.texto }}
+                </span>
+                }
+            </div>
+
+            <!-- Nombre Completo y Metadatos -->
+            <div class="row-col-details">
+                <h3 class="row-prod-title notranslate" translate="no" [matTooltip]="prod.nombre">{{ prod.nombre }}</h3>
+                <div class="row-meta">
+                    @if (prod.marcaRepuesto) {
+                    <span class="badge-tag notranslate" translate="no">{{ prod.marcaRepuesto }}</span>
+                    }
+                    <span class="badge-tag condition notranslate" translate="no">{{ prod.condicion }}</span>
+                    @if (prod.ubicacion) {
+                    <span class="location-tag notranslate" translate="no">{{ prod.ubicacion }}</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Existencias -->
+            <div class="row-col-stock">
+                @if (obtenerCantidadEnCarrito(prod); as cantEnCarrito) {
+                <span class="stock-chip in-cart-badge">
+                    En ticket ({{ cantEnCarrito }})
+                </span>
+                } @else {
+                <span class="stock-chip" [class.out-of-stock]="prod.stockActual <= 0"
+                    [class.low-stock]="prod.stockActual > 0 && prod.stockActual <= prod.stockMinimo">
+                    {{ prod.stockActual }} disp.
+                </span>
+                }
+            </div>
+
+            <!-- Precio -->
+            <div class="row-col-price">
+                @if (prod.precioVenta > 0) {
+                <span class="price-val">{{ prod.precioVenta | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                } @else {
+                <span class="price-val price-quote">$0 <small>(Por cotizar)</small></span>
+                }
+            </div>
+
+            <!-- Acción Rápida -->
+            <div class="row-col-action">
+                <button mat-flat-button class="btn-add-row"
+                    [disabled]="prod.stockDisponibleVisual <= 0"
+                    (click)="$event.stopPropagation(); agregarAlCarrito(prod)">
+                    <mat-icon>add_shopping_cart</mat-icon>
+                    <span>Agregar</span>
+                </button>
+            </div>
+        </div>
+        } @empty {
+        <div class="empty-products-notice">
+            <mat-icon>inventory_2</mat-icon>
+            <p>No se encontraron repuestos con los filtros seleccionados.</p>
+            <button mat-stroked-button color="primary" (click)="limpiarFiltros()">Limpiar Filtros</button>
+        </div>
+        }
+    </div>
+    }
+</div>

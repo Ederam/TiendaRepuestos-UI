@@ -177,12 +177,16 @@ export class ProductoMockService extends ProductoService {
     }
 
     if (params.busqueda && params.busqueda.trim() !== '') {
-      const q: string = params.busqueda.toLowerCase().trim();
-      filtrados = filtrados.filter(
-        (p: Producto) =>
-          p.nombre.toLowerCase().includes(q) ||
-          p.codigo.toLowerCase().includes(q),
-      );
+      const tokens: string[] = params.busqueda
+        .toLowerCase()
+        .trim()
+        .split(/\s+/)
+        .filter((t) => t.length > 0);
+
+      filtrados = filtrados.filter((p: Producto) => {
+        const textoBusqueda = `${p.nombre} ${p.codigo} ${p.marcaVehiculo || ''} ${p.marcaRepuesto || ''}`.toLowerCase();
+        return tokens.every((token) => textoBusqueda.includes(token));
+      });
     }
 
     if (params.categoriaId) {

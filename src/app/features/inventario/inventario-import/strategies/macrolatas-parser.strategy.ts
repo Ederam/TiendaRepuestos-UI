@@ -41,23 +41,23 @@ export class MacrolatasParserStrategy implements ExcelParserStrategy {
       row['CANT'] || row['CANTIDAD'] || row['STOCK'],
     );
 
+    const marcaCruda = String(row['MARCA'] || '').trim().toUpperCase();
+    const vehiculoCrudo = String(row['MARCA VEHICULO'] || '').trim().toUpperCase();
+    const ubiCruda = String(
+      row['UBICACIÓN'] || row['UBICACION'] || '',
+    ).trim().toUpperCase();
+
     return [
       {
         codigo: codigo.toUpperCase(),
         nombre,
-        categoriaNombre: categoria,
-        marcaRepuesto: String(row['MARCA'] || 'GENÉRICO')
-          .trim()
-          .toUpperCase(),
-        marcaVehiculo: String(row['MARCA VEHICULO'] || 'MULTIMARCA')
-          .trim()
-          .toUpperCase(),
+        categoriaNombre: categoria || 'Colisión / Latas',
+        marcaRepuesto: marcaCruda ? marcaCruda : 'GENÉRICO',
+        marcaVehiculo: vehiculoCrudo ? vehiculoCrudo : 'MULTIMARCA',
         condicion: 'Nuevo',
         origen: 'PROPIO_MACROLATAS',
-        ubicacion: String(
-          row['UBICACIÓN'] || row['UBICACION'] || 'BODEGA PRINCIPAL',
-        ).trim(),
-        costo,
+        ubicacion: ubiCruda ? ubiCruda : 'BODEGA PRINCIPAL',
+        costo: costo > 0 ? costo : Math.round(precio * 0.7),
         precioVenta: precio,
         stockActual: stock > 0 ? stock : 1,
       },

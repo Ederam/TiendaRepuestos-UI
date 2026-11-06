@@ -555,3 +555,66 @@ npm run build: Empaqueta para Vercel usando environment.prod.ts (useMocks: true)
 
 # creacion de componentes de historial
 npx ng g c features/pos/ventas-historial --skip-tests --style=scss
+
+Flujo Recomendado al Terminar y Probar los Ajustes
+Para mantener el código sincronizado con los planes y la documentación sin agotar tokens ni perder el hilo, sigue este ciclo en cuatro pasos:
+
+[1. Código y Pruebas] ➔ 
+   [2. Bitácora Rápida] ➔ 
+      [3. Docs de Arquitectura] ➔ 
+         [4. Siguiente Tarea del Plan]
+
+# cierre de tarea en el hilo actual
+"Listo, ya probé los cambios y quedaron funcionales. Actualiza @MACROLATAS_ESTADO.md con este ajuste completado. Entrega solo el fragmento modificado."
+
+# para iniciar un nuevo hilo
+"Revisa @PLAN_DE_DESARROLLO.md y @MACROLATAS_ESTADO.md. ¿Cuál es la siguiente tarea prioritaria?"
+
+# documentacion para manejar el poryecto conectado al grafo
+# Protocolo para Nuevos Requerimientos o Mejoras
+El flujo estándar de ingeniería para garantizar orden, persistencia y cero pérdida de contexto entre casa y oficina sigue estos 5 pasos:
+
+┌─────────────────────────────────────────────────────────────┐
+│ 1. Actualizar MACROLATAS_ESTADO.md (Documentar intención)   │
+│ 2. Actualizar el Grafo si hubo cambios estructurales        │
+│ 3. Abrir Hilo Nuevo en Antigravity con Prompt Estructurado   │
+│ 4. Revisión, Verificación Funcional y Compilación           │
+│ 5. Commit de Git y Cierre de Tarea                          │
+└─────────────────────────────────────────────────────────────┘
+Paso A: Registrar en MACROLATAS_ESTADO.md
+Antes de pedir código, abre MACROLATAS_ESTADO.md y anota el requerimiento en la sección de pendientes.
+
+Ejemplo: Si vas a iniciar la Fase 2 (Modal de Nuevo Repuesto y Carga Masiva), marcas la Fase 1 como completada [x] y dejas la Fase 2 como activa [ ].
+
+Paso B: Refrescar el Grafo (si hubo cambios de arquitectura)
+Si en la tarea anterior creaste nuevos servicios, interfaces o componentes, refresca el grafo en la terminal con:
+
+PowerShell
+& "C:\DEV_ER\Mis Archivos\graphify\.venv\Scripts\python.exe" -m graphify update "C:\DEV_ER\Mis Archivos\Projects\Repuestos"
+(O ejecuta /graphify . dentro de Antigravity).
+
+Paso C: Iniciar el Nuevo Hilo con un Prompt de 4 Bloques
+En el nuevo hilo, no necesitas explicar todo el sistema desde cero; el archivo de estado y las reglas ya lo hacen por ti. Estructura el prompt siempre con este formato:
+
+Rol y Referencias:
+
+"Actúa como Ingeniero Senior de Software siguiendo MACROLATAS_ESTADO.md, las reglas en IA/ y consultando graphify-out/graph.json."
+
+Contexto inmediato:
+
+"La Fase 1 ya fue completada e integrada. Ahora abordaremos la Fase 2."
+
+Requerimientos específicos (Alcance atómico):
+
+"- Tarea 1: En el modal de Nuevo Repuesto, predeterminar Origen en PROPIO_MACROLATAS.
+
+- Tarea 2: Autogenerar SKU reactivo al cambiar la descripción comercial.
+
+- Tarea 3: Proteger marcas como DEPO con translate='no'.
+
+- Tarea 4: Formatear celdas vacías en la vista previa de Excel."
+
+Criterios de entrega y verificación:
+
+"Entrega componentes completos respetando SOLID, compila con npm start / ng build y entrega el resumen de archivos modificados."
+

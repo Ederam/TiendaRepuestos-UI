@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // Estilos Globales y Tema Oscuro Corporativo — MACROLATAS
 // Forzado universal de alto contraste en Overlays, Modales, SnackBar y Tablas
 // =============================================================================
@@ -271,5 +271,101 @@ main {
 
   &:hover {
     background: #334155;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Forzado Universal de Alto Contraste en Menú Lateral (Sidebar)
+// -----------------------------------------------------------------------------
+.sidebar {
+  background-color: #0d1527 !important;
+
+  // Variables nativas de Angular Material MDC
+  --mdc-list-list-item-label-text-color: #ffffff !important;
+  --mdc-list-list-item-supporting-text-color: #cbd5e1 !important;
+  --mdc-list-list-item-leading-icon-color: #38bdf8 !important;
+  --mat-list-list-item-label-text-color: #ffffff !important;
+  --mat-list-list-item-icon-color: #38bdf8 !important;
+  --mat-nav-list-item-label-text-color: #ffffff !important;
+  --mat-nav-list-item-icon-color: #38bdf8 !important;
+
+  .nav-link,
+  .mat-mdc-list-item,
+  a.mat-mdc-list-item {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    margin-bottom: 8px !important;
+    border-radius: 8px !important;
+
+    .mat-icon,
+    .nav-icon,
+    [matListItemIcon] {
+      color: #38bdf8 !important;
+      opacity: 1 !important;
+      font-size: 24px !important;
+      width: 24px !important;
+      height: 24px !important;
+    }
+
+    .nav-label,
+    .mdc-list-item__primary-text,
+    .mat-mdc-list-item-title,
+    span {
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      font-size: 0.98rem !important;
+      letter-spacing: 0.3px !important;
+      opacity: 1 !important;
+    }
+
+    &:hover {
+      background: #1e293b !important;
+      border-color: #38bdf8 !important;
+
+      .mat-icon,
+      [matListItemIcon] {
+        color: #38bdf8 !important;
+      }
+
+      .nav-label,
+      .mdc-list-item__primary-text,
+      .mat-mdc-list-item-title,
+      span {
+        color: #ffffff !important;
+      }
+    }
+
+    &.active-link {
+      background: #dc2626 !important;
+      border-color: #ef4444 !important;
+      box-shadow: 0 4px 14px rgba(220, 38, 38, 0.45) !important;
+
+      .mat-icon,
+      .nav-icon,
+      [matListItemIcon],
+      .nav-label,
+      .mdc-list-item__primary-text,
+      .mat-mdc-list-item-title,
+      span {
+        color: #ffffff !important;
+        font-weight: 800 !important;
+      }
+    }
+  }
+
+  .sidebar-header {
+    .brand-name {
+      color: #ffffff !important;
+    }
+    .brand-sub {
+      color: #cbd5e1 !important;
+      font-weight: 500 !important;
+    }
+  }
+
+  .sidebar-footer small {
+    color: #cbd5e1 !important;
+    font-weight: 600 !important;
   }
 }

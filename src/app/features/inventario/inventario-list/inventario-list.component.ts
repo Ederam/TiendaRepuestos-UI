@@ -1,7 +1,8 @@
 /**
  * @fileoverview Componente de vista principal para el catálogo de inventario de MACROLATAS.
  * Administra la consulta paginada en servidor, búsqueda reactiva con debounce,
- * filtros rápidos por familias de colisión y persistencia de creación y edición de repuestos.
+ * filtros rápidos combinables por Tipo de Repuesto y Marca de Vehículo (ergonomía de mostrador),
+ * y persistencia de creación y edición de repuestos.
  */
 
 import {
@@ -36,7 +37,11 @@ import {
   CreateProductoRequest,
 } from '../../../core/models/producto.models';
 import { ProductoDialogComponent } from '../producto-dialog/producto-dialog.component';
-import { CATEGORIAS_REPUESTOS } from '@core/constants/categorias.constants';
+import {
+  FILTROS_TIPO_REPUESTO,
+  FILTROS_MARCA_VEHICULO,
+  FiltroRapidoOpcion,
+} from '@core/constants/categorias.constants';
 
 @Component({
   selector: 'app-inventario-list',
@@ -74,22 +79,21 @@ export class InventarioListComponent implements OnInit {
     'acciones',
   ];
 
-  readonly filtrosRapidos: readonly string[] = [
-    'Todas',
-    'Farolas',
-    'Stops',
-    'Bomperes',
-    'Capots',
-    'Direccionales',
-    'Persianas',
-  ];
+  /** Colección inmutable de píldoras por Tipo de Repuesto */
+  readonly filtrosTipo: readonly FiltroRapidoOpcion[] = FILTROS_TIPO_REPUESTO;
+
+  /** Colección inmutable de píldoras por Marca de Vehículo */
+  readonly filtrosMarca: readonly FiltroRapidoOpcion[] = FILTROS_MARCA_VEHICULO;
 
   readonly productos: WritableSignal<Producto[]> = signal<Producto[]>([]);
   readonly totalItems: WritableSignal<number> = signal<number>(0);
   readonly pageSize: WritableSignal<number> = signal<number>(10);
   readonly pageIndex: WritableSignal<number> = signal<number>(0);
   readonly isLoading: WritableSignal<boolean> = signal<boolean>(false);
-  readonly filtroSeleccionado: WritableSignal<string> = signal<string>('Todas');
+
+  /** Filtros seleccionados actualmente */
+  readonly filtroTipoSeleccionado: WritableSignal<string> = signal<string>('');
+  readonly filtroMarcaSeleccionada: WritableSignal<string> = signal<string>('');
 
   readonly searchControl: FormControl<string> = new FormControl<string>('', {
     nonNullable: true,
@@ -109,47 +113,56 @@ export class InventarioListComponent implements OnInit {
       });
   }
 
-  seleccionarFiltroRapido(filtro: string): void {
-    this.filtroSeleccionado.set(filtro);
+  /**
+   * Cambia o activa el filtro de Tipo de Repuesto (Farola, Stop, Bomper, etc.)
+   */
+  seleccionarFiltroTipo(valor: string): void {
+    this.filtroTipoSeleccionado.set(valor);
     this.pageIndex.set(0);
-
-    if (filtro === 'Todas') {
-      this.cargarProductos();
-    } else {
-      this.cargarProductosConFiltro(filtro);
-    }
+    this.cargarProductos();
   }
 
-  private cargarProductosConFiltro(familia: string): void {
-    const busquedaTexto: string = this.searchControl.value.trim();
-    const queryFinal: string = busquedaTexto
-      ? `${busquedaTexto} ${familia}`
-      : familia;
+  /**
+   * Cambia o activa el filtro de Marca de Vehículo (Chevrolet, Renault, etc.)
+   */
+  seleccionarFiltroMarca(valor: string): void {
+    this.filtroMarcaSeleccionada.set(valor);
+    this.pageIndex.set(0);
+    this.cargarProductos();
+  }
 
-    this.isLoading.set(true);
-    this.productoService
-      .getProductosPaginado({
-        busqueda: queryFinal,
-        soloActivos: true,
-        pageNumber: this.pageIndex() + 1,
-        pageSize: this.pageSize(),
-      })
-      .subscribe({
-        next: (response) => {
-          this.productos.set(response.items);
-          this.totalItems.set(response.totalCount);
-          this.isLoading.set(false);
-        },
-        error: () => this.isLoading.set(false),
-      });
+  /**
+   * Construye el término de búsqueda combinando el texto escrito, tipo y marca.
+   */
+  private construirCriterioBusqueda(): string {
+    const terminos: string[] = [];
+
+    const textoLibre: string = this.searchControl.value.trim();
+    if (textoLibre) {
+      terminos.push(textoLibre);
+    }
+
+    const tipo: string = this.filtroTipoSeleccionado();
+    if (tipo) {
+      terminos.push(tipo);
+    }
+
+    const marca: string = this.filtroMarcaSeleccionada();
+    if (marca) {
+      terminos.push(marca);
+    }
+
+    return terminos.join(' ');
   }
 
   cargarProductos(): void {
     this.isLoading.set(true);
 
+    const criterioFinal: string = this.construirCriterioBusqueda();
+
     this.productoService
       .getProductosPaginado({
-        busqueda: this.searchControl.value,
+        busqueda: criterioFinal,
         soloActivos: true,
         pageNumber: this.pageIndex() + 1,
         pageSize: this.pageSize(),
@@ -178,6 +191,10 @@ export class InventarioListComponent implements OnInit {
 
   limpiarFiltro(): void {
     this.searchControl.setValue('');
+    this.filtroTipoSeleccionado.set('');
+    this.filtroMarcaSeleccionada.set('');
+    this.pageIndex.set(0);
+    this.cargarProductos();
   }
 
   abrirModalCrear(): void {
