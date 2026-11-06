@@ -1,7 +1,7 @@
 /**
  * @fileoverview Diálogo modal para la creación y edición de repuestos en MACROLATAS.
  * Proporciona validación reactiva de formularios, sugerencia asistida de códigos SKU
- * basada en la libreta física del negocio y soporte para catálogos multiorigen.
+ * sincronizada en tiempo real con la descripción comercial y soporte para catálogos multiorigen.
  */
 
 import { Component, OnInit, inject } from '@angular/core';
@@ -47,6 +47,14 @@ export interface ProductoDialogData {
   producto?: Producto;
   /** Modo operativo del diálogo modal */
   modo: 'crear' | 'editar';
+}
+
+/**
+ * Estructura para opciones de procedencia de inventario con descripciones amigables.
+ */
+export interface OrigenOpcion {
+  valor: OrigenInventario;
+  etiqueta: string;
 }
 
 @Component({
@@ -95,12 +103,27 @@ export class ProductoDialogComponent implements OnInit {
   /** Opciones de condición física del repuesto */
   readonly condiciones: readonly CondicionRepuesto[] = ['Nuevo', 'Segunda'];
 
-  /** Procedencias de inventario admitidas */
-  readonly origenes: readonly OrigenInventario[] = [
-    'PROPIO_MACROLATAS',
-    'ALIADO_EUROCAR',
-    'ALIADO_LATAS',
+  /** Procedencias de inventario admitidas con etiquetas amigables para el operador */
+  readonly origenesOpciones: readonly OrigenOpcion[] = [
+    {
+      valor: 'PROPIO_MACROLATAS',
+      etiqueta: '🏢 Propio de Almacén (MACROLATAS)',
+    },
+    {
+      valor: 'ALIADO_EUROCAR',
+      etiqueta: '🤝 Aliado Eurocar',
+    },
+    {
+      valor: 'ALIADO_LATAS',
+      etiqueta: '🤝 Aliado Latas y Bomperes',
+    },
   ];
+
+  /**
+   * Bandera que determina si el usuario ha escrito manualmente un código SKU.
+   * Si es false, el código se actualiza automáticamente al cambiar el nombre del repuesto.
+   */
+  codigoEditadoManualmente: boolean = false;
 
   /** Formulario reactivo tipado para la captura del repuesto */
   readonly form: FormGroup = this.fb.group({
@@ -150,7 +173,8 @@ export class ProductoDialogComponent implements OnInit {
    * Ciclo de inicialización: asigna el código en mayúsculas en modo edición.
    */
   ngOnInit(): void {
-    if (this.data.producto?.codigo) {
+    if (this.data.modo === 'editar' && this.data.producto?.codigo) {
+      this.codigoEditadoManualmente = true;
       this.form
         .get('codigo')
         ?.setValue(this.data.producto.codigo.toUpperCase(), {
@@ -160,30 +184,41 @@ export class ProductoDialogComponent implements OnInit {
   }
 
   /**
-   * Sugiere el código al perder el foco del campo nombre si el código aún no se ha digitado.
+   * Se ejecuta cuando el usuario escribe manualmente en el campo código.
+   * Marca que el código fue personalizado para no sobreescribirlo automáticamente.
    */
-  onNombreBlur(): void {
-    if (this.data.modo === 'editar') return;
+  onCodigoManualInput(): void {
+    this.codigoEditadoManualmente = true;
+  }
 
-    const codigoActual: string = this.form.get('codigo')?.value;
+  /**
+   * Sincroniza o sugiere el código SKU a partir del nombre comercial.
+   * Si no ha sido editado manualmente por el operador, se actualiza automáticamente.
+   */
+  sincronizarCodigoConNombre(): void {
+    if (this.data.modo === 'editar' || this.codigoEditadoManualmente) {
+      return;
+    }
+
     const nombreActual: string = this.form.get('nombre')?.value;
-
-    if (!codigoActual || codigoActual.trim() === '') {
+    if (nombreActual && nombreActual.trim().length >= 3) {
       const sugerido: string = generarCodigoSugerido(nombreActual);
       if (sugerido) {
-        this.form.patchValue({ codigo: sugerido });
+        this.form.patchValue({ codigo: sugerido }, { emitEvent: false });
       }
     }
   }
 
   /**
    * Genera o regenera un código sugerido bajo demanda del operador mediante el botón de asistencia.
+   * Restablece la bandera de edición manual.
    */
   sugerirCodigoManual(): void {
     const nombreActual: string = this.form.get('nombre')?.value;
     const sugerido: string = generarCodigoSugerido(nombreActual);
     if (sugerido) {
       this.form.patchValue({ codigo: sugerido });
+      this.codigoEditadoManualmente = false;
     }
   }
 
@@ -203,6 +238,7 @@ export class ProductoDialogComponent implements OnInit {
    */
   copiarPlantilla(textoEjemplo: string): void {
     this.form.patchValue({ nombre: textoEjemplo });
+    this.codigoEditadoManualmente = false;
     const codigoSugerido: string = generarCodigoSugerido(textoEjemplo);
     if (codigoSugerido) {
       this.form.patchValue({ codigo: codigoSugerido });

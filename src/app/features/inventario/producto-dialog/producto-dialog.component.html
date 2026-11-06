@@ -19,7 +19,8 @@
                 <mat-form-field appearance="outline" class="w-full">
                     <mat-label>Nombre o Descripción Comercial*</mat-label>
                     <input matInput formControlName="nombre" placeholder="Ej: HYUNDAI ACCENT 98/05 FAROLA LH"
-                        (blur)="onNombreBlur()" autocomplete="off" />
+                        (input)="sincronizarCodigoConNombre()" (blur)="sincronizarCodigoConNombre()"
+                        autocomplete="off" />
                     @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
                     <mat-error>El nombre del repuesto es obligatorio.</mat-error>
                     }
@@ -40,16 +41,17 @@
             <div class="code-row">
                 <mat-form-field appearance="outline" class="code-field">
                     <mat-label>Código de Repuesto / SKU*</mat-label>
-                    <input matInput formControlName="codigo" placeholder="Ej: F-200-LH-101" (blur)="onCodigoBlur()"
-                        class="input-code" />
-                    <mat-hint>Código interno de almacén o de fabricante.</mat-hint>
+                    <input matInput formControlName="codigo" placeholder="Ej: F-200-LH-101"
+                        (input)="onCodigoManualInput()" (blur)="onCodigoBlur()"
+                        class="input-code notranslate" translate="no" />
+                    <mat-hint>Código interno de almacén o de fabricante (se deduce del nombre).</mat-hint>
                     @if (form.get('codigo')?.invalid && form.get('codigo')?.touched) {
                     <mat-error>El código es obligatorio.</mat-error>
                     }
                 </mat-form-field>
 
                 <button type="button" mat-stroked-button class="btn-magic" (click)="sugerirCodigoManual()"
-                    matTooltip="Generar código sugerido">
+                    matTooltip="Regenerar código sugerido basado en la descripción actual">
                     <mat-icon>auto_fix_high</mat-icon>
                     <span>Sugerir</span>
                 </button>
@@ -70,7 +72,7 @@
                     <mat-label>Marca / Fabricante</mat-label>
                     <mat-select formControlName="marcaRepuesto">
                         @for (m of marcasRepuesto; track m) {
-                        <mat-option [value]="m">{{ m }}</mat-option>
+                        <mat-option [value]="m" class="notranslate" translate="no">{{ m }}</mat-option>
                         }
                     </mat-select>
                 </mat-form-field>
@@ -88,10 +90,10 @@
             <!-- Fila 4: Origen y Ubicación -->
             <div class="grid-2">
                 <mat-form-field appearance="outline">
-                    <mat-label>Origen de Inventario</mat-label>
+                    <mat-label>Origen de Inventario*</mat-label>
                     <mat-select formControlName="origen">
-                        @for (o of origenes; track o) {
-                        <mat-option [value]="o">{{ o }}</mat-option>
+                        @for (o of origenesOpciones; track o.valor) {
+                        <mat-option [value]="o.valor">{{ o.etiqueta }}</mat-option>
                         }
                     </mat-select>
                 </mat-form-field>

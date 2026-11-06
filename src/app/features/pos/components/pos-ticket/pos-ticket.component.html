@@ -1,0 +1,166 @@
+<div class="pos-ticket-panel">
+    <header class="ticket-header">
+        <mat-icon class="ticket-icon">receipt_long</mat-icon>
+        <h2 class="ticket-title">Ticket de Venta</h2>
+        <button type="button" mat-icon-button (click)="irAlHistorial()" matTooltip="Consultar Historial de Ventas"
+            aria-label="Consultar Historial de Ventas" class="btn-historial-nav">
+            <mat-icon>history</mat-icon>
+        </button>
+    </header>
+
+    <!-- Lista de Artículos en el Carrito con Validación de Precio y Margen Comercial -->
+    <div class="ticket-items-scroll">
+        @if (carrito().length === 0) {
+        <div class="empty-ticket-state">
+            <mat-icon class="cart-empty-icon">remove_shopping_cart</mat-icon>
+            <p>El ticket está vacío. Seleccione repuestos del catálogo.</p>
+        </div>
+        } @else {
+        <div class="ticket-items-list">
+            @for (item of carrito(); track item.producto.codigo) {
+            <div class="ticket-item-row" [class.warning-cost]="item.esBajoCosto || item.esPrecioInvalido">
+                <div class="item-info">
+                    <span class="item-name notranslate" translate="no">{{ item.producto.nombre }}</span>
+                    <span class="item-code notranslate" translate="no">{{ item.producto.codigo || 'SIN-COD' }}</span>
+                </div>
+
+                <!-- Modificador de Cantidad -->
+                <div class="quantity-controls">
+                    <button mat-icon-button class="btn-qty" (click)="actualizarCantidad(item.producto.codigo, -1)"
+                        aria-label="Disminuir cantidad">
+                        <mat-icon>remove</mat-icon>
+                    </button>
+                    <span class="qty-val">{{ item.cantidad }}</span>
+                    <button mat-icon-button class="btn-qty" (click)="actualizarCantidad(item.producto.codigo, 1)"
+                        aria-label="Aumentar cantidad">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                </div>
+
+                <!-- Precio Unitario Negociable con Validación de Costo -->
+                <div class="price-edit-box">
+                    <span class="lbl-unit">P. Unit:</span>
+                    <input type="number" [ngModel]="item.precioUnitario"
+                        (ngModelChange)="actualizarPrecioUnitario(item.producto.codigo, $event)"
+                        class="input-unit-price" [class.under-cost]="item.esBajoCosto || item.esPrecioInvalido"
+                        matTooltip="Editar precio unitario acordado en mostrador" />
+                </div>
+
+                <!-- Subtotal y Eliminar -->
+                <div class="item-total-col">
+                    <span class="item-subtotal">{{ item.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                    <button mat-icon-button class="btn-remove" (click)="eliminarDelCarrito(item.producto.codigo)"
+                        aria-label="Eliminar repuesto">
+                        <mat-icon>delete_outline</mat-icon>
+                    </button>
+                </div>
+
+                <!-- Alertas de Margen Comercial -->
+                @if (item.esBajoCosto) {
+                <div class="cost-alert-msg">
+                    ⚠️ Precio menor al costo ($ {{ item.costoUnitario | number:'1.0-0' }}). Ajuste el precio para cobrar.
+                </div>
+                }
+                @if (item.esPrecioInvalido) {
+                <div class="cost-alert-msg">
+                    ⚠️ El precio debe ser mayor a cero.
+                </div>
+                }
+            </div>
+            }
+        </div>
+        }
+    </div>
+
+    <!-- Configuración del Cliente: Mostrador (111111111111 / CLIENTE MOSTRADOR) vs Factura Electrónica -->
+    <div class="ticket-client-box">
+        <div class="switch-factura-row">
+            <mat-slide-toggle [checked]="requiereFacturaElectronica()"
+                (change)="onToggleFacturaElectronica($event.checked)" color="primary">
+                ¿Factura Electrónica (DIAN)?
+            </mat-slide-toggle>
+        </div>
+
+        <!-- Modo Mostrador Predeterminado: 111111111111 / CLIENTE MOSTRADOR -->
+        @if (!requiereFacturaElectronica()) {
+        <div class="client-summary-badge">
+            <mat-icon class="client-badge-icon">storefront</mat-icon>
+            <div class="client-badge-text">
+                <span class="cli-title">Venta de Mostrador</span>
+                <span class="cli-sub notranslate" translate="no">CLIENTE MOSTRADOR (111111111111)</span>
+            </div>
+        </div>
+        } @else {
+        <!-- Modo Facturación Electrónica con Búsqueda Asistida y Limpieza Inmediata -->
+        <form [formGroup]="ventaForm" class="client-form-dian">
+            <div class="doc-search-row">
+                <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                    <mat-label>Buscar Cliente (Cédula / NIT / Nombre)*</mat-label>
+                    <input matInput formControlName="clienteDocumento" [matAutocomplete]="autoCliente"
+                        (input)="onBuscarCliente($any($event.target).value)" placeholder="Ej: 1023456789" />
+                    <mat-autocomplete #autoCliente="matAutocomplete">
+                        @for (cli of clientesSugeridos(); track cli.id) {
+                        <mat-option [value]="cli.documento" (onSelectionChange)="seleccionarCliente(cli)">
+                            <strong>{{ cli.documento }}</strong> - {{ cli.nombre }}
+                        </mat-option>
+                        }
+                    </mat-autocomplete>
+                </mat-form-field>
+
+                <button mat-icon-button type="button" class="btn-add-client" (click)="abrirModalNuevoCliente()"
+                    matTooltip="Registrar nuevo cliente">
+                    <mat-icon>person_add</mat-icon>
+                </button>
+            </div>
+
+            <!-- Alerta visual si no existe el cliente -->
+            @if (clienteNoEncontrado()) {
+            <div class="cliente-not-found-banner">
+                <span>Cliente no registrado con esta identificación.</span>
+                <button type="button" class="btn-crear-inline" (click)="abrirModalNuevoCliente()">
+                    + Crear ahora
+                </button>
+            </div>
+            }
+
+            <mat-form-field appearance="outline" class="w-full mt-2" subscriptSizing="dynamic">
+                <mat-label>Nombre Completo / Razón Social*</mat-label>
+                <input matInput formControlName="clienteNombre" placeholder="Nombre del cliente o empresa" />
+            </mat-form-field>
+        </form>
+        }
+
+        <!-- Selector del Medio de Pago -->
+        <form [formGroup]="ventaForm" class="mt-2">
+            <mat-form-field appearance="outline" class="w-full" subscriptSizing="dynamic">
+                <mat-label>Método de Pago*</mat-label>
+                <mat-select formControlName="metodoPago">
+                    @for (metodo of metodosPago; track metodo.id) {
+                    <mat-option [value]="metodo.id">{{ metodo.label }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </form>
+    </div>
+
+    <!-- Resumen Final y Botón de Cobro -->
+    <div class="ticket-footer">
+        <div class="totals-summary">
+            <div class="row-stat">
+                <span>Artículos:</span>
+                <strong>{{ cantidadItems() }} u.</strong>
+            </div>
+            <div class="row-stat total-row">
+                <span>Total a Pagar:</span>
+                <strong class="total-number">{{ subtotalVenta() | currency:'COP':'symbol-narrow':'1.0-0' }}</strong>
+            </div>
+        </div>
+
+        <button mat-flat-button color="warn" class="btn-cobrar-pos" [disabled]="!puedeCobrar()"
+            (click)="procesarVenta()">
+            <mat-icon>check_circle</mat-icon>
+            <span>Cobrar {{ subtotalVenta() | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </button>
+    </div>
+</div>
+

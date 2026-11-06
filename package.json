@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --configuration=development",
-    "start:mock": "ng serve --configuration=mock",
-    "build": "ng build --configuration=production",
-    "build:dev": "ng build --configuration=development",
+    "start": "node ./node_modules/@angular/cli/bin/ng.js serve --configuration=development",
+    "start:mock": "node ./node_modules/@angular/cli/bin/ng.js serve --configuration=mock",
+    "build": "node ./node_modules/@angular/cli/bin/ng.js build --configuration=production",
+    "build:dev": "node ./node_modules/@angular/cli/bin/ng.js build --configuration=development",
     "watch": "ng build --watch --configuration=development",
     "test": "ng test"
   },

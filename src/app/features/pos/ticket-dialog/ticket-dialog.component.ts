@@ -27,6 +27,7 @@ export interface TicketDialogData {
   items: CarritoItem[];
   clienteNombre?: string;
   clienteDocumento?: string;
+  vendedorNombre?: string;
   metodoPago: string | number;
 }
 

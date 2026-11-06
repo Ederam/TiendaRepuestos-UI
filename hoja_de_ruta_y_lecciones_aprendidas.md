@@ -397,3 +397,48 @@ Copia y pega este bloque en **`hoja_de_ruta_y_lecciones_aprendidas.md`**:
   - Configuración multi-ambiente en `angular.json` con `environment.prod.ts` (`useMocks: true`) para despliegues autónomos en Vercel.
 - **Lecciones Aprendidas:**
   - **Navegación en Encabezados Complejos:** En componentes Standalone de Angular Material, es preferible utilizar botones con eventos `(click)` que invoquen `Router.navigate()` en lugar de anclas con `routerLink`, garantizando la ejecución de la navegación sin interferencia de estilos de layout.
+
+### Hito 29 — Ergonomía de Mostrador: Doble Fila de Píldoras, Prevención de Traducción, Sincronización de SKU, Badges LH/RH y Vendedor en Comprobante
+
+- **Fecha:** 2026-11-04
+- **Rama Git:** `feat/inventario-carga-masiva`
+- **Entregables:**
+  - **Prevención de Traducción Automática de Marcas:** Se configuró `src/index.html` con `<html lang="es" translate="no" class="notranslate">` y metaetiqueta `<meta name="google" content="notranslate">`, blindando marcas de autopartes como `DEPO` y códigos SKU para evitar su traducción involuntaria a "Depósito".
+  - **Sincronización Reactiva de SKU Asistido:** Corrección en `ProductoDialogComponent` con bandera `codigoEditadoManualmente`. Al editar el nombre del repuesto (ej. de Farola a Direccional), el código SKU se actualiza automáticamente con la fórmula de libreta física correspondiente (`D-222-...`), respetando códigos personalizados si el operador los digita manualmente.
+  - **Origen por Defecto MACROLATAS:** Preselección fija de `PROPIO_MACROLATAS` con etiquetas humanas legibles (`🏢 Propio de Almacén (MACROLATAS)`).
+  - **Doble Fila de Píldoras Ergonómicas (Inventario y POS):** Implementación de filtrado combinable por Tipo de Repuesto (Farolas, Stops, Bomperes, etc. mapeados a términos singulares) y Marca de Vehículo (Chevrolet, Renault, Mazda, Nissan, etc.), junto con búsqueda por tokens independientes en `ProductoMockService` y `ProductoRepository.cs`.
+  - **Badges de Posición y Tooltip en POS:** Identificación visual de lado de colisión mediante chips de alto contraste `IZQ (LH)` (ámbar) y `DER (RH)` (cian), tooltip nativo `matTooltip` con descripción completa y ampliación de título a 3 líneas.
+  - **Consumidor Final 111111111111:** Actualización del documento por defecto de mostrador a `111111111111` en frontend y backend (`Venta.cs`, `VentaDtos.cs`, `VentaServiceTests.cs`).
+  - **Facturación Electrónica DIAN:** Desvinculación y limpieza reactiva del campo nombre al modificar o borrar la identificación del cliente.
+  - **Vendedor en Ticket Térmico:** Inclusión del nombre del vendedor activo en el comprobante de 80mm extraído de `AuthService.currentUser()`.
+  - **Homogeneización Visual en Importación:** Rediseño completo de `inventario-import` bajo el tema oscuro corporativo (`#0b1120`, `#0f172a`), eliminando fondos blancos deslumbrantes y agregando fallbacks para celdas vacías (`GENÉRICO`, `BODEGA PRINCIPAL`, `SIN-COD`).
+- **Lecciones Aprendidas:**
+  - **Atributos `translate="no"` en Catálogos Automotrices:** En plataformas web en español que manejan marcas internacionales como DEPO, TYC, o siglas mecánicas (LH, RH, SKU), es indispensable blindar el documento con `lang="es"` y `notranslate` para evitar que los navegadores alteren la terminología operativa del negocio.
+  - **Búsqueda por Tokens vs Cadenas Contiguas:** Los operadores de mostrador combinan términos desordenados (ej: "Chevrolet Farola" o "Optra Stop"). La consulta debe descomponer el criterio en tokens y verificar la coincidencia de cada palabra de forma independiente.
+
+### Hito 30 — Vista de Mostrador en Lista, Tarjetas Amplias, Alto Contraste en Menú Lateral y Búsqueda Multi-Token en BD
+
+- **Fecha:** 2026-11-05
+- **Rama Git:** eat/inventario-carga-masiva
+- **Entregables:**
+  - **Selector de Vista Dual en POS (Punto 9 Resuelto):** Se incorporaron botones toggle [ Modo Cuadrícula ⊞ ] y [ Modo Lista Mostrador ☰ ] en la barra superior del POS, con persistencia en localStorage. La **Vista de Lista de Mostrador** muestra los nombres de los repuestos al 100% completos sin ningún recorte, ideal para leer descripciones técnicas largas sin tener que agregarlos al ticket.
+  - **Tarjetas POS Optimizadas:** Ancho mínimo ampliado de 205px a 260px, soporte para 4 líneas de título con tipografía blanca de alto contraste (#ffffff, ont-weight: 700).
+  - **Alto Contraste en Menú Lateral:** Sobreescritura global de tokens CSS de Angular Material MDC (--mdc-list-list-item-label-text-color, --mat-nav-list-item-label-text-color, etc.) en styles.scss, logrando texto blanco #ffffff e íconos azul cielo #38bdf8 100% nítidos sobre fondo oscuro.
+  - **Corrección de Búsqueda por Tokens en BD:** En ProductoRepository.cs, se aisló la variable del closure en C# (string t = token;) y se extendió la búsqueda a Nombre, CodigoParte, MarcaVehiculo y MarcaRepuesto.
+- **Lecciones Aprendidas:**
+  - **Variables de Componentes MDC de Angular Material:** Los estilos encapsulados de Angular Material 17+ sobreescriben selectores CSS estándar. Para componentes del layout principal como mat-nav-list, es imperativo configurar las variables custom properties de Material a nivel global en styles.scss.
+
+### Hito 31 — Finalización Fase 1 POS: Corrección Flexbox Vertical, Bloqueo Físico de Stock, Desacople SRP y Doble Fila de Píldoras
+
+- **Fecha:** 2026-11-06
+- **Rama Git:** `feat/inventario-carga-masiva`
+- **Entregables:**
+  - **Desacoplamiento Arquitectónico (SRP):** Reducción de `pos.component.ts` a un orquestador ligero (<40 líneas), delegando la búsqueda y presentación a `PosCatalogComponent` y la canasta, clientes y checkout a `PosTicketComponent`.
+  - **Doble Fila de Píldoras Ergonómicas:** Fila 1 de Marcas Populares (`TODAS`, `CHEVROLET`, `RENAULT`, etc.) y Fila 2 de Tipos (`TODOS`, `FAROLAS`, `STOPS`, etc.) con filtrado reactivo cruzado (`Texto AND Marca AND Tipo`) mediante `computed()`.
+  - **Control Defensivo y Bloqueo de Tarjeta:** Deshabilitación visual estricta cuando `stockDisponibleVisual <= 0` (opacidad 0.45, `cursor: not-allowed`, `pointer-events: none` y botón `disabled`), complementado con guardas a nivel de servicio en `PosCartService.agregarProducto` y `actualizarCantidad`.
+  - **Corrección de Layout Flexbox Vertical:** Estructuración de `.product-pos-card` en tres bloques (`.card-header`, `.card-body`, `.card-footer`), anclando el precio y botón al fondo con `margin-top: auto` y eliminando cualquier flotación desbordada.
+  - **Accesibilidad en Menú Lateral:** Enlaces inactivos a `#cbd5e1`, íconos a `#94a3b8` y hover en `rgba(255, 255, 255, 0.08)`.
+  - **Consumidor Final Estándar:** Identificación predeterminada `111111111111` / `CLIENTE MOSTRADOR` con purga inmediata del nombre si el documento cambia o no coincide en el directorio DIAN.
+- **Lecciones Aprendidas:**
+  - **Flujo Vertical Estándar vs `position: absolute` en Tarjetas Dinámicas:** En catálogos con descripciones de longitud variable, el uso de posicionamiento absoluto para elementos de pie (como el precio o botón de compra) tiende a colapsar o flotar sobre el contenido cuando el texto se expande a 2 o 3 líneas. El uso de Flexbox vertical estándar (`flex-direction: column`) con `min-height` estable en el cuerpo y `margin-top: auto` en el footer garantiza que el precio permanezca en la base sin importar la altura del título.
+  - **Control Estricto de Clics y `pointer-events` al Agotar Stock:** Deshabilitar únicamente el botón interno de una tarjeta interactiva es insuficiente si la tarjeta completa escucha eventos de clic. Para evitar incrementos accidentales o condiciones de carrera que superen el inventario físico, es indispensable aplicar `pointer-events: none` y `cursor: not-allowed` en el contenedor padre (`.disabled-card`), respaldado por guardas defensivas a nivel de lógica en el componente y en el servicio de carrito.

@@ -55,27 +55,53 @@ export class PosCartService {
   );
 
   /**
-   * Incorpora un producto a la canasta. Si ya existe, incrementa su volumen controlando el stock disponible.
+   * Incorpora un producto a la canasta validando estrictamente el stock físico existente.
+   * Si ya existe, incrementa su volumen hasta el límite de existencias.
    * @param producto Objeto del catálogo de repuestos seleccionado.
    * @returns Objeto indicando el resultado de la operación y el mensaje descriptivo si falló.
    */
   agregarProducto(producto: Producto): { exito: boolean; mensaje?: string } {
-    const listadoActual = this._items();
-    const indice = listadoActual.findIndex(
-      (i) => i.producto.codigo === producto.codigo,
-    );
+    // Guarda defensiva: Validación de existencia física disponible
+    if (producto.stockActual <= 0) {
+      return {
+        exito: false,
+        mensaje: `No hay unidades disponibles del repuesto "${producto.nombre}".`,
+      };
+    }
 
+    const listadoActual = this._items();
+
+    // Normalización de identificadores para búsqueda infalible del repuesto
+    const prodId = producto.id && producto.id !== '00000000-0000-0000-0000-000000000000' ? producto.id : null;
+    const prodCodigo = (producto.codigo || '').trim().toUpperCase();
+    const prodNombre = (producto.nombre || '').trim().toUpperCase();
+
+    // 1. Buscar si el repuesto ya está presente en el ticket
+    const indice = listadoActual.findIndex((i) => {
+      if (prodId && i.producto.id && i.producto.id !== '00000000-0000-0000-0000-000000000000') {
+        if (i.producto.id === prodId) return true;
+      }
+      const itemCodigo = (i.producto.codigo || '').trim().toUpperCase();
+      if (prodCodigo && itemCodigo && prodCodigo === itemCodigo) {
+        return true;
+      }
+      const itemNombre = (i.producto.nombre || '').trim().toUpperCase();
+      return prodNombre.length > 0 && prodNombre === itemNombre;
+    });
+
+    // 2. Si ya existe, validar que no supere el stock físico antes de sumar +1
     if (indice > -1) {
       const itemExistente = listadoActual[indice];
-      if (itemExistente.cantidad + 1 > producto.stockActual) {
+      if (itemExistente.cantidad >= producto.stockActual) {
         return {
           exito: false,
-          mensaje: `Existencias agotadas para "${producto.nombre}".`,
+          mensaje: `Stock máximo alcanzado: No es posible agregar más unidades de "${producto.nombre}" (${producto.stockActual} u. disponibles).`,
         };
       }
 
       const copiaActualizada = [...listadoActual];
       const nuevaCantidad = itemExistente.cantidad + 1;
+
       copiaActualizada[indice] = {
         ...itemExistente,
         cantidad: nuevaCantidad,
@@ -86,13 +112,7 @@ export class PosCartService {
       return { exito: true };
     }
 
-    if (producto.stockActual < 1) {
-      return {
-        exito: false,
-        mensaje: `Existencias agotadas para "${producto.nombre}".`,
-      };
-    }
-
+    // 3. Si no existe, agregarlo como nuevo ítem en el carrito
     const costo = producto.costo || 0;
     const precioBase =
       producto.precioVenta > 0
@@ -121,7 +141,7 @@ export class PosCartService {
   /**
    * Modifica directamente la cantidad de unidades de un repuesto validando existencias.
    * Si la cantidad resultante es cero o negativa, retira el producto del carrito.
-   * @param codigo Código SKU único del repuesto.
+   * @param codigo Código SKU único del repuesto o identificador del producto.
    * @param cambio Incremento o decremento relativo (+1, -1).
    * @returns Objeto con el estado de la operación.
    */
@@ -135,7 +155,8 @@ export class PosCartService {
       .map((item) => {
         if (item.producto.codigo === codigo) {
           const nuevaCantidad = item.cantidad + cambio;
-          if (nuevaCantidad > item.producto.stockActual) {
+          // Guarda defensiva: No permitir superar el stock disponible
+          if (cambio > 0 && nuevaCantidad > item.producto.stockActual) {
             mensajeAdvertencia = `Stock máximo alcanzado: ${item.producto.stockActual} unidades disponibles.`;
             return item;
           }
@@ -158,38 +179,31 @@ export class PosCartService {
   }
 
   /**
-   * Permite la edición flexible de precios en el mostrador validando políticas contra costo y cero.
-   * @param codigo Código SKU del repuesto.
-   * @param nuevoPrecio Valor monetario digitado por el cajero.
-   * @returns Objeto con las validaciones de negocio emitidas.
+   * Modifica el precio unitario pactado para un repuesto asegurando margen comercial.
+   * Regla de negocio MACROLATAS: Se permite negociación siempre que precioUnitario >= costoUnitario.
+   * @param codigo Código SKU único del repuesto a modificar.
+   * @param nuevoPrecio Monto comercial acordado con el cliente en mostrador.
+   * @returns Objeto con las banderas de validación técnica y financiera.
    */
   actualizarPrecioUnitario(
     codigo: string,
     nuevoPrecio: number,
-  ): { esInvalido: boolean; esBajoCosto: boolean; costo: number } {
-    const precioNumerico = Number(nuevoPrecio) || 0;
-    let resultadoValidacion = {
-      esInvalido: false,
-      esBajoCosto: false,
-      costo: 0,
-    };
+  ): { esBajoCosto: boolean; esInvalido: boolean; costo: number } {
+    const precio = Number(nuevoPrecio) || 0;
+    let esBajoCosto = false;
+    let esInvalido = precio <= 0;
+    let costoRef = 0;
 
     const actualizados = this._items().map((item) => {
       if (item.producto.codigo === codigo) {
-        const esInvalido = precioNumerico <= 0;
-        const esBajoCosto =
-          item.costoUnitario > 0 && precioNumerico < item.costoUnitario;
-
-        resultadoValidacion = {
-          esInvalido,
-          esBajoCosto,
-          costo: item.costoUnitario,
-        };
+        costoRef = item.costoUnitario;
+        esBajoCosto = costoRef > 0 && precio < costoRef;
+        esInvalido = precio <= 0;
 
         return {
           ...item,
-          precioUnitario: precioNumerico,
-          subtotal: item.cantidad * precioNumerico,
+          precioUnitario: precio,
+          subtotal: item.cantidad * precio,
           esBajoCosto,
           esPrecioInvalido: esInvalido,
         };
@@ -198,21 +212,26 @@ export class PosCartService {
     });
 
     this._items.set(actualizados);
-    return resultadoValidacion;
+
+    return {
+      esBajoCosto,
+      esInvalido,
+      costo: costoRef,
+    };
   }
 
   /**
-   * Elimina un ítem específico de la orden activa.
-   * @param codigo Código SKU del repuesto a excluir.
+   * Remueve definitivamente un repuesto del ticket.
+   * @param codigo Identificador del producto a retirar.
    */
   eliminarItem(codigo: string): void {
-    this._items.update((elementos) =>
-      elementos.filter((item) => item.producto.codigo !== codigo),
+    this._items.update((previos) =>
+      previos.filter((i) => i.producto.codigo !== codigo),
     );
   }
 
   /**
-   * Restablece el carrito dejando la orden activa en ceros.
+   * Vacía íntegramente la canasta de compras.
    */
   limpiar(): void {
     this._items.set([]);

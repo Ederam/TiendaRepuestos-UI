@@ -42,8 +42,12 @@
                 <span>{{ fechaEmision | date:'dd/MM/yyyy HH:mm' }}</span>
             </div>
             <div class="meta-row">
+                <span>VENDEDOR:</span>
+                <strong>{{ data.vendedorNombre || 'Atención Mostrador' }}</strong>
+            </div>
+            <div class="meta-row">
                 <span>CLIENTE:</span>
-                <span>{{ data.clienteNombre || 'Cliente Mostrador' }}</span>
+                <span>{{ data.clienteNombre || 'Consumidor Final' }}</span>
             </div>
             @if (data.clienteDocumento) {
             <div class="meta-row">
@@ -73,7 +77,7 @@
                     <td class="col-cant">{{ item.cantidad }}</td>
                     <td class="col-desc">
                         <span class="item-name">{{ item.producto.nombre }}</span>
-                        <small class="item-code">[{{ item.producto.codigo }}]</small>
+                        <small class="item-code notranslate" translate="no">[{{ item.producto.codigo }}]</small>
                     </td>
                     <td class="col-precio">
                         {{ item.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}
@@ -98,7 +102,7 @@
         <footer class="ticket-footer">
             <p class="thank-you-msg">¡GRACIAS POR SU COMPRA!</p>
             <p class="despachos-tag">DESPACHOS A NIVEL NACIONAL</p>
-            <small class="software-credits">Sistema Comercial MACROLATAS v1.0</small>
+            <p class="legal-warranty">Garantía por defecto de fábrica. Conserve este comprobante.</p>
         </footer>
     </div>
 </div>

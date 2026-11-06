@@ -7,7 +7,7 @@
                 Importa catálogos propios de MACROLATAS o listados compartidos de aliados (Latas y Bomperes / Eurocar).
             </p>
         </div>
-        <a mat-stroked-button routerLink="/inventario">
+        <a mat-stroked-button routerLink="/inventario" class="btn-back">
             <mat-icon>arrow_back</mat-icon>
             <span>Volver a Inventario</span>
         </a>
@@ -58,7 +58,7 @@
                 </span>
             </div>
             <div class="preview-actions">
-                <button mat-button (click)="cancelar()" [disabled]="isProcesando()">
+                <button mat-button (click)="cancelar()" [disabled]="isProcesando()" class="btn-discard">
                     Descartar
                 </button>
                 <button mat-flat-button color="primary" class="btn-confirm" (click)="confirmarImportacion()"
@@ -69,24 +69,28 @@
             </div>
         </div>
 
-        <!-- Tabla de Datos Extraídos -->
+        <!-- Tabla de Datos Extraídos con Protección Total contra Campos Vacíos -->
         <div class="table-responsive">
             <table mat-table [dataSource]="itemsPrevisualizacion().slice(0, 50)" class="preview-table">
                 <ng-container matColumnDef="codigo">
                     <th mat-header-cell *matHeaderCellDef>Código</th>
                     <td mat-cell *matCellDef="let row">
-                        <span class="badge-code">{{ row.codigo }}</span>
+                        <span class="badge-code notranslate" translate="no">{{ row.codigo || 'SIN-COD' }}</span>
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="nombre">
                     <th mat-header-cell *matHeaderCellDef>Descripción</th>
-                    <td mat-cell *matCellDef="let row">{{ row.nombre }}</td>
+                    <td mat-cell *matCellDef="let row">
+                        <strong class="item-name">{{ row.nombre || '— Sin Descripción —' }}</strong>
+                    </td>
                 </ng-container>
 
                 <ng-container matColumnDef="marca">
                     <th mat-header-cell *matHeaderCellDef>Marca</th>
-                    <td mat-cell *matCellDef="let row">{{ row.marcaRepuesto }}</td>
+                    <td mat-cell *matCellDef="let row">
+                        <span class="badge-brand notranslate" translate="no">{{ row.marcaRepuesto || 'GENÉRICO' }}</span>
+                    </td>
                 </ng-container>
 
                 <ng-container matColumnDef="condicion">
@@ -94,7 +98,7 @@
                     <td mat-cell *matCellDef="let row" class="text-center">
                         <span class="badge-pill" [class.badge-new]="row.condicion === 'Nuevo'"
                             [class.badge-second]="row.condicion === 'Segunda'">
-                            {{ row.condicion }}
+                            {{ row.condicion || 'Nuevo' }}
                         </span>
                     </td>
                 </ng-container>
@@ -102,33 +106,37 @@
                 <ng-container matColumnDef="origen">
                     <th mat-header-cell *matHeaderCellDef class="text-center">Origen</th>
                     <td mat-cell *matCellDef="let row" class="text-center">
-                        <span class="badge-pill badge-origin">{{ row.origen }}</span>
+                        <span class="badge-pill badge-origin">
+                            {{ row.origen === 'PROPIO_MACROLATAS' ? 'MACROLATAS' : (row.origen === 'ALIADO_EUROCAR' ? 'EUROCAR' : 'LATAS') }}
+                        </span>
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="ubicacion">
                     <th mat-header-cell *matHeaderCellDef>Ubicación</th>
-                    <td mat-cell *matCellDef="let row">{{ row.ubicacion }}</td>
+                    <td mat-cell *matCellDef="let row">
+                        <span class="location-tag">{{ row.ubicacion || 'BODEGA PRINCIPAL' }}</span>
+                    </td>
                 </ng-container>
 
                 <ng-container matColumnDef="costo">
                     <th mat-header-cell *matHeaderCellDef class="text-right">Costo</th>
-                    <td mat-cell *matCellDef="let row" class="text-right">
-                        {{ row.costo | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    <td mat-cell *matCellDef="let row" class="text-right cost-val">
+                        {{ (row.costo || 0) | currency:'COP':'symbol-narrow':'1.0-0' }}
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="precio">
                     <th mat-header-cell *matHeaderCellDef class="text-right">Precio Venta</th>
-                    <td mat-cell *matCellDef="let row" class="text-right income-cell">
-                        {{ row.precioVenta | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    <td mat-cell *matCellDef="let row" class="text-right price-val">
+                        {{ (row.precioVenta || 0) | currency:'COP':'symbol-narrow':'1.0-0' }}
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="stock">
                     <th mat-header-cell *matHeaderCellDef class="text-center">Cant.</th>
                     <td mat-cell *matCellDef="let row" class="text-center">
-                        <strong>{{ row.stockActual }}</strong>
+                        <span class="stock-badge">{{ row.stockActual || 1 }}</span>
                     </td>
                 </ng-container>
 
@@ -139,7 +147,7 @@
 
         @if (itemsPrevisualizacion().length > 50) {
         <div class="preview-footer-note">
-            <small>* Mostrando las primeras 50 referencias como muestra de verificación previa.</small>
+            <small>* Mostrando las primeras 50 referencias como muestra de verificación previa de un total de {{ itemsPrevisualizacion().length }}.</small>
         </div>
         }
     </mat-card>

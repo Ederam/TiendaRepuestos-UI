@@ -35,9 +35,9 @@ export class EurocarParserStrategy implements ExcelParserStrategy {
     const cantBase = ExcelNumericUtils.parse(row['Cant']);
     const stockActual = cantEuro > 0 ? cantEuro : cantBase > 0 ? cantBase : 1;
 
-    const ubicacion = String(
-      row['UBI EURO'] || row['Personalizado14'] || 'BODEGA EUROCAR',
-    ).trim();
+    const ubicacionCruda = String(
+      row['UBI EURO'] || row['Personalizado14'] || '',
+    ).trim().toUpperCase();
 
     return [
       {
@@ -48,7 +48,7 @@ export class EurocarParserStrategy implements ExcelParserStrategy {
         marcaVehiculo: this.extraerVehiculo(nombre),
         condicion: this.esSegunda ? 'Segunda' : 'Nuevo',
         origen: 'ALIADO_EUROCAR',
-        ubicacion,
+        ubicacion: ubicacionCruda ? ubicacionCruda : 'BODEGA EUROCAR',
         costo: Math.round(precioVenta * 0.8), // Margen comercial estimado
         precioVenta,
         stockActual,
@@ -61,6 +61,7 @@ export class EurocarParserStrategy implements ExcelParserStrategy {
     if (desc.includes('TYC')) return 'TYC';
     if (desc.includes('DEPO')) return 'DEPO';
     if (desc.includes('TAIWAN')) return 'TAIWÁN';
+    if (desc.includes('FITAM')) return 'FITAM';
     return 'GENÉRICO';
   }
 
@@ -69,6 +70,12 @@ export class EurocarParserStrategy implements ExcelParserStrategy {
     if (desc.includes('AUDI')) return 'AUDI';
     if (desc.includes('RENAULT')) return 'RENAULT';
     if (desc.includes('CHEVROLET')) return 'CHEVROLET';
+    if (desc.includes('MAZDA')) return 'MAZDA';
+    if (desc.includes('NISSAN')) return 'NISSAN';
+    if (desc.includes('TOYOTA')) return 'TOYOTA';
+    if (desc.includes('FORD')) return 'FORD';
+    if (desc.includes('HYUNDAI')) return 'HYUNDAI';
+    if (desc.includes('KIA')) return 'KIA';
     return 'MULTIMARCA';
   }
 }
