@@ -7,7 +7,7 @@ Este documento reúne los casos de prueba estructurados para certificar el siste
 ## 🔐 1. Credenciales y Cuentas de Acceso
 
 | Perfil            | Correo Electrónico        | Contraseña     | Alcance de Permisos                                   |
-| ----------------- | ------------------------- | -------------- | ----------------------------------------------------- |
+| :---------------- | :------------------------ | :------------- | :---------------------------------------------------- |
 | **Administrador** | `admin@macrolatas.com`    | `Password123*` | Acceso total: POS, Inventario, Carga Masiva, Reportes |
 | **Vendedor**      | `vendedor@macrolatas.com` | `Password123*` | Restringido exclusivamente al Punto de Venta (POS)    |
 | **Técnico / Dev** | `camilo@repuestos.com`    | `Password123*` | Administrador de pruebas técnicas                     |
@@ -22,8 +22,8 @@ Este documento reúne los casos de prueba estructurados para certificar el siste
 
 1. **Inicio como Administrador:** Comprobar acceso a POS, Inventario / Catálogo y Reportes.
 2. **Inicio como Vendedor:** Comprobar que en la barra lateral solo figura `Punto de Venta (POS)`.
-3. **Bloqueo por URL (Guards):** Intentar ingresar directamente a `http://localhost:4200/inventario` con rol Vendedor. Debe redirigir y bloquear.
-4. **Servicio Desconectado:** Con el backend apagado, intentar iniciar sesión. Validar que el toast informe con claridad: _"No fue posible conectar con el sistema. Por favor verifique que el servicio esté encendido."_ (sin tecnicismos de CORS).
+3. **Bloqueo por URL (Guards):** Intentar ingresar directamente a `/inventario` con rol Vendedor. Debe redirigir y bloquear el acceso.
+4. **Servicio Desconectado:** Con el backend apagado, intentar iniciar sesión. Validar que el toast informe con claridad: _"No fue posible conectar con el sistema. Por favor verifique que el servicio esté encendido."_ (sin tecnicismos de CORS ni trazas HTTP).
 
 ---
 
@@ -33,7 +33,8 @@ Este documento reúne los casos de prueba estructurados para certificar el siste
 
 1. **Navegador en Modo Claro:** Abrir la aplicación en Edge o Chrome en modo incógnito sin extensiones.
 2. **Validación de Paleta:** Verificar fondo azul noche profundo (`#0b1120`), tarjetas oscuras (`#0f172a`) y textos claros legibles.
-3. **Botones de Acción:** Abrir el modal de creación de cliente y verificar que el botón _"Guardar Cliente"_ muestre fondo azul visible y texto blanco nítido.
+3. **Botones de Acción:** Abrir el modal de creación de cliente y verificar que el botón _"Guardar Cliente"_ muestre fondo visible y texto blanco nítido.
+4. **Layout de Tarjetas en POS:** Confirmar que el contenedor de precio (`.card-footer`) permanezca anclado en la base sin solaparse sobre el nombre del repuesto ni sobre las insignias `IZQ (LH)` / `DER (RH)`.
 
 ---
 
@@ -42,8 +43,9 @@ Este documento reúne los casos de prueba estructurados para certificar el siste
 - **Objetivo:** Comprobar velocidad y precisión en la búsqueda de repuestos.
 
 1. **Chips de Familia Rápida:** En `/inventario`, hacer clic en el chip `Farolas`. La tabla debe proyectar exclusivamente farolas.
-2. **Búsqueda Combinada:** Estando activo el chip `Farolas`, escribir `Accent` en el buscador. El sistema debe combinar ambos términos y traer únicamente farolas de Hyundai Accent en menos de 100 ms.
-3. **Restablecer Filtros:** Hacer clic en `Todas` y limpiar el buscador; la grilla debe retornar a la paginación general.
+2. **Búsqueda Combinada:** Estando activo el chip `Farolas`, escribir `Accent` en el buscador. El sistema debe combinar ambos criterios (Tipo AND Modelo) en menos de 100 ms.
+3. **Filtro Combinado Marca + Tipo:** Seleccionar una marca específica (ej. `Chevrolet`) y luego pulsar una píldora de tipo. Debe proyectar solo los repuestos que cumplan ambas condiciones sin dejar la grilla en blanco de forma errónea.
+4. **Restablecer Filtros:** Hacer clic en `Todas` y limpiar el buscador; la grilla debe retornar a la paginación general.
 
 ---
 
@@ -51,11 +53,12 @@ Este documento reúne los casos de prueba estructurados para certificar el siste
 
 - **Objetivo:** Validar que el operador no tenga que inventar ni memorizar nomenclaturas.
 
-1. **Apertura de Modal:** Pulsar `+ Nuevo Repuesto`. Comprobar dimensiones amplias (ancho ~720px, sin barras de scroll horizontal).
-2. **Plantilla de Un Clic:** Hacer clic en el chip de sugerencia rápida `HYUNDAI ACCENT 98/05 FAROLA LH`.
-3. **Deducción de Código:** Verificar que el campo SKU genere automáticamente la nomenclatura de la libreta física: `F-200-LH-XXX` (`F` de Farola, `200` de Hyundai, `LH` de lado izquierdo).
-4. **Botón Sugerir:** Pulsar el botón de la varita mágica _"Sugerir"_ y corroborar la regeneración del consecutivo sin alterar la descripción.
-5. **Persistencia:** Asignar precio y existencias y pulsar _"Registrar Repuesto"_. Comprobar que en la tabla aparezca con su código visible en badge oscuro (no debe aparecer "Sin código").
+1. **Apertura de Modal:** Pulsar `+ Nuevo Repuesto`. Comprobar dimensiones amplias (~720px, sin barras de scroll horizontal).
+2. **Origen de Inventario por Defecto:** Verificar que el selector de origen venga preseleccionado con `MACROLATAS`.
+3. **Deducción Dinámica de Código por Nombre:** Escribir un nombre de repuesto, modificarlo (ej. de `direccional` a `farola`) y retirar el foco (`blur`/`Tab`); el prefijo del código debe recalcularse al nuevo tipo.
+4. **Protección contra Traducción de Marcas:** Verificar que marcas comerciales como `DEPO` cuenten con aislamiento (`translate="no"`) para evitar que Google Chrome las traduzca automáticamente como _"Depósito"_.
+5. **Botón Sugerir:** Pulsar la varita mágica _"Sugerir"_ y corroborar la regeneración del consecutivo sin alterar la descripción.
+6. **Persistencia:** Asignar precio y existencias y pulsar _"Registrar Repuesto"_. Comprobar que en la tabla aparezca con su código visible en badge oscuro (sin leyendas "Sin código").
 
 ---
 
@@ -68,67 +71,73 @@ Este documento reúne los casos de prueba estructurados para certificar el siste
    - Confirmar importación y comprobar mensaje de resumen: `X creados, Y actualizados`.
 2. **Prueba de Idempotencia:**
    - Volver a seleccionar el mismo archivo inmediatamente después y confirmar.
-   - Resultado esperado: `0 creados, 0 actualizados, todos en sinCambios`. El total en base de datos debe ser exactamente idéntico.
+   - Resultado esperado: `0 creados, 0 actualizados, todos en sinCambios`.
 3. **Coexistencia Multiorigen (Eurocar):**
-   - Seleccionar plantilla Eurocar y subir lote de aliado. Comprobar que se registre bajo origen `ALIADO_EUROCAR` sin chocar con códigos de Macrolatas.
+   - Seleccionar plantilla Eurocar y subir lote de aliado. Comprobar que se registre bajo origen `ALIADO_EUROCAR` sin colisionar con los códigos de Macrolatas.
 
 ---
 
-### CP06 — Operación de Caja y Flexibilidad en Mostrador (POS)
+### CP06 — Operación de Caja y Mostrador Predeterminado (POS)
 
-- **Objetivo:** Agilidad operativa en el mostrador del 7 de Agosto.
+- **Objetivo:** Agilidad operativa en el mostrador físico del 7 de Agosto.
 
-1. **Cliente Mostrador por Defecto:** Al iniciar una venta, el cliente asignado debe ser automáticamente _"Consumidor Final / Mostrador"_.
-2. **Interruptor de Factura Electrónica:** Al activar el switch de factura electrónica, debe desplegar la búsqueda de cliente por Cédula/NIT o Nombre.
-3. **Negociación de Precios:** Permitir editar el precio unitario del repuesto directamente en el ticket para acuerdos de mostrador, validando que no sea inferior al costo de compra.
-4. **Emisión de Ticket:** Completar el cobro y comprobar la apertura del comprobante térmico de 80mm listo para imprimir o guardar en PDF.
+1. **Cliente Mostrador por Defecto:** Al abrir `/pos`, el cliente asignado en el panel lateral debe ser automáticamente _"Venta de Mostrador - Consumidor Final (1111111111)"_.
+2. **Interruptor de Factura Electrónica:** Al activar el switch de factura electrónica, debe ocultarse el badge de mostrador y habilitarse la búsqueda de cliente por Cédula/NIT o Nombre.
+3. **Limpieza Predictiva en Facturación:** Si se ingresa una cédula/NIT no registrada, el campo del nombre debe limpiarse automáticamente y desplegar la opción _"Cliente no registrado. [+ Crear ahora]"_.
+4. **Emisión de Ticket:** Completar el cobro y comprobar la apertura del comprobante térmico de 80mm listo para imprimir o guardar en PDF, mostrando vendedor y datos de cabecera.
 
 ---
 
-### CP07 — Analítica y Reportes
+### CP07 — Integridad de Stock, Acumulación en Ticket y Búsqueda en POS
+
+- **Objetivo:** Prevenir sobreventas, repetición de items en el ticket y desconfiguración visual del catálogo.
+
+1. **Incremento Acumulativo de Items:**
+   - Seleccionar un repuesto del catálogo con stock > 1.
+   - Hacer clic nuevamente sobre el mismo repuesto.
+   - **Resultado:** No debe agregarse una segunda fila en el ticket; la fila existente debe incrementar su campo `cantidad` a `2`.
+2. **Bloqueo Estricto de Stock Agotado (Existencias = 0):**
+   - Seleccionar un repuesto que tenga exactamente `1` unidad en existencia.
+   - Al agregarlo al ticket, su `stockDisponibleVisual` pasará a `0`.
+   - **Resultado:** La tarjeta del catálogo debe atenuarse de inmediato (opacidad reducida, cursor `not-allowed`, `pointer-events: none`) y su botón `+` debe deshabilitarse (`disabled="true"`). Nuevos clics no deben disparar eventos ni sumar unidades por encima del límite físico.
+3. **Guarda Defensiva en Controlador:**
+   - Intentar forzar la invocación de `agregarProducto()` con stock <= 0.
+   - **Resultado:** La función debe abortar la ejecución inmediatamente sin alterar el subtotal ni el arreglo del ticket.
+4. **Búsqueda por Año en el Catálogo del POS:**
+   - Ingresar un año o rango en el buscador del POS (ej. `2015` o `98/05`).
+   - **Resultado:** Las tarjetas filtradas deben renderizarse conservando todos sus atributos: precio unitario legible, descripción completa, badge de código y chips de lado `LH` / `RH` (sin tarjetas en blanco o sin precio).
+
+---
+
+### CP08 — Negociación de Precios y Régimen Fiscal en Mostrador
+
+- **Objetivo:** Verificar la flexibilidad de precios pactados sin vender a pérdida.
+
+1. **Descuento Acordado:**
+   - En el ticket de venta, modificar el campo _"P. Unit"_ de un repuesto a un valor pactado (superior al costo de compra).
+   - Comprobar que subtotal, IVA (si aplica) y total a cobrar se recalculen al instante.
+2. **Bloqueo de Venta por Debajo del Costo:**
+   - Modificar el _"P. Unit"_ a un valor inferior al costo registrado en el inventario.
+   - **Resultado:** El input debe resaltarse en rojo y mostrar la advertencia _"⚠️ Por debajo del costo"_, impidiendo liquidar la venta en esas condiciones.
+
+---
+
+### CP09 — Módulo de Clientes y Facturación Fiscal (DIAN)
+
+- **Objetivo:** Certificar la persistencia de clientes comerciales en base de datos.
+
+1. **Herencia de Datos al Diálogo de Registro:**
+   - Habiendo digitado documento y nombre no registrados en el POS, presionar _"+ Crear ahora"_.
+   - El diálogo `ClienteDialogComponent` debe abrirse con los campos ya prellenados.
+2. **Persistencia en PostgreSQL:**
+   - Completar correo y datos fiscales, y hacer clic en _"Guardar Cliente"_.
+   - Comprobar respuesta HTTP `201 Created` y asignación automática del cliente al ticket actual.
+
+---
+
+### CP10 — Analítica y Reportes de Cierre
 
 - **Objetivo:** Trazabilidad de ingresos y alertas de reabastecimiento.
 
-1. **Tarjetas KPI:** Validar actualización de ingresos totales y transacciones completadas.
-2. **Semáforo de Existencias:** Validar que los repuestos con stock menor o igual al mínimo muestren la alerta roja de advertencia.
-
-### CP08 — Operación de Venta en Mostrador, Precios Negociables y Régimen Fiscal
-
-- **Objetivo:** Verificar la fluidez de caja en el mostrador del 7 de Agosto y la capacidad de pactar precios.
-
-1. **Venta Rápida por Mostrador (Flujo Predeterminado):**
-   - Navegar al Punto de Venta (`/pos`).
-   - Validar que en el panel derecho aparece seleccionado _"Venta de Mostrador - Consumidor Final (222222222222)"_.
-   - Hacer clic en una tarjeta de repuesto con existencias para añadirlo al ticket.
-   - Pulsar directamente el botón rojo _"Cobrar"_.
-   - **Resultado:** La venta se liquida al instante, emite el ticket térmico y limpia el carrito sin pedir datos fiscales.
-
-2. **Negociación de Precios en el Carrito (Subir o Bajar Precio):**
-   - Añadir al ticket un repuesto con precio estándar (ej: `$180.000` y costo `$120.000`).
-   - En el campo numérico _"P. Unit"_ del ticket, modificar el valor a `$165.000` (descuento acordado).
-   - Comprobar que el subtotal de la línea y el botón _"Cobrar"_ recalculan el monto de inmediato.
-   - Modificar el precio a `$90.000` (menor al costo): verificar que el input se resalta en rojo y aparece el mensaje de advertencia _"⚠️ Por debajo del costo"_.
-
-3. **Activación de Factura Electrónica (DIAN):**
-   - En el ticket de venta, activar el switch _`¿Factura Electrónica (DIAN)?`_.
-   - Comprobar que el badge de mostrador se oculta y aparecen los campos Cédula/NIT y Nombre.
-   - Escribir en Cédula o NIT los primeros dígitos de un cliente existente: comprobar que el autocompletado sugiere coincidencias.
-   - Si el cliente no existe, pulsar el botón lateral de agregar cliente (`person_add`) para registrarlo en el modal.
-   - Pulsar _"Cobrar"_: la venta se emite asociada al cliente formal.
-
-### CP09 — Módulo de Clientes, Autocompletado y Facturación Fiscal (DIAN)
-
-- **Objetivo:** Certificar la persistencia de clientes comerciales y la eliminación de falsos errores 404 en búsquedas.
-
-1. **Búsqueda Predictiva sin Falsos Positivos:**
-   - Activar el switch de Factura Electrónica en el POS.
-   - Escribir una identificación inexistente (ej. `901234567`).
-   - Comprobar que no se emite ninguna alerta de error y se proyecta el banner de sugerencia _"Cliente no registrado. [+ Crear ahora]"_.
-
-2. **Herencia de Datos al Diálogo de Registro:**
-   - Habiendo digitado documento y nombre en el POS, pulsar _"+ Crear ahora"_.
-   - Validar que el modal `ClienteDialogComponent` abre con ambos campos prellenados sin requerir redigitación.
-
-3. **Persistencia en Base de Datos PostgreSQL:**
-   - Ingresar correo de facturación electrónica y presionar _"Guardar Cliente"_.
-   - Comprobar que la petición `POST /api/Clientes` responde con código `201 Created` y el cliente queda seleccionado en la orden de cobro.
+1. **Tarjetas KPI:** Comprobar actualización inmediata de ingresos diarios y transacciones cerradas tras emitir ventas.
+2. **Semáforo de Existencias:** Validar que los repuestos con stock menor o igual al mínimo muestren la alerta visual roja en la tabla de inventario.
