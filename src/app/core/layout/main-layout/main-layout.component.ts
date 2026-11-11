@@ -22,6 +22,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatDialog } from '@angular/material/dialog';
+import { UsuarioDialogComponent } from '../../../features/usuarios/usuario-dialog/usuario-dialog.component';
 
 // Core Services & Constants
 import { AuthService } from '../../services/auth/auth.service';
@@ -53,6 +55,7 @@ import { ROLES } from '../../constants/roles.constants';
 export class MainLayoutComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
   readonly navItems: readonly NavItem[] = MENU_PRINCIPAL;
 
   /** Signal derivado del usuario actual en sesión */
@@ -66,5 +69,15 @@ export class MainLayoutComponent {
    */
   onLogout(): void {
     this.authService.logout();
+  }
+
+  /** Abre el modal de creación de usuarios (solo visible para Administrador). */
+  abrirCrearUsuario(): void {
+    if (!this.isAdmin()) return;
+    this.dialog.open(UsuarioDialogComponent, {
+      width: '460px',
+      maxWidth: '95vw',
+      panelClass: 'dark-dialog-panel',
+    });
   }
 }

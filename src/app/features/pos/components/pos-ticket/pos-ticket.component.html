@@ -19,46 +19,56 @@
         <div class="ticket-items-list">
             @for (item of carrito(); track item.producto.codigo) {
             <div class="ticket-item-row" [class.warning-cost]="item.esBajoCosto || item.esPrecioInvalido">
-                <div class="item-info">
-                    <span class="item-name notranslate" translate="no">{{ item.producto.nombre }}</span>
-                    <span class="item-code notranslate" translate="no">{{ item.producto.codigo || 'SIN-COD' }}</span>
+                <!-- Fila 1 (100% ancho): Nombre comercial completo + Badge SKU/Lado -->
+                <div class="item-row-top">
+                    <span class="item-name notranslate" translate="no" [matTooltip]="item.producto.nombre"
+                        matTooltipPosition="above">{{ item.producto.nombre }}</span>
+                    <div class="item-badges">
+                        <span class="item-code notranslate" translate="no">{{ item.producto.codigo || 'SIN-COD' }}</span>
+                        @if (obtenerPosicionLado(item.producto.nombre); as lado) {
+                        <span class="side-badge" [ngClass]="lado.clase">{{ lado.texto }}</span>
+                        }
+                    </div>
                 </div>
 
-                <!-- Modificador de Cantidad -->
-                <div class="quantity-controls">
-                    <button mat-icon-button class="btn-qty" (click)="actualizarCantidad(item.producto.codigo, -1)"
-                        aria-label="Disminuir cantidad">
-                        <mat-icon>remove</mat-icon>
-                    </button>
-                    <span class="qty-val">{{ item.cantidad }}</span>
-                    <button mat-icon-button class="btn-qty" (click)="actualizarCantidad(item.producto.codigo, 1)"
-                        aria-label="Aumentar cantidad">
-                        <mat-icon>add</mat-icon>
-                    </button>
-                </div>
+                <!-- Fila 2: Controles de cantidad, input de P. Unitario y subtotal alineados -->
+                <div class="item-row-bottom">
+                    <div class="quantity-controls">
+                        <button mat-icon-button class="btn-qty" (click)="actualizarCantidad(item.producto.codigo, -1)"
+                            aria-label="Disminuir cantidad">
+                            <mat-icon>remove</mat-icon>
+                        </button>
+                        <span class="qty-val">{{ item.cantidad }}</span>
+                        <button mat-icon-button class="btn-qty" (click)="actualizarCantidad(item.producto.codigo, 1)"
+                            aria-label="Aumentar cantidad">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                    </div>
 
-                <!-- Precio Unitario Negociable con Validación de Costo -->
-                <div class="price-edit-box">
-                    <span class="lbl-unit">P. Unit:</span>
-                    <input type="number" [ngModel]="item.precioUnitario"
-                        (ngModelChange)="actualizarPrecioUnitario(item.producto.codigo, $event)"
-                        class="input-unit-price" [class.under-cost]="item.esBajoCosto || item.esPrecioInvalido"
-                        matTooltip="Editar precio unitario acordado en mostrador" />
-                </div>
+                    <div class="price-edit-box">
+                        <span class="lbl-unit">P. Unit:</span>
+                        <input type="text" inputmode="numeric" [value]="item.precioUnitario"
+                            (input)="onPrecioInput($event, item.producto.codigo)"
+                            (focus)="$any($event.target).select()"
+                            (blur)="$any($event.target).value = item.precioUnitario"
+                            class="input-unit-price" [class.under-cost]="item.esBajoCosto || item.esPrecioInvalido"
+                            matTooltip="Editar precio unitario acordado en mostrador" />
+                    </div>
 
-                <!-- Subtotal y Eliminar -->
-                <div class="item-total-col">
-                    <span class="item-subtotal">{{ item.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                    <button mat-icon-button class="btn-remove" (click)="eliminarDelCarrito(item.producto.codigo)"
-                        aria-label="Eliminar repuesto">
-                        <mat-icon>delete_outline</mat-icon>
-                    </button>
+                    <div class="item-total-col">
+                        <span class="item-subtotal">{{ item.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                        <button mat-icon-button class="btn-remove" (click)="eliminarDelCarrito(item.producto.codigo)"
+                            aria-label="Eliminar repuesto">
+                            <mat-icon>delete_outline</mat-icon>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Alertas de Margen Comercial -->
                 @if (item.esBajoCosto) {
                 <div class="cost-alert-msg">
-                    ⚠️ Precio menor al costo ($ {{ item.costoUnitario | number:'1.0-0' }}). Ajuste el precio para cobrar.
+                    ⚠️ Precio menor al costo ($ {{ item.costoUnitario | number:'1.0-0' }}). Ajuste el precio para
+                    cobrar.
                 </div>
                 }
                 @if (item.esPrecioInvalido) {
@@ -163,4 +173,3 @@
         </button>
     </div>
 </div>
-

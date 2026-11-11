@@ -1,7 +1,13 @@
-<div class="pos-layout">
+<div class="pos-layout" [class.ticket-collapsed]="!ticketVisible()">
     <!-- Panel Izquierdo: Catálogo de Repuestos y Filtros Ergonómicos -->
-    <app-pos-catalog class="pos-catalog-section" />
+    <app-pos-catalog
+        class="pos-catalog-section"
+        [ticketVisible]="ticketVisible()"
+        [cantidadEnTicket]="cantidadItemsTicket()"
+        (toggleTicket)="alternarTicket()" />
 
-    <!-- Panel Derecho: Ticket de Venta, Cliente y Cobro -->
+    <!-- Panel Derecho: Ticket de Venta, Cliente y Cobro (Colapsable en laptops) -->
+    @if (ticketVisible()) {
     <app-pos-ticket class="pos-ticket-panel" (ventaExitosa)="onVentaRegistrada()" />
+    }
 </div>

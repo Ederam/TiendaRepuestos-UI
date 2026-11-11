@@ -45,28 +45,39 @@ export class ProductoHttpService extends ProductoService {
   private readonly http: HttpClient = inject(HttpClient);
   private readonly apiUrl: string = `${environment.apiUrl}/Productos`;
 
+  private mapearCategoriaIdAGuid(categoriaId?: number): string {
+    const id = Number(categoriaId) || 1;
+    return `00000000-0000-0000-0000-${id.toString().padStart(12, '0')}`;
+  }
+
   private normalizarProducto(dto: BackendProductoDto): Producto {
     const parsedCategoriaId = Number(dto.categoriaId);
+    let catIdFinal = 1;
+    if (!isNaN(parsedCategoriaId) && parsedCategoriaId > 0) {
+      catIdFinal = parsedCategoriaId;
+    } else if (typeof dto.categoriaId === 'string') {
+      const match = dto.categoriaId.match(/-0*([1-9]\d*)$/);
+      if (match) {
+        catIdFinal = parseInt(match[1], 10);
+      }
+    }
 
     return {
       id: dto.id ? dto.id.toString() : '00000000-0000-0000-0000-000000000000',
       codigo: (dto.codigoParte || dto.codigo || '').trim().toUpperCase(),
       nombre: dto.nombre,
       descripcion: dto.descripcion,
-      categoriaId:
-        !isNaN(parsedCategoriaId) && parsedCategoriaId > 0
-          ? parsedCategoriaId
-          : 1,
+      categoriaId: catIdFinal,
       nombreCategoria: dto.nombreCategoria || 'General',
       marcaRepuesto: dto.marcaRepuesto || 'GENÉRICO',
       marcaVehiculo: dto.marcaVehiculo || 'MULTIMARCA',
       condicion: (dto.condicion as any) || 'Nuevo',
       origen: (dto.origen as any) || 'PROPIO_MACROLATAS',
       ubicacion: dto.ubicacion || 'BODEGA PRINCIPAL',
-      costo: dto.costo || 0,
-      precioVenta: dto.precioVenta || 0,
-      stockActual: dto.stockActual || 0,
-      stockMinimo: dto.stockMinimo || 2,
+      costo: dto.costo ?? 0,
+      precioVenta: dto.precioVenta ?? 0,
+      stockActual: dto.stockActual ?? 0,
+      stockMinimo: dto.stockMinimo ?? 2,
       activo: dto.activo ?? true,
     };
   }
@@ -137,10 +148,16 @@ export class ProductoHttpService extends ProductoService {
       nombre: request.nombre.trim(),
       codigoParte: request.codigo.trim().toUpperCase(),
       precioVenta: request.precioVenta,
+      costo: request.costo,
       stockInicial: request.stockActual,
       stockMinimo: request.stockMinimo,
       estado: 0,
-      categoriaId: '00000000-0000-0000-0000-000000000000',
+      categoriaId: this.mapearCategoriaIdAGuid(request.categoriaId),
+      ubicacion: request.ubicacion?.trim().toUpperCase() || 'BODEGA PRINCIPAL',
+      marcaRepuesto: request.marcaRepuesto || 'GENÉRICO',
+      marcaVehiculo: request.marcaVehiculo || 'MULTIMARCA',
+      condicion: request.condicion || 'Nuevo',
+      descripcion: request.descripcion?.trim() || '',
     };
 
     return this.http
@@ -157,7 +174,14 @@ export class ProductoHttpService extends ProductoService {
       codigoParte: request.codigo.trim().toUpperCase(),
       precioVenta: request.precioVenta,
       costo: request.costo,
-      categoriaId: '00000000-0000-0000-0000-000000000000',
+      categoriaId: this.mapearCategoriaIdAGuid(request.categoriaId),
+      stockActual: request.stockActual,
+      stockMinimo: request.stockMinimo,
+      ubicacion: request.ubicacion?.trim().toUpperCase(),
+      marcaRepuesto: request.marcaRepuesto,
+      marcaVehiculo: request.marcaVehiculo,
+      condicion: request.condicion,
+      descripcion: request.descripcion?.trim(),
     };
 
     return this.http

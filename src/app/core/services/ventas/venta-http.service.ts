@@ -3,7 +3,7 @@
  */
 
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { VentaService } from './venta.service';
@@ -31,9 +31,14 @@ export class VentaHttpService extends VentaService {
 
   /**
    * Consulta el histórico de comprobantes mediante GET /api/Ventas.
+   * @param vendedorId Filtro opcional por identificador o nombre de vendedor.
    */
-  override obtenerVentas(): Observable<VentaResponse[]> {
-    return this.http.get<VentaResponse[]>(this.apiUrl);
+  override obtenerVentas(vendedorId?: string): Observable<VentaResponse[]> {
+    let params = new HttpParams();
+    if (vendedorId && vendedorId.trim() !== '') {
+      params = params.set('vendedorId', vendedorId.trim());
+    }
+    return this.http.get<VentaResponse[]>(this.apiUrl, { params });
   }
 
   /**

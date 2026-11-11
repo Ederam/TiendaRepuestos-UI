@@ -90,6 +90,8 @@ export interface CargaMasivaItemRequest {
   costo: number;
   precioVenta: number;
   stockActual: number;
+  /** Indica si el código SKU fue autogenerado automáticamente por venir vacío en la planilla */
+  esCodigoAutogenerado?: boolean;
 }
 
 /**

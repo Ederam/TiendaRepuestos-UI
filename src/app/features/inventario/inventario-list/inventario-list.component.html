@@ -31,30 +31,34 @@
             }
         </div>
 
-        <!-- Grupo 1: Píldoras por Tipo de Repuesto -->
-        <div class="filters-group">
-            <span class="group-label">Tipo de Pieza:</span>
-            <div class="pills-wrapper">
-                @for (filtro of filtrosTipo; track filtro.label) {
-                <button type="button" class="pill-chip" [class.active]="filtroTipoSeleccionado() === filtro.valor"
-                    (click)="seleccionarFiltroTipo(filtro.valor)">
-                    {{ filtro.label }}
-                </button>
-                }
+        <!-- Doble Fila Homologada con POS: MARCA y TIPO -->
+        <div class="filters-container-unified">
+            <!-- Fila 1: MARCA -->
+            <div class="filters-pills-row">
+                <span class="pills-row-title">MARCA:</span>
+                <div class="pills-wrapper">
+                    @for (marca of filtrosMarca; track marca.label) {
+                    <button type="button" class="pill-chip brand-pill notranslate" translate="no"
+                        [class.active]="filtroMarcaSeleccionada() === marca.valor"
+                        (click)="seleccionarFiltroMarca(marca.valor)">
+                        {{ marca.label }}
+                    </button>
+                    }
+                </div>
             </div>
-        </div>
 
-        <!-- Grupo 2: Píldoras por Marca de Vehículo -->
-        <div class="filters-group brand-group">
-            <span class="group-label">Marca de Vehículo:</span>
-            <div class="pills-wrapper">
-                @for (marca of filtrosMarca; track marca.label) {
-                <button type="button" class="pill-chip pill-brand notranslate" translate="no"
-                    [class.active]="filtroMarcaSeleccionada() === marca.valor"
-                    (click)="seleccionarFiltroMarca(marca.valor)">
-                    {{ marca.label }}
-                </button>
-                }
+            <!-- Fila 2: TIPO -->
+            <div class="filters-pills-row">
+                <span class="pills-row-title">TIPO:</span>
+                <div class="pills-wrapper">
+                    @for (filtro of filtrosTipo; track filtro.label) {
+                    <button type="button" class="pill-chip notranslate" translate="no"
+                        [class.active]="filtroTipoSeleccionado() === filtro.valor"
+                        (click)="seleccionarFiltroTipo(filtro.valor)">
+                        {{ filtro.label }}
+                    </button>
+                    }
+                </div>
             </div>
         </div>
     </section>

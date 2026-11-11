@@ -618,3 +618,41 @@ Criterios de entrega y verificación:
 
 "Entrega componentes completos respetando SOLID, compila con npm start / ng build y entrega el resumen de archivos modificados."
 
+# URL desplegada del front
+https://tienda-repuestos-ui-xi.vercel.app/pos
+
+
+Ultimas pruebas ejecutadas
+
+Administrador
+camilo@repuestos.com
+Password123*
+
+Vendedor
+vendedor@repuestos.com
+Venta2026*
+
+
+**************
+
+cuando se utilizan los filtros y hay apenas dos o un repuesto la tarejeta se alarga hasta el limite y se ve mal y raro
+cuando hay un producto con disponibilidad mayor a 1 y se agrega uno o varios al ticket, no se ve en pantalla cuantos quedan disponibles
+
+Pruebas de lo desplegado
+CP01 — Control de Acceso, Autenticación y RBAC
+	No deja redireccionar por url si no esta logueado
+	1. **Inicio como Administrador:** Comprobar acceso a POS, Inventario / Catálogo y Reportes. RTA: CORRECTO
+	2. **Inicio como Vendedor:** Comprobar que en la barra lateral solo figura `Punto de Venta (POS)`. RTA: COMO VENDEDOR DEJA VER LOS 3 MENUS, sin embargo al dar click no permite la redireccion y sale el mensaje que debe ser administrador, en mi concepto deberian estar ocultos esos menus
+	3. **Bloqueo por URL (Guards):** Intentar ingresar directamente a `/inventario` con rol Vendedor. Debe redirigir y bloquear el acceso. RTA: Al intentar acceder por url colocando la ruta de inventario u otra no permite y sale la validacion
+	4. **Servicio Desconectado:** RTA: SALE EL MENSAJE CORRECTAMENTE
+CP02 — Ergonomía Visual, Tema y Contrastes (Dark Theme Forzado)
+	1. **Navegador en Modo Claro:** Abrir la aplicación en Edge o Chrome en modo incógnito sin extensiones. RTA: en la oficina no es posible abrir pestañas en modo incognito
+	2. **Validación de Paleta:** Verificar fondo azul noche profundo (`#0b1120`), tarjetas oscuras (`#0f172a`) y textos claros legibles. RTA. A nivel de diseño lo veo bien por ahora
+	3. **Botones de Acción:** Abrir el modal de creación de cliente y verificar que el botón _"Guardar Cliente"_ muestre fondo visible y texto blanco nítido. RTA: Se ve bien el noton de creacion de cliente
+	4. **Layout de Tarjetas en POS:** Confirmar que el contenedor de precio (`.card-footer`) permanezca anclado en la base sin solaparse sobre el nombre del repuesto ni sobre las insignias `IZQ (LH)` / `DER (RH)`. RTA: Lo veo bien, lo que si note es cuando realizo filtros y en la busqeuda apenas encuentra 1 o dos registros la tarjeta se alarga hasta el limite por abajo y se me hace que queda ya mucho espacio vacio.
+CP03 — Catálogo de Inventario y Filtros Híbridos (Píldoras + Texto)
+	1. **Chips de Familia Rápida:** En `/inventario`, hacer clic en el chip `Farolas`. La tabla debe proyectar exclusivamente farolas. RTA: Funcionando correctamente
+	2. **Búsqueda Combinada:** Estando activo el chip `Farolas`, escribir `Accent` en el buscador. El sistema debe combinar ambos criterios (Tipo AND Modelo) en menos de 100 ms. RTA: Filtro funcionando correcto , solo que como comente antes la tarjeta se alarga hacia abajo dejando mucho espacio
+	3. **Filtro Combinado Marca + Tipo:** Seleccionar una marca específica (ej. `Chevrolet`) y luego pulsar una píldora de tipo. Debe proyectar solo los repuestos que cumplan ambas condiciones sin dejar la grilla en blanco de forma errónea. RTA: Justo ene sta prueba seleccione chevrolet y encontro dos registros con la opcion todas en pieza y aparecen 2 registros, uno de ellos dice bumper con "u" y al dar click en la pildor a de BOMPERES no sale nada. Para este caso es mejor editar ese repuesto para que quede con el estandar "BOMPER", ETC. o que seria lo mejor. Esto sucede tanto en la opcion de POS como en inventario. Por otro lado veo diferencias en estos dos modulos con las pildoras. En POS aparecen MARCA y sus pildoras en MAYUSCULAS y debajo TIPO y sus pildoras en MAYUSCULAS. En Catalogo o Inventario aparecen muy distintas. Sale "Tipo de Pieza" Y las Pildoras abajo en otra fila y con la primera en Mayuscula. 
+	4. **Restablecer Filtros:** Hacer clic en `Todas` y limpiar el buscador; la grilla debe retornar a la paginación general. RTA: La limpieza funciona correctamente
+	

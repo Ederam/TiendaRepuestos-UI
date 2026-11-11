@@ -11,14 +11,16 @@
             </div>
         </div>
 
-        <!-- Menú de Navegación -->
+        <!-- Menú de Navegación con Protección RBAC Estructural -->
         <mat-nav-list class="nav-menu">
             @for (item of navItems; track item.route) {
+            @if (!item.adminOnly || isAdmin()) {
             <a mat-list-item [routerLink]="item.route" routerLinkActive="active-link"
                 [routerLinkActiveOptions]="{ exact: item.exact || false }" class="nav-link">
                 <mat-icon matListItemIcon class="nav-icon">{{ item.icon }}</mat-icon>
                 <span matListItemTitle class="nav-label">{{ item.label }}</span>
             </a>
+            }
             }
         </mat-nav-list>
 
@@ -53,6 +55,12 @@
                         <small>{{ currentUser()?.email || 'admin@macrolatas.com' }}</small>
                     </div>
                     <mat-divider></mat-divider>
+                    @if (isAdmin()) {
+                    <button mat-menu-item (click)="abrirCrearUsuario()" class="create-user-item">
+                        <mat-icon>person_add</mat-icon>
+                        <span>+ Crear Usuario</span>
+                    </button>
+                    }
                     <button mat-menu-item (click)="onLogout()" class="logout-item">
                         <mat-icon>logout</mat-icon>
                         <span>Cerrar Sesión</span>

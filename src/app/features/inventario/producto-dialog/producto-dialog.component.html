@@ -1,4 +1,4 @@
-<div class="repuesto-dialog-container">
+<div class="repuesto-dialog-container notranslate" translate="no">
     <!-- Cabecera -->
     <div class="dialog-header">
         <div class="header-icon-title">
@@ -20,6 +20,7 @@
                     <mat-label>Nombre o Descripción Comercial*</mat-label>
                     <input matInput formControlName="nombre" placeholder="Ej: HYUNDAI ACCENT 98/05 FAROLA LH"
                         (input)="sincronizarCodigoConNombre()" (blur)="sincronizarCodigoConNombre()"
+                        class="notranslate" translate="no"
                         autocomplete="off" />
                     @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
                     <mat-error>El nombre del repuesto es obligatorio.</mat-error>
@@ -28,10 +29,10 @@
 
                 <div class="plantillas-bar">
                     <span class="label-sugerido">Copiar plantilla de ejemplo:</span>
-                    <button type="button" class="btn-tag" (click)="copiarPlantilla('HYUNDAI ACCENT 98/05 FAROLA LH')">
+                    <button type="button" class="btn-tag notranslate" translate="no" (click)="copiarPlantilla('HYUNDAI ACCENT 98/05 FAROLA LH')">
                         HYUNDAI ACCENT 98/05 FAROLA LH
                     </button>
-                    <button type="button" class="btn-tag" (click)="copiarPlantilla('CHEVROLET OPTRA 06/10 STOP RH')">
+                    <button type="button" class="btn-tag notranslate" translate="no" (click)="copiarPlantilla('CHEVROLET OPTRA 06/10 STOP RH')">
                         CHEVROLET OPTRA 06/10 STOP RH
                     </button>
                 </div>
@@ -70,7 +71,7 @@
 
                 <mat-form-field appearance="outline">
                     <mat-label>Marca / Fabricante</mat-label>
-                    <mat-select formControlName="marcaRepuesto">
+                    <mat-select formControlName="marcaRepuesto" class="notranslate" translate="no">
                         @for (m of marcasRepuesto; track m) {
                         <mat-option [value]="m" class="notranslate" translate="no">{{ m }}</mat-option>
                         }
@@ -100,7 +101,7 @@
 
                 <mat-form-field appearance="outline">
                     <mat-label>Ubicación Física en Bodega</mat-label>
-                    <input matInput formControlName="ubicacion" placeholder="BODEGA PRINCIPAL" />
+                    <input matInput formControlName="ubicacion" placeholder="BODEGA PRINCIPAL" class="notranslate" translate="no" />
                 </mat-form-field>
             </div>
 
@@ -130,7 +131,7 @@
             <!-- Fila 6: Detalle -->
             <mat-form-field appearance="outline" class="w-full">
                 <mat-label>Detalle Adicional / Aplicación (Opcional)</mat-label>
-                <textarea matInput formControlName="descripcion" rows="2"
+                <textarea matInput formControlName="descripcion" rows="2" class="notranslate" translate="no"
                     placeholder="Observaciones o compatibilidad del repuesto"></textarea>
             </mat-form-field>
         </form>
