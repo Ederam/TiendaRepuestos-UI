@@ -29,6 +29,17 @@ export interface LoginResponse {
 }
 
 /**
+ * Payload para el registro de usuarios en POST /api/Auth/registro.
+ * rol: 1 = Vendedor, 2 = Administrador.
+ */
+export interface RegistroUsuarioRequest {
+  nombreCompleto: string;
+  email: string;
+  password: string;
+  rol: 1 | 2;
+}
+
+/**
  * Estado mínimo de sesión conservado en memoria y almacenamiento local.
  * Excluye credenciales sensibles y almacena únicamente claims de presentación.
  */
@@ -39,4 +50,14 @@ export interface UserSession {
   rol: RolUsuario;
   /** Nombre completo del usuario */
   nombreCompleto: string;
+}
+
+/**
+ * Resumen de usuario activo devuelto por GET /api/Usuarios/vendedores.
+ */
+export interface VendedorResumen {
+  id: string;
+  nombreCompleto: string;
+  email: string;
+  rol?: string;
 }

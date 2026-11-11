@@ -25,13 +25,26 @@
                     <mat-icon>view_list</mat-icon>
                 </button>
             </div>
+
+            <!-- Botón de Colapso / Expansión del Panel de Ticket para Laptops -->
+            <button type="button" class="btn-toggle-ticket"
+                [class.collapsed]="!ticketVisible()"
+                [class.has-items]="!ticketVisible() && cantidadEnTicket() > 0"
+                (click)="toggleTicket.emit()"
+                [matTooltip]="ticketVisible() ? 'Ocultar panel de ticket para expandir el catálogo' : 'Mostrar panel de ticket de venta'">
+                @if (ticketVisible()) {
+                <span>&lt; Ocultar Ticket</span>
+                } @else {
+                <span>Ver Ticket ({{ cantidadEnTicket() }}) &gt;</span>
+                }
+            </button>
         </div>
 
         <!-- Doble Fila de Píldoras Ergonómicas para Mostrador -->
         <div class="pos-filters-container">
             <!-- Fila 1: Marcas Populares -->
             <div class="filters-pills-row brand-row">
-                <span class="pills-row-title">Marca:</span>
+                <span class="pills-row-title">MARCA:</span>
                 <div class="pills-scroll">
                     @for (marca of filtrosMarca; track marca.label) {
                     <button type="button" class="pos-pill-btn brand-pill notranslate" translate="no"
@@ -45,7 +58,7 @@
 
             <!-- Fila 2: Tipos de Autoparte -->
             <div class="filters-pills-row">
-                <span class="pills-row-title">Tipo:</span>
+                <span class="pills-row-title">TIPO:</span>
                 <div class="pills-scroll">
                     @for (tipo of filtrosTipo; track tipo.label) {
                     <button type="button" class="pos-pill-btn notranslate" translate="no"
@@ -84,15 +97,21 @@
                 </span>
                 }
 
-                <!-- Stock Disponible o Unidades en Ticket -->
+                <!-- Stock Disponible o Balance Dinámico en Ticket -->
                 @if (obtenerCantidadEnCarrito(prod); as cantEnCarrito) {
-                <span class="stock-chip in-cart-badge">
-                    En ticket ({{ cantEnCarrito }})
+                @if (prod.stockDisponibleVisual > 0) {
+                <span class="badge-stock-balance notranslate" translate="no">
+                    <b>{{ cantEnCarrito }}</b> en ticket &bull; <b>{{ prod.stockDisponibleVisual }}</b> disp.
                 </span>
+                } @else {
+                <span class="badge-stock-agotado notranslate" translate="no">
+                    <b>{{ cantEnCarrito }}</b> en ticket &bull; Agotado
+                </span>
+                }
                 } @else {
                 <span class="stock-chip" [class.out-of-stock]="prod.stockActual <= 0"
                     [class.low-stock]="prod.stockActual > 0 && prod.stockActual <= prod.stockMinimo">
-                    {{ prod.stockActual }} disp.
+                    {{ prod.stockActual > 0 ? (prod.stockActual + ' disp.') : 'Agotado' }}
                 </span>
                 }
             </div>
@@ -173,16 +192,22 @@
                 </div>
             </div>
 
-            <!-- Existencias -->
+            <!-- Existencias con Balance Dinámico -->
             <div class="row-col-stock">
                 @if (obtenerCantidadEnCarrito(prod); as cantEnCarrito) {
-                <span class="stock-chip in-cart-badge">
-                    En ticket ({{ cantEnCarrito }})
+                @if (prod.stockDisponibleVisual > 0) {
+                <span class="badge-stock-balance notranslate" translate="no">
+                    <b>{{ cantEnCarrito }}</b> en ticket &bull; <b>{{ prod.stockDisponibleVisual }}</b> disp.
                 </span>
+                } @else {
+                <span class="badge-stock-agotado notranslate" translate="no">
+                    <b>{{ cantEnCarrito }}</b> en ticket &bull; Agotado
+                </span>
+                }
                 } @else {
                 <span class="stock-chip" [class.out-of-stock]="prod.stockActual <= 0"
                     [class.low-stock]="prod.stockActual > 0 && prod.stockActual <= prod.stockMinimo">
-                    {{ prod.stockActual }} disp.
+                    {{ prod.stockActual > 0 ? (prod.stockActual + ' disp.') : 'Agotado' }}
                 </span>
                 }
             </div>

@@ -4,7 +4,15 @@
  * selección asistida de cliente (Mostrador vs DIAN) y ejecución del cobro (SRP).
  */
 
-import { Component, OnInit, inject, signal, computed, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal,
+  computed,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormControl,
@@ -41,6 +49,7 @@ import {
 import { LISTA_METODOS_PAGO } from '@core/constants/pagos.constants';
 import { TicketDialogComponent } from '../../ticket-dialog/ticket-dialog.component';
 import { ClienteDialogComponent } from '../../cliente-dialog/cliente-dialog.component';
+import { obtenerPosicionLado } from '@core/utils/sku-generator.util';
 
 /**
  * Constantes institucionales para la venta de mostrador
@@ -79,6 +88,7 @@ export class PosTicketComponent implements OnInit {
   @Output() ventaExitosa = new EventEmitter<VentaResponse>();
 
   readonly metodosPago = LISTA_METODOS_PAGO;
+  readonly obtenerPosicionLado = obtenerPosicionLado;
 
   // Estado del proceso de venta
   readonly isProcesandoVenta = signal<boolean>(false);
@@ -165,8 +175,31 @@ export class PosTicketComponent implements OnInit {
     });
   }
 
-  actualizarPrecioUnitario(codigo: string, nuevoPrecio: number): void {
-    const val = this.cartService.actualizarPrecioUnitario(codigo, nuevoPrecio);
+  onPrecioInput(event: Event, codigo: string): void {
+    const input = event.target as HTMLInputElement;
+    // Sanitizar entrada numérica eliminando cualquier cero residual a la izquierda
+    const soloDigitos = input.value.replace(/[^\d]/g, '');
+    const rawLimpio = soloDigitos.replace(/^0+(?=\d)/, '');
+
+    if (input.value !== rawLimpio) {
+      input.value = rawLimpio;
+    }
+
+    const precioNumerico = Number(rawLimpio) || 0;
+    this.actualizarPrecioUnitario(codigo, precioNumerico);
+  }
+
+  actualizarPrecioUnitario(codigo: string, valorInput: any): void {
+    // Sanitizar a valor numérico puro eliminando ceros a la izquierda
+    let precioLimpio = 0;
+    if (typeof valorInput === 'string') {
+      const sanitized = valorInput.replace(/^0+(?=\d)/, '');
+      precioLimpio = Number(sanitized) || 0;
+    } else if (typeof valorInput === 'number') {
+      precioLimpio = isNaN(valorInput) ? 0 : valorInput;
+    }
+
+    const val = this.cartService.actualizarPrecioUnitario(codigo, precioLimpio);
     if (val.esInvalido) {
       this.notify.showError('El precio de venta debe ser mayor a cero.');
     } else if (val.esBajoCosto) {
@@ -238,7 +271,10 @@ export class PosTicketComponent implements OnInit {
         if (noEncontrado) {
           this.clienteSeleccionado.set(null);
           this.clienteNomSignal.set('');
-          this.ventaForm.patchValue({ clienteNombre: '' }, { emitEvent: false });
+          this.ventaForm.patchValue(
+            { clienteNombre: '' },
+            { emitEvent: false },
+          );
         }
       },
       error: () => {
@@ -311,7 +347,8 @@ export class PosTicketComponent implements OnInit {
     );
 
     const clienteActual = this.clienteSeleccionado();
-    const documentoFinal = this.clienteDocSignal().trim() || CONSUMIDOR_FINAL_DOC;
+    const documentoFinal =
+      this.clienteDocSignal().trim() || CONSUMIDOR_FINAL_DOC;
     const nombreFinal = this.clienteNomSignal().trim() || CONSUMIDOR_FINAL_NOM;
     const metodoPagoFinal = this.metodoPagoSignal();
     const nombreVendedor =
@@ -363,4 +400,3 @@ export class PosTicketComponent implements OnInit {
     });
   }
 }
-

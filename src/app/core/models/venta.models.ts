@@ -71,6 +71,10 @@ export interface VentaResponse {
   clienteDocumento: string;
   /** Nombre o razón social del cliente */
   clienteNombre: string;
+  /** Identificador del usuario/cajero que atendió la venta */
+  usuarioId?: string | null;
+  /** Nombre completo del vendedor o cajero devuelto por la API */
+  nombreVendedor?: string | null;
   /** Subtotal monetario acumulado antes de impuestos */
   subtotal: number;
   /** Monto de impuesto liquidado */

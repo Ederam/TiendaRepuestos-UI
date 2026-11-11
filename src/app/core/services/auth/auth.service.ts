@@ -6,7 +6,13 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { LoginRequest, LoginResponse, UserSession } from '../../models/auth.models';
+import {
+  LoginRequest,
+  LoginResponse,
+  UserSession,
+  RegistroUsuarioRequest,
+  VendedorResumen,
+} from '../../models/auth.models';
 import { ROLES, RolUsuario } from '../../constants/roles.constants';
 
 const TOKEN_KEY = 'TR_AUTH_TOKEN';
@@ -16,18 +22,38 @@ const USER_KEY = 'TR_AUTH_USER';
 export abstract class AuthService {
   protected readonly router = inject(Router);
 
-  private readonly _currentUser = signal<UserSession | null>(this.getStoredUser());
-  private readonly _token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
+  private readonly _currentUser = signal<UserSession | null>(
+    this.getStoredUser(),
+  );
+  private readonly _token = signal<string | null>(
+    localStorage.getItem(TOKEN_KEY),
+  );
 
   readonly currentUser = this._currentUser.asReadonly();
   readonly token = this._token.asReadonly();
-  readonly isAuthenticated = computed(() => !!this._token() && !this.isTokenExpired());
-  readonly userRole = computed<RolUsuario | null>(() => this._currentUser()?.rol ?? null);
-  readonly isAdmin = computed(() => this._currentUser()?.rol === ROLES.ADMIN);
-  readonly isVendedor = computed(() => this._currentUser()?.rol === ROLES.VENDEDOR);
+  readonly isAuthenticated = computed(
+    () => !!this._token() && !this.isTokenExpired(),
+  );
+  readonly userRole = computed<RolUsuario | null>(
+    () => this._currentUser()?.rol ?? null,
+  );
+  readonly isAdmin = computed(() => {
+    const rol: unknown = this._currentUser()?.rol;
+    return rol === ROLES.ADMIN || rol === 2 || rol === '2';
+  });
+  readonly isVendedor = computed(() => {
+    const rol: unknown = this._currentUser()?.rol;
+    return rol === ROLES.VENDEDOR || rol === 1 || rol === '1';
+  });
 
   /** Método abstracto a implementar por AuthHttpService o AuthMockService */
   abstract login(credentials: LoginRequest): Observable<LoginResponse>;
+
+  /** Registra un nuevo usuario (solo Administrador) vía POST /api/Auth/registro */
+  abstract registrarUsuario(data: RegistroUsuarioRequest): Observable<any>;
+
+  /** Obtiene la lista de usuarios/vendedores activos vía GET /api/Usuarios/vendedores */
+  abstract obtenerVendedores(): Observable<VendedorResumen[]>;
 
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
@@ -41,7 +67,7 @@ export abstract class AuthService {
     const session: UserSession = {
       email: res.email,
       rol: res.rol,
-      nombreCompleto: res.nombreCompleto
+      nombreCompleto: res.nombreCompleto,
     };
 
     localStorage.setItem(TOKEN_KEY, res.token);

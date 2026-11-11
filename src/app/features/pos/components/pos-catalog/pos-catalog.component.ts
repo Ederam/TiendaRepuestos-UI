@@ -4,7 +4,15 @@
  * modos de visualización (Grid y Lista) y presentación de autopartes (SRP).
  */
 
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal,
+  computed,
+  input,
+  output,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
@@ -26,7 +34,9 @@ import {
   FILTROS_MARCAS_POS,
   FILTROS_TIPOS_POS,
   FiltroRapidoOpcion,
+  coincideSinonimoColision,
 } from '@core/constants/categorias.constants';
+import { obtenerPosicionLado } from '@core/utils/sku-generator.util';
 
 @Component({
   selector: 'app-pos-catalog',
@@ -48,6 +58,14 @@ export class PosCatalogComponent implements OnInit {
   private readonly productoService = inject(ProductoService);
   private readonly notify = inject(NotificationService);
   readonly cartService = inject(PosCartService);
+
+  /** Estado de visibilidad del panel de ticket y contador de ítems (para laptops) */
+  readonly ticketVisible = input<boolean>(true);
+  readonly cantidadEnTicket = input<number>(0);
+  readonly toggleTicket = output<void>();
+
+  /** Helper compartido para detección de lado de colisión */
+  readonly obtenerPosicionLado = obtenerPosicionLado;
 
   /** Píldoras de filtros ergonómicos para mostrador */
   readonly filtrosMarca: readonly FiltroRapidoOpcion[] = FILTROS_MARCAS_POS;
@@ -83,28 +101,32 @@ export class PosCatalogComponent implements OnInit {
       // 1. Filtro por Texto (multi-token AND)
       if (texto) {
         const tokens = texto.split(/\s+/).filter(Boolean);
-        const target = `${prod.nombre} ${prod.codigo} ${prod.marcaRepuesto || ''} ${prod.marcaVehiculo || ''}`.toLowerCase();
+        const target =
+          `${prod.nombre} ${prod.codigo} ${prod.marcaRepuesto || ''} ${prod.marcaVehiculo || ''}`.toLowerCase();
         const coincideTexto = tokens.every((token) => target.includes(token));
         if (!coincideTexto) return false;
       }
 
       // 2. Filtro por Marca de Vehículo
       if (marca) {
-        const targetMarca = `${prod.marcaVehiculo || ''} ${prod.marcaRepuesto || ''} ${prod.nombre}`.toUpperCase();
+        const targetMarca =
+          `${prod.marcaVehiculo || ''} ${prod.marcaRepuesto || ''} ${prod.nombre}`.toUpperCase();
         if (!targetMarca.includes(marca)) return false;
       }
 
-      // 3. Filtro por Tipo de Autoparte
+      // 3. Filtro por Tipo de Autoparte con normalización de sinónimos de colisión
       if (tipo) {
-        const targetTipo = `${prod.nombre} ${prod.descripcion || ''} ${prod.nombreCategoria || ''}`.toUpperCase();
-        if (!targetTipo.includes(tipo)) return false;
+        const targetTipo = `${prod.nombre} ${prod.descripcion || ''} ${prod.nombreCategoria || ''}`;
+        if (!coincideSinonimoColision(targetTipo, tipo)) return false;
       }
 
       return true;
     });
 
     const proyectados = filtrados.map((prod: Producto) => {
-      const enCarrito = itemsCarrito.find((c) => c.producto.codigo === prod.codigo);
+      const enCarrito = itemsCarrito.find(
+        (c) => c.producto.codigo === prod.codigo,
+      );
       const cantidadEnCarrito = enCarrito ? enCarrito.cantidad : 0;
       const stockDisponible = Math.max(0, prod.stockActual - cantidadEnCarrito);
 
@@ -116,8 +138,10 @@ export class PosCatalogComponent implements OnInit {
 
     // Ordenar con existencias primero
     return proyectados.sort((a, b) => {
-      if (a.stockDisponibleVisual > 0 && b.stockDisponibleVisual === 0) return -1;
-      if (a.stockDisponibleVisual === 0 && b.stockDisponibleVisual > 0) return 1;
+      if (a.stockDisponibleVisual > 0 && b.stockDisponibleVisual === 0)
+        return -1;
+      if (a.stockDisponibleVisual === 0 && b.stockDisponibleVisual > 0)
+        return 1;
       return 0;
     });
   });
@@ -125,7 +149,9 @@ export class PosCatalogComponent implements OnInit {
   ngOnInit(): void {
     // Recuperar modo de vista guardado
     try {
-      const vistaGuardada = localStorage.getItem('macrolatas_pos_vista') as 'grid' | 'list';
+      const vistaGuardada = localStorage.getItem('macrolatas_pos_vista') as
+        | 'grid'
+        | 'list';
       if (vistaGuardada === 'grid' || vistaGuardada === 'list') {
         this.modoVista.set(vistaGuardada);
       }
@@ -217,29 +243,21 @@ export class PosCatalogComponent implements OnInit {
     this.buscarProductos();
   }
 
-  /**
-   * Identifica si el repuesto corresponde a lado Izquierdo (LH) o Derecho (RH).
-   */
-  obtenerPosicionLado(nombre: string): { texto: string; clase: string } | null {
-    if (!nombre) return null;
-    const u = nombre.toUpperCase();
-    if (u.includes(' LH') || u.includes('-LH') || u.includes(' IZQ')) {
-      return { texto: 'IZQ (LH)', clase: 'badge-side-lh' };
-    }
-    if (u.includes(' RH') || u.includes('-RH') || u.includes(' DER')) {
-      return { texto: 'DER (RH)', clase: 'badge-side-rh' };
-    }
-    return null;
-  }
-
   /** Cantidad que el producto tiene apartada en el ticket activo */
   obtenerCantidadEnCarrito(producto: Producto): number {
-    const prodId = producto.id && producto.id !== '00000000-0000-0000-0000-000000000000' ? producto.id : null;
+    const prodId =
+      producto.id && producto.id !== '00000000-0000-0000-0000-000000000000'
+        ? producto.id
+        : null;
     const prodCodigo = (producto.codigo || '').trim().toUpperCase();
     const prodNombre = (producto.nombre || '').trim().toUpperCase();
 
     const item = this.cartService.items().find((i) => {
-      if (prodId && i.producto.id && i.producto.id !== '00000000-0000-0000-0000-000000000000') {
+      if (
+        prodId &&
+        i.producto.id &&
+        i.producto.id !== '00000000-0000-0000-0000-000000000000'
+      ) {
         if (i.producto.id === prodId) return true;
       }
       const itemCodigo = (i.producto.codigo || '').trim().toUpperCase();

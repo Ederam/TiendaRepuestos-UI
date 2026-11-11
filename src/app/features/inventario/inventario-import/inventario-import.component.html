@@ -75,14 +75,22 @@
                 <ng-container matColumnDef="codigo">
                     <th mat-header-cell *matHeaderCellDef>Código</th>
                     <td mat-cell *matCellDef="let row">
+                        @if (row.esCodigoAutogenerado) {
+                        <span class="badge-code badge-auto notranslate" translate="no"
+                            matTooltip="Código generado automáticamente por colisión y secuencia">
+                            <mat-icon class="icon-auto">auto_awesome</mat-icon>
+                            <span>Auto: {{ row.codigo }}</span>
+                        </span>
+                        } @else {
                         <span class="badge-code notranslate" translate="no">{{ row.codigo || 'SIN-COD' }}</span>
+                        }
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="nombre">
                     <th mat-header-cell *matHeaderCellDef>Descripción</th>
                     <td mat-cell *matCellDef="let row">
-                        <strong class="item-name">{{ row.nombre || '— Sin Descripción —' }}</strong>
+                        <strong class="item-name notranslate" translate="no">{{ row.nombre || '— Sin Descripción —' }}</strong>
                     </td>
                 </ng-container>
 
@@ -115,21 +123,33 @@
                 <ng-container matColumnDef="ubicacion">
                     <th mat-header-cell *matHeaderCellDef>Ubicación</th>
                     <td mat-cell *matCellDef="let row">
-                        <span class="location-tag">{{ row.ubicacion || 'BODEGA PRINCIPAL' }}</span>
+                        <span class="location-tag notranslate" translate="no">{{ row.ubicacion || 'BODEGA PRINCIPAL' }}</span>
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="costo">
                     <th mat-header-cell *matHeaderCellDef class="text-right">Costo</th>
                     <td mat-cell *matCellDef="let row" class="text-right cost-val">
-                        {{ (row.costo || 0) | currency:'COP':'symbol-narrow':'1.0-0' }}
+                        @if (row.costo > 0) {
+                        {{ row.costo | currency:'COP':'symbol-narrow':'1.0-0' }}
+                        } @else {
+                        <span class="badge-pending-price" matTooltip="Costo en $0 - Pendiente definir valor de adquisición">
+                            Pendiente Precio
+                        </span>
+                        }
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="precio">
                     <th mat-header-cell *matHeaderCellDef class="text-right">Precio Venta</th>
                     <td mat-cell *matCellDef="let row" class="text-right price-val">
-                        {{ (row.precioVenta || 0) | currency:'COP':'symbol-narrow':'1.0-0' }}
+                        @if (row.precioVenta > 0) {
+                        {{ row.precioVenta | currency:'COP':'symbol-narrow':'1.0-0' }}
+                        } @else {
+                        <span class="badge-pending-price" matTooltip="Precio en $0 - Pendiente definir valor de mostrador">
+                            Pendiente Precio
+                        </span>
+                        }
                     </td>
                 </ng-container>
 

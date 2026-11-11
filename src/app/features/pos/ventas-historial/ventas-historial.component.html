@@ -23,13 +23,27 @@
         </div>
     </header>
 
-    <!-- Filtro Reactivo y Tarjetas de Estadísticas -->
-    <section class="toolbar-section">
-        <mat-form-field appearance="outline" class="search-input">
+    <!-- Filtro Reactivo, Selector de Vendedor (Solo Admin) y Tarjetas de Estadísticas -->
+    <section class="toolbar-section" [class.has-vendedor-filter]="isAdmin()">
+        <mat-form-field appearance="outline" class="search-input" subscriptSizing="dynamic">
             <mat-label>Buscar por consecutivo (VTA-00001), NIT o cliente</mat-label>
             <input matInput [formControl]="filtroControl" placeholder="Ej: VTA-00009 o 901234567" />
             <mat-icon matPrefix>search</mat-icon>
         </mat-form-field>
+
+        @if (isAdmin()) {
+        <mat-form-field appearance="outline" class="vendedor-select" subscriptSizing="dynamic">
+            <mat-label>Auditoría por Vendedor</mat-label>
+            <mat-select [value]="vendedorSeleccionado()" (selectionChange)="onVendedorChange($event.value)">
+                <mat-option value="">Todos los vendedores</mat-option>
+                @for (vend of vendedoresDisponibles(); track vend.key) {
+                <mat-option [value]="vend.key" class="notranslate" translate="no">
+                    {{ vend.nombre }}
+                </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+        }
 
         <div class="kpi-card">
             <span class="kpi-label">Comprobantes</span>
@@ -72,8 +86,19 @@
                     <td mat-cell *matCellDef="let v">
                         <div class="cliente-cell">
                             <span class="cli-nombre">{{ v.clienteNombre || 'Consumidor Final' }}</span>
-                            <small class="cli-doc">NIT/CC: {{ v.clienteDocumento || '222222222222' }}</small>
+                            <small class="cli-doc">NIT/CC: {{ v.clienteDocumento || '111111111111' }}</small>
                         </div>
+                    </td>
+                </ng-container>
+
+                <!-- Columna: Atendido por / Vendedor -->
+                <ng-container matColumnDef="vendedor">
+                    <th mat-header-cell *matHeaderCellDef>Atendido por</th>
+                    <td mat-cell *matCellDef="let v">
+                        <span class="vendedor-chip notranslate" translate="no">
+                            <mat-icon class="vendedor-icon">person</mat-icon>
+                            <span>{{ v.nombreVendedor || 'Mostrador' }}</span>
+                        </span>
                     </td>
                 </ng-container>
 

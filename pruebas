@@ -16,49 +16,50 @@ Este documento reúne los casos de prueba estructurados para certificar el siste
 
 ## 📋 2. Matriz de Casos de Prueba (Ejecución Secuencial)
 
-### CP01 — Control de Acceso, Autenticación y RBAC
+### CP01 — Control de Acceso, Autenticación y RBAC `[VALIDADO / SUBSANADO]`
 
-- **Objetivo:** Verificar restricción de rutas y caducidad de tokens.
+- **Objetivo:** Verificar restricción de rutas, aislamiento visual en el DOM por rol y caducidad de tokens.
 
-1. **Inicio como Administrador:** Comprobar acceso a POS, Inventario / Catálogo y Reportes.
-2. **Inicio como Vendedor:** Comprobar que en la barra lateral solo figura `Punto de Venta (POS)`.
+1. **Inicio como Administrador (`rol = 2`):** Comprobar acceso a POS, Inventario / Catálogo y Reportes, además de la opción `+ Crear Usuario` en el menú de perfil.
+2. **Inicio como Vendedor (`rol = 1`):** Comprobar que en la barra lateral solo figura `Punto de Venta (POS)`. Los enlaces `/inventario` y `/reportes` y la opción `+ Crear Usuario` **no se renderizan en el DOM** (`@if (!item.adminOnly || isAdmin())`).
 3. **Bloqueo por URL (Guards):** Intentar ingresar directamente a `/inventario` con rol Vendedor. Debe redirigir y bloquear el acceso.
 4. **Servicio Desconectado:** Con el backend apagado, intentar iniciar sesión. Validar que el toast informe con claridad: _"No fue posible conectar con el sistema. Por favor verifique que el servicio esté encendido."_ (sin tecnicismos de CORS ni trazas HTTP).
 
 ---
 
-### CP02 — Ergonomía Visual, Tema y Contrastes (Dark Theme Forzado)
+### CP02 — Ergonomía Visual, Tema, Rejilla Flexbox/Grid y Contrastes `[VALIDADO / SUBSANADO]`
 
-- **Objetivo:** Garantizar legibilidad idéntica en cualquier pantalla o navegador.
+- **Objetivo:** Garantizar legibilidad idéntica y proporciones estables de tarjetas en cualquier pantalla o navegador.
 
 1. **Navegador en Modo Claro:** Abrir la aplicación en Edge o Chrome en modo incógnito sin extensiones.
 2. **Validación de Paleta:** Verificar fondo azul noche profundo (`#0b1120`), tarjetas oscuras (`#0f172a`) y textos claros legibles.
 3. **Botones de Acción:** Abrir el modal de creación de cliente y verificar que el botón _"Guardar Cliente"_ muestre fondo visible y texto blanco nítido.
-4. **Layout de Tarjetas en POS:** Confirmar que el contenedor de precio (`.card-footer`) permanezca anclado en la base sin solaparse sobre el nombre del repuesto ni sobre las insignias `IZQ (LH)` / `DER (RH)`.
+4. **Layout Flexbox/Grid de Tarjetas en POS:** Confirmar que `.products-grid` aplica `align-items: start; align-content: start;` y altura acotada de tarjetas (sin estiramiento vertical cuando el filtro retorna 1 o 2 resultados) y que `.card-footer` permanece anclado en la base sin solaparse.
 
 ---
 
-### CP03 — Catálogo de Inventario y Filtros Híbridos (Píldoras + Texto)
+### CP03 — Catálogo de Inventario, Píldoras Homologadas y Sinónimos (`BOMPER`/`BUMPER`) `[VALIDADO / SUBSANADO]`
 
-- **Objetivo:** Comprobar velocidad y precisión en la búsqueda de repuestos.
+- **Objetivo:** Comprobar velocidad, homologación visual entre `/pos` e `/inventario` y precisión terminológica en la búsqueda de repuestos.
 
-1. **Chips de Familia Rápida:** En `/inventario`, hacer clic en el chip `Farolas`. La tabla debe proyectar exclusivamente farolas.
-2. **Búsqueda Combinada:** Estando activo el chip `Farolas`, escribir `Accent` en el buscador. El sistema debe combinar ambos criterios (Tipo AND Modelo) en menos de 100 ms.
-3. **Filtro Combinado Marca + Tipo:** Seleccionar una marca específica (ej. `Chevrolet`) y luego pulsar una píldora de tipo. Debe proyectar solo los repuestos que cumplan ambas condiciones sin dejar la grilla en blanco de forma errónea.
-4. **Restablecer Filtros:** Hacer clic en `Todas` y limpiar el buscador; la grilla debe retornar a la paginación general.
+1. **Homologación Visual y de Etiquetas:** Verificar que tanto `/pos` como `/inventario` muestran las filas `MARCA` y `TIPO` en **MAYÚSCULAS** con píldoras oscuras de idéntico tamaño y contraste.
+2. **Normalización de Sinónimos (`BOMPER` ↔ `BUMPER`):** Hacer clic en la píldora `BOMPERES`. Tanto en memoria (mock) como en PostgreSQL, deben proyectarse repuestos registrados con la palabra `BOMPER` como aquellos registrados con `BUMPER`.
+3. **Búsqueda Combinada:** Estando activo el chip `FAROLAS`, escribir `Accent` en el buscador. El sistema debe combinar ambos criterios (Tipo AND Modelo) en menos de 100 ms.
+4. **Filtro Combinado Marca + Tipo:** Seleccionar una marca específica (ej. `CHEVROLET`) y luego pulsar una píldora de tipo. Debe proyectar solo los repuestos que cumplan ambas condiciones.
+5. **Restablecer Filtros:** Hacer clic en `TODAS` / `TODOS` y limpiar el buscador; la grilla debe retornar a la paginación general.
 
 ---
 
-### CP04 — Creación Asistida con SKU Automático y Plantillas Rápidas
+### CP04 — Creación Asistida, SKU Automático y Persistencia Completa en Edición `[VALIDADO / SUBSANADO]`
 
-- **Objetivo:** Validar que el operador no tenga que inventar ni memorizar nomenclaturas.
+- **Objetivo:** Validar deducción de SKU sin fricción y persistencia real en PostgreSQL de categoría, costo y stock mínimo al editar.
 
 1. **Apertura de Modal:** Pulsar `+ Nuevo Repuesto`. Comprobar dimensiones amplias (~720px, sin barras de scroll horizontal).
-2. **Origen de Inventario por Defecto:** Verificar que el selector de origen venga preseleccionado con `MACROLATAS`.
+2. **Origen de Inventario por Defecto:** Verificar que el selector de origen venga preseleccionado con `PROPIO_MACROLATAS`.
 3. **Deducción Dinámica de Código por Nombre:** Escribir un nombre de repuesto, modificarlo (ej. de `direccional` a `farola`) y retirar el foco (`blur`/`Tab`); el prefijo del código debe recalcularse al nuevo tipo.
 4. **Protección contra Traducción de Marcas:** Verificar que marcas comerciales como `DEPO` cuenten con aislamiento (`translate="no"`) para evitar que Google Chrome las traduzca automáticamente como _"Depósito"_.
 5. **Botón Sugerir:** Pulsar la varita mágica _"Sugerir"_ y corroborar la regeneración del consecutivo sin alterar la descripción.
-6. **Persistencia:** Asignar precio y existencias y pulsar _"Registrar Repuesto"_. Comprobar que en la tabla aparezca con su código visible en badge oscuro (sin leyendas "Sin código").
+6. **Persistencia en Creación y Edición (Backend):** Al editar un repuesto existente cambiando **Categoría**, **Costo** y **Stock Mínimo**, confirmar mediante `PUT /api/Productos/{id}` que PostgreSQL persiste efectivamente los nuevos valores tras recargar la tabla.
 
 ---
 
@@ -88,24 +89,23 @@ Este documento reúne los casos de prueba estructurados para certificar el siste
 
 ---
 
-### CP07 — Integridad de Stock, Acumulación en Ticket y Búsqueda en POS
+### CP07 — Integridad de Stock, Layout de Ticket en 2 Niveles y Colapso Ergónomico en POS `[VALIDADO / SUBSANADO]`
 
-- **Objetivo:** Prevenir sobreventas, repetición de items en el ticket y desconfiguración visual del catálogo.
+- **Objetivo:** Prevenir sobreventas, evitar truncamiento de nombres en ticket y optimizar espacio en portátiles de mostrador.
 
-1. **Incremento Acumulativo de Items:**
+1. **Incremento Acumulativo y Balance Dinámico de Stock Remanente:**
    - Seleccionar un repuesto del catálogo con stock > 1.
-   - Hacer clic nuevamente sobre el mismo repuesto.
-   - **Resultado:** No debe agregarse una segunda fila en el ticket; la fila existente debe incrementar su campo `cantidad` a `2`.
-2. **Bloqueo Estricto de Stock Agotado (Existencias = 0):**
-   - Seleccionar un repuesto que tenga exactamente `1` unidad en existencia.
-   - Al agregarlo al ticket, su `stockDisponibleVisual` pasará a `0`.
-   - **Resultado:** La tarjeta del catálogo debe atenuarse de inmediato (opacidad reducida, cursor `not-allowed`, `pointer-events: none`) y su botón `+` debe deshabilitarse (`disabled="true"`). Nuevos clics no deben disparar eventos ni sumar unidades por encima del límite físico.
-3. **Guarda Defensiva en Controlador:**
-   - Intentar forzar la invocación de `agregarProducto()` con stock <= 0.
-   - **Resultado:** La función debe abortar la ejecución inmediatamente sin alterar el subtotal ni el arreglo del ticket.
-4. **Búsqueda por Año en el Catálogo del POS:**
-   - Ingresar un año o rango en el buscador del POS (ej. `2015` o `98/05`).
-   - **Resultado:** Las tarjetas filtradas deben renderizarse conservando todos sus atributos: precio unitario legible, descripción completa, badge de código y chips de lado `LH` / `RH` (sin tarjetas en blanco o sin precio).
+   - Al agregar unidades al ticket, el chip de existencias de la tarjeta debe mostrar `[ X en ticket | Y disp. ]`.
+   - **Resultado:** No debe agregarse una segunda fila en el ticket; la fila existente incrementa `cantidad` y recalcula el remanente visual.
+2. **Bloqueo Estricto de Stock Agotado (`Y <= 0`):**
+   - Al agregar la última unidad disponible (`stockDisponibleVisual <= 0`), el chip debe cambiar a `[ X en ticket | Agotado ]`, la tarjeta se atenúa (`opacity: 0.45`, `cursor: not-allowed`, `pointer-events: none`) y el botón `+` queda deshabilitado.
+3. **Layout del Ticket en 2 Niveles Verticales (`.ticket-item-row`):**
+   - Comprobar en pantallas pequeñas/laptops que la **Fila 1** muestre el nombre comercial completo sin truncamientos agresivos (`matTooltip` en hover) + badge SKU/Lado, ocupando 100% del ancho.
+   - Comprobar que la **Fila 2** alinee controles `- N +`, entrada sanitizada de **P. Unitario** (sin cero residual a la izquierda al tipear tras un `0`) y subtotal.
+4. **Botón de Colapso del Panel de Ticket:**
+   - En la cabecera del catálogo, pulsar `< Ocultar Ticket`. El panel lateral se oculta, la rejilla de repuestos y las píldoras se expanden al 100% del ancho sin scroll horizontal, y el botón cambia a `Ver Ticket (N) >`.
+5. **Guarda Defensiva y Búsqueda por Año:**
+   - Invocaciones con `stock <= 0` abortan sin alterar el ticket; búsquedas por año (ej. `2015` o `98/05`) muestran tarjetas completas sin solapamientos.
 
 ---
 
@@ -135,9 +135,27 @@ Este documento reúne los casos de prueba estructurados para certificar el siste
 
 ---
 
-### CP10 — Analítica y Reportes de Cierre
+### CP10 — Analítica, Reportes de Cierre y Semáforo por Stock Mínimo `[VALIDADO / SUBSANADO]`
 
-- **Objetivo:** Trazabilidad de ingresos y alertas de reabastecimiento.
+- **Objetivo:** Trazabilidad de ingresos y alertas de reabastecimiento con persistencia real en backend.
 
 1. **Tarjetas KPI:** Comprobar actualización inmediata de ingresos diarios y transacciones cerradas tras emitir ventas.
-2. **Semáforo de Existencias:** Validar que los repuestos con stock menor o igual al mínimo muestren la alerta visual roja en la tabla de inventario.
+2. **Semáforo de Existencias y Persistencia de `StockMinimo`:** Editar un repuesto cambiando su `Stock Mínimo` y `Categoría`; verificar mediante `PUT /api/Productos/{id}` su almacenamiento en PostgreSQL y confirmar que los repuestos con `stockActual <= stockMinimo` desplieguen la alerta visual roja en la tabla de inventario.
+
+---
+
+### CP11 — Gestión de Usuarios (Registro de Administrador y Vendedor)
+
+- **Objetivo:** Permitir exclusivamente al Administrador crear cuentas operativas en el sistema consumiendo `POST /api/Auth/registro`.
+
+1. **Visibilidad Restringida por Rol:**
+   - Iniciar sesión como Vendedor (`rol = 1`): comprobar que la opción `+ Crear Usuario` no aparece en el menú del perfil.
+   - Iniciar sesión como Administrador (`rol = 2`): abrir el menú superior derecho de perfil y verificar la presencia de `+ Crear Usuario`.
+2. **Validaciones Reactivas del Modal (`UsuarioDialogComponent`):**
+   - Abrir `+ Crear Usuario` y comprobar tema oscuro corporativo (`#0b1120` / `#0f172a`).
+   - Validar mensajes de error en `Nombre Completo` (< 3 caracteres), `Correo Electrónico` (formato inválido) y `Contraseña` (< 6 caracteres). Comprobar el toggle de mostrar/ocultar contraseña y que el selector `Rol` inicie predeterminado en `Vendedor`.
+3. **Registro de Vendedor (`rol = 1`) y Administrador (`rol = 2`):**
+   - Completar el formulario y pulsar _"Crear Usuario"_.
+   - **Resultado esperado:** Petición `POST /api/Auth/registro` con `{ nombreCompleto, email, password, rol: 1 | 2 }`, despliegue de notificación Toast de confirmación y cierre automático del modal.
+4. **Verificación de Inicio de Sesión:**
+   - Cerrar sesión e ingresar con el nuevo usuario Vendedor creado, confirmando acceso exclusivo a `/pos` y ocultamiento de `/inventario` y `/reportes`.

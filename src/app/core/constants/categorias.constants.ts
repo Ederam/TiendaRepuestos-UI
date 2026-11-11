@@ -24,40 +24,24 @@ export interface FiltroRapidoOpcion {
 }
 
 /**
- * Píldoras de familias y tipos de autoparte (con valor singular coincidente con catálogo).
+ * Píldoras homologadas de familias y tipos de autoparte en MAYÚSCULAS para POS e Inventario.
  */
 export const FILTROS_TIPO_REPUESTO: readonly FiltroRapidoOpcion[] = [
-  { label: 'Todas las piezas', valor: '' },
-  { label: 'Farolas', valor: 'FAROLA' },
-  { label: 'Stops', valor: 'STOP' },
-  { label: 'Bomperes', valor: 'BOMPER' },
-  { label: 'Capots', valor: 'CAPOT' },
-  { label: 'Direccionales', valor: 'DIRECCIONAL' },
-  { label: 'Persianas', valor: 'PERSIANA' },
-  { label: 'Espejos', valor: 'ESPEJO' },
-  { label: 'Guardabarros', valor: 'GUARDABARRO' },
+  { label: 'TODOS', valor: '' },
+  { label: 'FAROLAS', valor: 'FAROLA' },
+  { label: 'STOPS', valor: 'STOP' },
+  { label: 'BOMPERES', valor: 'BOMPER' },
+  { label: 'CAPOTS', valor: 'CAPOT' },
+  { label: 'PERSIANAS', valor: 'PERSIANA' },
+  { label: 'DIRECCIONALES', valor: 'DIRECCIONAL' },
+  { label: 'ESPEJOS', valor: 'ESPEJO' },
+  { label: 'GUARDABARROS', valor: 'GUARDABARRO' },
 ] as const;
 
 /**
- * Píldoras de marcas automotrices más comerciales en MACROLATAS.
+ * Píldoras homologadas de marcas automotrices en MAYÚSCULAS para POS e Inventario.
  */
 export const FILTROS_MARCA_VEHICULO: readonly FiltroRapidoOpcion[] = [
-  { label: 'Todas las marcas', valor: '' },
-  { label: 'Chevrolet', valor: 'CHEVROLET' },
-  { label: 'Renault', valor: 'RENAULT' },
-  { label: 'Mazda', valor: 'MAZDA' },
-  { label: 'Nissan', valor: 'NISSAN' },
-  { label: 'Toyota', valor: 'TOYOTA' },
-  { label: 'Ford', valor: 'FORD' },
-  { label: 'Kia', valor: 'KIA' },
-  { label: 'Hyundai', valor: 'HYUNDAI' },
-  { label: 'Volkswagen', valor: 'VOLKSWAGEN' },
-] as const;
-
-/**
- * Píldoras ergonómicas para mostrador POS - Fila 1: Marcas populares
- */
-export const FILTROS_MARCAS_POS: readonly FiltroRapidoOpcion[] = [
   { label: 'TODAS', valor: '' },
   { label: 'CHEVROLET', valor: 'CHEVROLET' },
   { label: 'RENAULT', valor: 'RENAULT' },
@@ -66,17 +50,51 @@ export const FILTROS_MARCAS_POS: readonly FiltroRapidoOpcion[] = [
   { label: 'HYUNDAI', valor: 'HYUNDAI' },
   { label: 'TOYOTA', valor: 'TOYOTA' },
   { label: 'NISSAN', valor: 'NISSAN' },
+  { label: 'FORD', valor: 'FORD' },
+  { label: 'VOLKSWAGEN', valor: 'VOLKSWAGEN' },
 ] as const;
 
 /**
- * Píldoras ergonómicas para mostrador POS - Fila 2: Tipos de autoparte
+ * Alias de compatibilidad para mostrador POS - Fila 1: Marcas populares (homologado)
  */
-export const FILTROS_TIPOS_POS: readonly FiltroRapidoOpcion[] = [
-  { label: 'TODOS', valor: '' },
-  { label: 'FAROLAS', valor: 'FAROLA' },
-  { label: 'STOPS', valor: 'STOP' },
-  { label: 'BOMPERES', valor: 'BOMPER' },
-  { label: 'CAPOTS', valor: 'CAPOT' },
-  { label: 'PERSIANAS', valor: 'PERSIANA' },
-  { label: 'DIRECCIONALES', valor: 'DIRECCIONAL' },
-] as const;
+export const FILTROS_MARCAS_POS: readonly FiltroRapidoOpcion[] = FILTROS_MARCA_VEHICULO;
+
+/**
+ * Alias de compatibilidad para mostrador POS - Fila 2: Tipos de autoparte (homologado)
+ */
+export const FILTROS_TIPOS_POS: readonly FiltroRapidoOpcion[] = FILTROS_TIPO_REPUESTO;
+
+/**
+ * Diccionario de sinónimos y variantes terminológicas de colisión para búsqueda inteligente.
+ * Normaliza términos equivalentes como BOMPER <-> BUMPER <-> DEFENSA bajo la misma condición.
+ */
+export const SINONIMOS_COLISION: Record<string, readonly string[]> = {
+  BOMPER: ['BOMPER', 'BOMPERES', 'BUMPER', 'BUMPERS', 'DEFENSA', 'DEFENSAS'],
+  BUMPER: ['BOMPER', 'BOMPERES', 'BUMPER', 'BUMPERS', 'DEFENSA', 'DEFENSAS'],
+  FAROLA: ['FAROLA', 'FAROLAS', 'FARO', 'FAROS'],
+  STOP: ['STOP', 'STOPS'],
+  DIRECCIONAL: ['DIRECCIONAL', 'DIRECCIONALES'],
+  CAPOT: ['CAPOT', 'CAPOTS', 'CAPO'],
+  PERSIANA: ['PERSIANA', 'PERSIANAS', 'REJILLA', 'REJILLAS'],
+  ESPEJO: ['ESPEJO', 'ESPEJOS', 'RETROVISOR', 'RETROVISORES'],
+  GUARDABARRO: ['GUARDABARRO', 'GUARDABARROS', 'GUARDAPOLVO'],
+};
+
+/**
+ * Obtiene las variantes de búsqueda de un término de colisión o el término mismo.
+ */
+export function obtenerSinonimosColision(termino: string): readonly string[] {
+  if (!termino) return [];
+  const upper = termino.toUpperCase().trim();
+  return SINONIMOS_COLISION[upper] || [upper];
+}
+
+/**
+ * Evalúa si una cadena de texto contiene el término solicitado o cualquiera de sus sinónimos.
+ */
+export function coincideSinonimoColision(texto: string, termino: string): boolean {
+  if (!termino) return true;
+  const upperTexto = texto.toUpperCase();
+  const variantes = obtenerSinonimosColision(termino);
+  return variantes.some((v) => upperTexto.includes(v));
+}

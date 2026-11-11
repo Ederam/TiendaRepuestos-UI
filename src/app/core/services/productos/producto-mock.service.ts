@@ -17,7 +17,10 @@ import {
   ProductoFilterParams,
 } from '../../models/api-response.models';
 import { MOCK_PRODUCTOS } from '../../mocks/repuestos.mock';
-import { CATEGORIAS_REPUESTOS } from '../../constants/categorias.constants';
+import {
+  CATEGORIAS_REPUESTOS,
+  obtenerSinonimosColision,
+} from '../../constants/categorias.constants';
 
 /**
  * Servicio mock para pruebas y entornos autónomos (como Vercel sin backend público).
@@ -185,7 +188,10 @@ export class ProductoMockService extends ProductoService {
 
       filtrados = filtrados.filter((p: Producto) => {
         const textoBusqueda = `${p.nombre} ${p.codigo} ${p.marcaVehiculo || ''} ${p.marcaRepuesto || ''}`.toLowerCase();
-        return tokens.every((token) => textoBusqueda.includes(token));
+        return tokens.every((token) => {
+          const variantes = obtenerSinonimosColision(token);
+          return variantes.some((v) => textoBusqueda.includes(v.toLowerCase()));
+        });
       });
     }
 

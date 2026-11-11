@@ -2,9 +2,10 @@
  * @fileoverview Adaptador en memoria (Mock) de VentaService para pruebas unitarias y desarrollo offline.
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
 import { VentaService } from './venta.service';
+import { AuthService } from '../auth/auth.service';
 import {
   CreateVentaRequest,
   VentaResponse,
@@ -19,6 +20,7 @@ import { MOCK_PRODUCTOS } from '../../mocks/repuestos.mock';
   providedIn: 'root',
 })
 export class VentaMockService extends VentaService {
+  private readonly authService = inject(AuthService);
   private mockVentas: VentaResponse[] = [];
   private contadorConsecutivo = 1;
 
@@ -55,6 +57,8 @@ export class VentaMockService extends VentaService {
           ? 'Transferencia'
           : 'Tarjeta';
 
+    const usuarioActivo = this.authService.currentUser();
+
     const response: VentaResponse = {
       id: crypto.randomUUID(),
       numeroComprobante: `VTA-${this.contadorConsecutivo.toString().padStart(5, '0')}`,
@@ -62,8 +66,10 @@ export class VentaMockService extends VentaService {
       metodoPago: metodoTexto,
       estado: 'Completada',
       clienteId: request.clienteId ?? null,
-      clienteDocumento: request.clienteDocumento || '222222222222',
-      clienteNombre: request.clienteNombre || 'Consumidor Final',
+      clienteDocumento: request.clienteDocumento || '111111111111',
+      clienteNombre: request.clienteNombre || 'CLIENTE MOSTRADOR',
+      usuarioId: usuarioActivo?.email || 'mock-user',
+      nombreVendedor: usuarioActivo?.nombreCompleto || 'Atención Mostrador',
       subtotal: subtotalCalculado,
       impuesto: 0,
       total: subtotalCalculado,
@@ -76,8 +82,27 @@ export class VentaMockService extends VentaService {
     return of(response).pipe(delay(300));
   }
 
-  override obtenerVentas(): Observable<VentaResponse[]> {
-    return of(this.mockVentas).pipe(delay(200));
+  override obtenerVentas(vendedorId?: string): Observable<VentaResponse[]> {
+    let resultado = [...this.mockVentas];
+
+    if (!this.authService.isAdmin()) {
+      const emailActual = this.authService.currentUser()?.email;
+      const nombreActual = this.authService.currentUser()?.nombreCompleto;
+      resultado = resultado.filter(
+        (v) =>
+          (emailActual && v.usuarioId === emailActual) ||
+          (nombreActual && v.nombreVendedor === nombreActual),
+      );
+    } else if (vendedorId && vendedorId.trim() !== '') {
+      const filtro = vendedorId.trim().toLowerCase();
+      resultado = resultado.filter(
+        (v) =>
+          v.usuarioId?.toLowerCase() === filtro ||
+          v.nombreVendedor?.toLowerCase() === filtro,
+      );
+    }
+
+    return of(resultado).pipe(delay(200));
   }
 
   override obtenerVentaPorId(id: string): Observable<VentaResponse> {

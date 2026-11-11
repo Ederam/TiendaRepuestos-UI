@@ -152,25 +152,26 @@ export class ProductoDialogComponent implements OnInit {
       [Validators.maxLength(100)],
     ],
     costo: [
-      this.data.producto?.costo || 0,
+      this.data.producto?.costo ?? 0,
       [Validators.required, Validators.min(0)],
     ],
     precioVenta: [
-      this.data.producto?.precioVenta || 0,
+      this.data.producto?.precioVenta ?? 0,
       [Validators.required, Validators.min(0)],
     ],
     stockActual: [
-      this.data.producto?.stockActual || 1,
+      this.data.producto?.stockActual ?? 1,
       [Validators.required, Validators.min(0)],
     ],
     stockMinimo: [
-      this.data.producto?.stockMinimo || 2,
+      this.data.producto?.stockMinimo ?? 2,
       [Validators.required, Validators.min(0)],
     ],
   });
 
   /**
-   * Ciclo de inicialización: asigna el código en mayúsculas en modo edición.
+   * Ciclo de inicialización: asigna el código en mayúsculas en modo edición
+   * y garantiza el origen predeterminado PROPIO_MACROLATAS en modo creación.
    */
   ngOnInit(): void {
     if (this.data.modo === 'editar' && this.data.producto?.codigo) {
@@ -180,31 +181,46 @@ export class ProductoDialogComponent implements OnInit {
         ?.setValue(this.data.producto.codigo.toUpperCase(), {
           emitEvent: false,
         });
+    } else {
+      // Garantizar que en modo creación el origen predeterminado sea PROPIO_MACROLATAS
+      if (!this.form.get('origen')?.value) {
+        this.form.patchValue({ origen: 'PROPIO_MACROLATAS' });
+      }
     }
   }
 
   /**
-   * Se ejecuta cuando el usuario escribe manualmente en el campo código.
-   * Marca que el código fue personalizado para no sobreescribirlo automáticamente.
+   * Se ejecuta cuando el usuario escribe en el campo código.
+   * Si el usuario borra por completo el código, rehabilita la sugerencia automática del SKU.
    */
   onCodigoManualInput(): void {
-    this.codigoEditadoManualmente = true;
+    const val = this.form.get('codigo')?.value;
+    this.codigoEditadoManualmente = !!(val && val.toString().trim().length > 0);
   }
 
   /**
-   * Sincroniza o sugiere el código SKU a partir del nombre comercial.
-   * Si no ha sido editado manualmente por el operador, se actualiza automáticamente.
+   * Sincroniza o sugiere dinámicamente el código SKU a partir del nombre comercial.
+   * Se activa al escribir y en el evento blur de la descripción comercial.
+   * Si el operador no ha escrito un código manual (o si lo borró), actualiza el SKU.
    */
   sincronizarCodigoConNombre(): void {
-    if (this.data.modo === 'editar' || this.codigoEditadoManualmente) {
+    if (this.data.modo === 'editar' && this.data.producto?.codigo) {
       return;
     }
 
-    const nombreActual: string = this.form.get('nombre')?.value;
-    if (nombreActual && nombreActual.trim().length >= 3) {
-      const sugerido: string = generarCodigoSugerido(nombreActual);
-      if (sugerido) {
-        this.form.patchValue({ codigo: sugerido }, { emitEvent: false });
+    const codigoActual = this.form.get('codigo')?.value;
+    const tieneCodigoManual =
+      this.codigoEditadoManualmente &&
+      codigoActual &&
+      codigoActual.toString().trim().length > 0;
+
+    if (!tieneCodigoManual) {
+      const nombreActual: string = this.form.get('nombre')?.value;
+      if (nombreActual && nombreActual.trim().length >= 3) {
+        const sugerido: string = generarCodigoSugerido(nombreActual);
+        if (sugerido) {
+          this.form.patchValue({ codigo: sugerido }, { emitEvent: false });
+        }
       }
     }
   }

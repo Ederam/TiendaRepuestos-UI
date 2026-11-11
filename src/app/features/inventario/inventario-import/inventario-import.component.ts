@@ -16,6 +16,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { ProductoService } from '@core/services/productos/producto.service';
 import { NotificationService } from '@core/services/notification.service';
@@ -45,6 +46,7 @@ type FormatoPlantilla = 'MACROLATAS' | 'EUROCAR_NUEVO' | 'EUROCAR_SEGUNDA';
     MatSelectModule,
     MatFormFieldModule,
     MatProgressBarModule,
+    MatTooltipModule,
   ],
   templateUrl: './inventario-import.component.html',
   styleUrl: './inventario-import.component.scss',

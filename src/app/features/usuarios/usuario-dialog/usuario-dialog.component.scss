@@ -1,0 +1,74 @@
+.usuario-dialog {
+  background: #0f172a;
+  color: #f8fafc;
+  min-width: 360px;
+
+  .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    background: #0b1120;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+    .title-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .header-icon { color: #38bdf8; }
+
+      h2 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #ffffff;
+      }
+    }
+
+    button { color: #94a3b8; }
+  }
+
+  .dialog-body {
+    padding: 20px 20px 8px !important;
+    background: #0f172a;
+
+    .form-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-top: 6px;
+
+      ::ng-deep {
+        .mdc-text-field--outlined { background-color: #182235 !important; border-radius: 8px; }
+        .mat-mdc-input-element, .mat-mdc-select-value { color: #f8fafc !important; }
+        .mat-mdc-floating-label, .mat-mdc-select-arrow { color: #94a3b8 !important; }
+        .mat-mdc-form-field-icon-suffix .mat-icon { color: #94a3b8; }
+      }
+    }
+  }
+
+  .dialog-footer {
+    padding: 12px 20px 16px;
+    gap: 10px;
+    justify-content: flex-end;
+    background: #0f172a;
+
+    .btn-cancel {
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-create {
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: 700;
+
+      &:disabled {
+        background: #1e293b;
+        color: #64748b;
+      }
+    }
+  }
+}
+

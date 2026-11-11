@@ -107,35 +107,84 @@
       }
     }
 
-    // Píldoras con espaciado y contraste
-    .pills-wrapper {
+    // Contenedor homologado de doble fila de píldoras (MARCA y TIPO)
+    .filters-container-unified {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 8px;
-      padding: 4px 0;
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 14px;
 
-      .pill-chip {
-        background: #182235;
-        color: #cbd5e1;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        padding: 6px 16px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
+      .filters-pills-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
 
-        &:hover {
-          background: #24324d;
-          color: #ffffff;
-          border-color: rgba(56, 189, 248, 0.4);
+        .pills-row-title {
+          font-size: 0.72rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          color: #94a3b8;
+          min-width: 48px;
+          letter-spacing: 0.5px;
         }
 
-        &.active {
-          background: #2563eb;
-          color: #ffffff;
-          border-color: #3b82f6;
-          box-shadow: 0 2px 10px rgba(37, 99, 235, 0.4);
+        &:first-child .pills-row-title {
+          color: #38bdf8;
+        }
+
+        .pills-wrapper {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          padding: 2px 0;
+
+          .pill-chip {
+            background: #182235;
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+
+            &:hover {
+              background: #24324d;
+              color: #ffffff;
+              border-color: rgba(56, 189, 248, 0.4);
+            }
+
+            &.active {
+              background: #2563eb;
+              color: #ffffff;
+              border-color: #3b82f6;
+              box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+            }
+
+            &.brand-pill,
+            &.pill-brand {
+              background: rgba(56, 189, 248, 0.07);
+              border-color: rgba(56, 189, 248, 0.2);
+              color: #93c5fd;
+
+              &:hover {
+                background: rgba(56, 189, 248, 0.18);
+                color: #ffffff;
+              }
+
+              &.active {
+                background: #0284c7;
+                border-color: #38bdf8;
+                color: #ffffff;
+                box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+              }
+            }
+          }
         }
       }
     }

@@ -20,10 +20,11 @@ export abstract class VentaService {
   ): Observable<VentaResponse>;
 
   /**
-   * Obtiene la relación histórica consolidada de todas las ventas emitidas en el establecimiento.
+   * Obtiene la relación histórica consolidada de las ventas emitidas en el establecimiento.
+   * @param vendedorId Identificador opcional del vendedor/usuario para auditar ventas específicas.
    * @returns Observable con el arreglo de comprobantes de venta.
    */
-  abstract obtenerVentas(): Observable<VentaResponse[]>;
+  abstract obtenerVentas(vendedorId?: string): Observable<VentaResponse[]>;
 
   /**
    * Consulta una venta específica por su identificador único (GUID).
